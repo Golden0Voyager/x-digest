@@ -2,35 +2,65 @@
 配置文件
 """
 
-# 监控的 Twitter 账号列表（15 个）
+# 监控的 Twitter 账号列表
 ACCOUNTS = [
-    # AI / 人工智能
-    "karpathy",
-    "sama",
-    "ylecun",
-    "drfeifei",
-    # 航天
-    "elonmusk",
-    "EverydayAstronaut",
-    # 机器人
-    "BostonDynamics",
-    "rodneyabrooks",
-    # 科技经济
-    "naval",
-    "chamath",
-    "realDonaldTrump",
-    # 科技媒体
-    "techreview",
-    "WIRED",
-    "theinformation",
-    "technology",
+    # ===== AI / 人工智能 =====
+    "karpathy",          # Andrej Karpathy - 前特斯拉AI总监
+    "sama",              # Sam Altman - OpenAI CEO
+    "ylecun",            # Yann LeCun - Meta首席科学家
+    "drfeifei",          # 李飞飞 - 斯坦福/World Labs
+    "demaborehssabis",    # Demis Hassabis - DeepMind CEO
+    "daborehAmodei",      # Dario Amodei - Anthropic CEO
+    "DrJimFan",          # Jim Fan - NVIDIA 具身AI
+    "GregBrockman",      # Greg Brockman - OpenAI 联合创始人
+    "kaifulee",          # 李开复 - 创新工场
+    "ilyasut",           # Ilya Sutskever - SSI 联合创始人
+    "AndrewYNg",         # 吴恩达 - AI教育先驱
+
+    # ===== 芯片 / 硬件 =====
+    "nvidia",            # NVIDIA 官方
+    "LisaSu",            # Lisa Su - AMD CEO
+    "JensenHuang",       # Jensen Huang - NVIDIA CEO
+
+    # ===== 航天 =====
+    "elonmusk",          # Elon Musk - SpaceX/Tesla/xAI
+    "SpaceX",            # SpaceX 官方
+    "EverydayAstronaut", # Tim Dodd - 航天科普
+    "blueorigin",        # Blue Origin 官方
+    "NASA",              # NASA 官方
+
+    # ===== 机器人 =====
+    "BostonDynamics",    # Boston Dynamics
+    "rodneyabrooks",     # Rodney Brooks - iRobot创始人
+    "figure_robot",      # Figure AI - 人形机器人
+    "TeslaAI",           # Tesla AI 官方
+
+    # ===== 科技投资 / 经济 =====
+    "naval",             # Naval Ravikant - 投资人+哲学
+    "chamath",           # Chamath - Social Capital
+    "pmarca",            # Marc Andreessen - a16z
+    "paulg",             # Paul Graham - YC 创始人
+    "RayDalio",          # Ray Dalio - 桥水基金
+    "CathieDWood",       # Cathie Wood - ARK Invest
+    "balajis",           # Balaji Srinivasan - 科技+加密
+
+    # ===== 科技媒体 / 分析 =====
+    "techreview",        # MIT Technology Review
+    "WIRED",             # WIRED
+    "theinformation",    # The Information
+    "technology",        # Bloomberg Technology
+    "lexfridman",        # Lex Fridman - 播客/访谈
+    "benthompson",       # Ben Thompson - Stratechery
+
+    # ===== 政治 / 政策 =====
+    "realDonaldTrump",   # Trump - 政策+经济影响
 ]
 
 # 每个账号最多抓取多少条推文
 TWEETS_PER_ACCOUNT = 10
 
 # 只保留最近 N 小时的推文
-HOURS_LOOKBACK = 24
+HOURS_LOOKBACK = 72
 
 # 输出语言
 LANGUAGE = "zh-CN"

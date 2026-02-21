@@ -1,82 +1,127 @@
 """
-使用 Twikit + 浏览器 Cookies 抓取推文
+使用 Playwright 浏览器抓取 Twitter 推文
 """
 
 import asyncio
 import json
 import os
-from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
-from twikit import Client
+from playwright.async_api import async_playwright
 from dotenv import load_dotenv
 
 from config import ACCOUNTS, TWEETS_PER_ACCOUNT, HOURS_LOOKBACK
 
 load_dotenv()
 
-PROXY = "http://127.0.0.1:8118"
-COOKIES_FILE = "cookies.json"
+PROXY = os.getenv("PROXY", "http://127.0.0.1:8118")
 BROWSER_COOKIES_FILE = "browser_cookies.json"
 
 
-def convert_browser_cookies(browser_file: str, output_file: str):
-    """将浏览器导出的 cookies 转换为 Twikit 格式（Netscape/httpx 格式）"""
-    with open(browser_file, "r") as f:
-        browser_cookies = json.load(f)
+def load_browser_cookies() -> list[dict]:
+    """加载浏览器导出的 cookies 并转换为 Playwright 格式"""
+    with open(BROWSER_COOKIES_FILE) as f:
+        cookies = json.load(f)
 
-    # Twikit 使用 httpx，需要简单的 name=value 字典
-    cookies = {}
-    for cookie in browser_cookies:
-        cookies[cookie["name"]] = cookie["value"]
+    pw_cookies = []
+    for c in cookies:
+        pc = {
+            "name": c["name"],
+            "value": c["value"],
+            "domain": c["domain"],
+            "path": c.get("path", "/"),
+            "secure": c.get("secure", True),
+            "httpOnly": c.get("httpOnly", False),
+        }
+        if c.get("expirationDate"):
+            pc["expires"] = c["expirationDate"]
+        ss = c.get("sameSite")
+        if ss == "no_restriction":
+            pc["sameSite"] = "None"
+        elif ss == "lax":
+            pc["sameSite"] = "Lax"
+        elif ss == "strict":
+            pc["sameSite"] = "Strict"
+        pw_cookies.append(pc)
+    return pw_cookies
 
-    with open(output_file, "w") as f:
-        json.dump(cookies, f, indent=2)
 
-    print(f"✅ 已转换 {len(cookies)} 个 cookies → {output_file}")
-    return cookies
-
-
-async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
-    """获取指定用户的最新推文"""
+async def scrape_user_tweets(page, username: str) -> list[dict]:
+    """抓取指定用户的推文"""
     print(f"📥 抓取 @{username} ...")
 
     try:
-        user = await client.get_user_by_screen_name(username)
-        if not user:
-            print(f"  ⚠️  未找到用户 @{username}")
+        await page.goto(
+            f"https://x.com/{username}",
+            wait_until="domcontentloaded",
+            timeout=30000,
+        )
+
+        # 等待推文加载
+        try:
+            await page.wait_for_selector(
+                'article[data-testid="tweet"]', timeout=15000
+            )
+        except Exception:
+            print(f"  ⚠️  未找到推文，可能用户不存在或页面加载失败")
             return []
 
-        tweets = await client.get_user_tweets(user.id, "Tweets", count=TWEETS_PER_ACCOUNT)
+        # 滚动加载更多推文
+        for _ in range(3):
+            await page.evaluate("window.scrollBy(0, 1500)")
+            await page.wait_for_timeout(1500)
 
-        # 时间过滤：只保留最近 N 小时的推文
+        # 提取推文
+        tweets_data = await page.evaluate("""() => {
+            const tweets = [];
+            document.querySelectorAll('article[data-testid="tweet"]').forEach(article => {
+                try {
+                    const textEl = article.querySelector('[data-testid="tweetText"]');
+                    const text = textEl ? textEl.innerText : '';
+                    const timeEl = article.querySelector('time');
+                    const dt = timeEl ? timeEl.getAttribute('datetime') : '';
+                    if (text && dt) {
+                        tweets.push({ text, datetime: dt });
+                    }
+                } catch(e) {}
+            });
+            return tweets;
+        }""")
+
+        # 时间过滤 + 去重
         cutoff = datetime.now(timezone.utc) - timedelta(hours=HOURS_LOOKBACK)
-
+        seen = set()
         result = []
-        for tweet in tweets:
-            # 解析推文时间
-            tweet_time = None
-            if tweet.created_at:
-                try:
-                    tweet_time = datetime.strptime(
-                        tweet.created_at, "%a %b %d %H:%M:%S %z %Y"
-                    )
-                except (ValueError, TypeError):
-                    pass
 
-            # 跳过超出时间范围的推文
-            if tweet_time and tweet_time < cutoff:
+        for t in tweets_data:
+            # 去重
+            text_key = t["text"][:100]
+            if text_key in seen:
+                continue
+            seen.add(text_key)
+
+            # 时间过滤
+            try:
+                tweet_time = datetime.fromisoformat(
+                    t["datetime"].replace("Z", "+00:00")
+                )
+                if tweet_time < cutoff:
+                    continue
+            except (ValueError, TypeError):
                 continue
 
             result.append({
                 "username": username,
-                "text": tweet.text,
-                "created_at": tweet.created_at or "",
-                "likes": tweet.favorite_count or 0,
-                "retweets": tweet.retweet_count or 0,
+                "text": t["text"],
+                "created_at": t["datetime"],
+                "likes": 0,
+                "retweets": 0,
             })
-            text_preview = tweet.text[:60].replace('\n', ' ')
+            text_preview = t["text"][:60].replace("\n", " ")
             print(f"  ✓ {text_preview}...")
+
+            if len(result) >= TWEETS_PER_ACCOUNT:
+                break
 
         if not result:
             print(f"  ✓ 最近 {HOURS_LOOKBACK}h 无新推文")
@@ -90,27 +135,29 @@ async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
 
 async def fetch_all_tweets() -> list[dict]:
     """抓取所有账号的推文"""
-    client = Client("en-US", proxy=PROXY)
+    cookies = load_browser_cookies()
 
-    # 转换并加载浏览器 cookies
-    if not Path(COOKIES_FILE).exists():
-        if Path(BROWSER_COOKIES_FILE).exists():
-            convert_browser_cookies(BROWSER_COOKIES_FILE, COOKIES_FILE)
-        else:
-            raise FileNotFoundError(
-                "请先导出浏览器 cookies 到 browser_cookies.json"
-            )
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            proxy={"server": PROXY},
+        )
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/130.0.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 800},
+        )
+        await context.add_cookies(cookies)
+        page = await context.new_page()
 
-    print("🔑 使用浏览器 cookies 登录...")
-    client.load_cookies(COOKIES_FILE)
-    print("✅ Cookies 加载成功\n")
+        all_tweets = []
+        for username in ACCOUNTS:
+            tweets = await scrape_user_tweets(page, username)
+            all_tweets.extend(tweets)
+            await asyncio.sleep(2)
 
-    all_tweets = []
-    for username in ACCOUNTS:
-        tweets = await fetch_user_tweets(client, username)
-        all_tweets.extend(tweets)
-        # 避免请求过快
-        await asyncio.sleep(2)
+        await browser.close()
 
     return all_tweets
 
