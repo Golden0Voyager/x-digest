@@ -6,12 +6,12 @@ import asyncio
 import json
 import os
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 from twikit import Client
 from dotenv import load_dotenv
 
-from config import ACCOUNTS, TWEETS_PER_ACCOUNT
+from config import ACCOUNTS, TWEETS_PER_ACCOUNT, HOURS_LOOKBACK
 
 load_dotenv()
 
@@ -49,8 +49,25 @@ async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
 
         tweets = await client.get_user_tweets(user.id, "Tweets", count=TWEETS_PER_ACCOUNT)
 
+        # 时间过滤：只保留最近 N 小时的推文
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=HOURS_LOOKBACK)
+
         result = []
         for tweet in tweets:
+            # 解析推文时间
+            tweet_time = None
+            if tweet.created_at:
+                try:
+                    tweet_time = datetime.strptime(
+                        tweet.created_at, "%a %b %d %H:%M:%S %z %Y"
+                    )
+                except (ValueError, TypeError):
+                    pass
+
+            # 跳过超出时间范围的推文
+            if tweet_time and tweet_time < cutoff:
+                continue
+
             result.append({
                 "username": username,
                 "text": tweet.text,
@@ -60,6 +77,9 @@ async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
             })
             text_preview = tweet.text[:60].replace('\n', ' ')
             print(f"  ✓ {text_preview}...")
+
+        if not result:
+            print(f"  ✓ 最近 {HOURS_LOOKBACK}h 无新推文")
 
         return result
 
