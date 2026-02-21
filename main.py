@@ -5,6 +5,7 @@ X (Twitter) 摘要生成器 - 主程序
 """
 
 import os
+import asyncio
 from datetime import datetime
 from pathlib import Path
 
@@ -83,7 +84,7 @@ def main():
     print("🚀 X-Digest 启动\n")
     
     # 使用 Twikit 抓取推文
-    all_tweets = fetch_all_tweets()
+    all_tweets = asyncio.run(fetch_all_tweets())
     
     print(f"\n📊 共抓取 {len(all_tweets)} 条推文\n")
     

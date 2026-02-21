@@ -11,7 +11,7 @@ ACCOUNTS = [
     "drfeifei",
     # 航天
     "elonmusk",
-    "EverydayAstro",
+    "EverydayAstronaut",
     # 机器人
     "BostonDynamics",
     "rodneyabrooks",
@@ -20,7 +20,7 @@ ACCOUNTS = [
     "chamath",
     "realDonaldTrump",
     # 科技媒体
-    "MITTechReview",
+    "techreview",
     "WIRED",
     "theinformation",
     "technology",

@@ -1,6 +1,5 @@
 """
-使用 Twikit 抓取推文（无需 Twitter API Key）
-需要 Twitter 账号登录
+使用 Twikit + 浏览器 Cookies 抓取推文
 """
 
 import asyncio
@@ -16,35 +15,26 @@ from config import ACCOUNTS, TWEETS_PER_ACCOUNT
 
 load_dotenv()
 
+PROXY = "http://127.0.0.1:8118"
 COOKIES_FILE = "cookies.json"
+BROWSER_COOKIES_FILE = "browser_cookies.json"
 
 
-async def login(client: Client):
-    """登录 Twitter 账号"""
-    # 优先使用已保存的 cookies
-    if Path(COOKIES_FILE).exists():
-        print("🔑 使用已保存的 cookies 登录...")
-        client.load_cookies(COOKIES_FILE)
-        return
+def convert_browser_cookies(browser_file: str, output_file: str):
+    """将浏览器导出的 cookies 转换为 Twikit 格式（Netscape/httpx 格式）"""
+    with open(browser_file, "r") as f:
+        browser_cookies = json.load(f)
 
-    # 首次登录
-    username = os.getenv("TWITTER_USERNAME")
-    email = os.getenv("TWITTER_EMAIL")
-    password = os.getenv("TWITTER_PASSWORD")
+    # Twikit 使用 httpx，需要简单的 name=value 字典
+    cookies = {}
+    for cookie in browser_cookies:
+        cookies[cookie["name"]] = cookie["value"]
 
-    if not all([username, email, password]):
-        raise ValueError(
-            "首次登录需要设置 TWITTER_USERNAME, TWITTER_EMAIL, TWITTER_PASSWORD"
-        )
+    with open(output_file, "w") as f:
+        json.dump(cookies, f, indent=2)
 
-    print(f"🔑 使用账号 @{username} 登录...")
-    await client.login(
-        auth_info_1=username,
-        auth_info_2=email,
-        password=password,
-        cookies_file=COOKIES_FILE,
-    )
-    print("✅ 登录成功，cookies 已保存")
+    print(f"✅ 已转换 {len(cookies)} 个 cookies → {output_file}")
+    return cookies
 
 
 async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
@@ -52,13 +42,11 @@ async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
     print(f"📥 抓取 @{username} ...")
 
     try:
-        # 获取用户信息
         user = await client.get_user_by_screen_name(username)
         if not user:
             print(f"  ⚠️  未找到用户 @{username}")
             return []
 
-        # 获取推文
         tweets = await client.get_user_tweets(user.id, "Tweets", count=TWEETS_PER_ACCOUNT)
 
         result = []
@@ -66,11 +54,12 @@ async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
             result.append({
                 "username": username,
                 "text": tweet.text,
-                "created_at": tweet.created_at,
+                "created_at": tweet.created_at or "",
                 "likes": tweet.favorite_count or 0,
                 "retweets": tweet.retweet_count or 0,
             })
-            print(f"  ✓ {tweet.text[:60]}...")
+            text_preview = tweet.text[:60].replace('\n', ' ')
+            print(f"  ✓ {text_preview}...")
 
         return result
 
@@ -81,27 +70,31 @@ async def fetch_user_tweets(client: Client, username: str) -> list[dict]:
 
 async def fetch_all_tweets() -> list[dict]:
     """抓取所有账号的推文"""
-    client = Client("en-US")
-    await login(client)
+    client = Client("en-US", proxy=PROXY)
+
+    # 转换并加载浏览器 cookies
+    if not Path(COOKIES_FILE).exists():
+        if Path(BROWSER_COOKIES_FILE).exists():
+            convert_browser_cookies(BROWSER_COOKIES_FILE, COOKIES_FILE)
+        else:
+            raise FileNotFoundError(
+                "请先导出浏览器 cookies 到 browser_cookies.json"
+            )
+
+    print("🔑 使用浏览器 cookies 登录...")
+    client.load_cookies(COOKIES_FILE)
+    print("✅ Cookies 加载成功\n")
 
     all_tweets = []
     for username in ACCOUNTS:
         tweets = await fetch_user_tweets(client, username)
         all_tweets.extend(tweets)
-        # 避免请求过快被限流
+        # 避免请求过快
         await asyncio.sleep(2)
 
     return all_tweets
 
 
-def main():
-    """主函数"""
-    tweets = asyncio.run(fetch_all_tweets())
-    return tweets
-
-
 if __name__ == "__main__":
-    tweets = main()
+    tweets = asyncio.run(fetch_all_tweets())
     print(f"\n📊 共抓取 {len(tweets)} 条推文")
-    for t in tweets:
-        print(f"  @{t['username']}: {t['text'][:60]}...")
