@@ -26,16 +26,22 @@ ACCOUNTS = [
     # ===== 芯片 / 硬件 =====
     "nvidia",            # NVIDIA 官方
     "LisaSu",            # Lisa Su - AMD CEO
+    "AMD",               # AMD 官方
+    "IntelCorp",         # Intel 官方
+    "arm",               # ARM 官方
+    "Qualcomm",          # 高通官方
 
     # ===== 航天 =====
     "SpaceX",            # SpaceX 官方
     "blueorigin",        # Blue Origin 官方
     "NASA",              # NASA 官方
 
-    # ===== 机器人 =====
+    # ===== 机器人 / 自动驾驶 =====
     "BostonDynamics",    # Boston Dynamics
     "rodneyabrooks",     # Rodney Brooks - iRobot创始人
     "figure_robot",      # Figure AI - 人形机器人
+    "Waymo",             # Waymo 自动驾驶
+    "UnitreeRobotics",   # 宇树科技 - 中国机器人
 
     # ===== 科技投资 / 经济 =====
     "naval",             # Naval Ravikant - 投资人+哲学
@@ -56,7 +62,7 @@ ACCOUNTS = [
 
     # ===== 中文科技大V =====
     "kaifulee",          # 李开复 - 创新工场，AI投资
-    "dotey",             # 宝玉 - AI前沿内容翻译/科普，更新极高频
+    "dotey",             # 宝玉 - AI前沿内容翻译/科普
     "op7418",            # 歸藏 - AI产品/设计/工具评测
     "vikingmute",        # Viking - 前端/AI开发实践
     "FinanceYF5",        # AI Will - 财经/AI分析
@@ -65,10 +71,7 @@ ACCOUNTS = [
     "mazhengbo",         # 马正波 - AI创业/产品
     "realGeorgeHotz",    # George Hotz - comma.ai/tinygrad 极客
 
-    # ===== 政治 / 政策 =====
-    "realDonaldTrump",   # Trump - 政策+经济影响
-
-    # ===== AI 公司/实验室官方 =====
+    # ===== AI 公司/实验室官方（海外）=====
     "OpenAI",            # OpenAI 官方
     "AnthropicAI",       # Anthropic 官方
     "GoogleDeepMind",    # Google DeepMind 官方
@@ -79,7 +82,7 @@ ACCOUNTS = [
     "midjourney",        # Midjourney 官方
     "perplexity_ai",     # Perplexity AI 官方
 
-    # ===== 科技公司官方 =====
+    # ===== 科技巨头官方 =====
     "Google",            # Google 官方
     "Microsoft",         # Microsoft 官方
     "Apple",             # Apple 官方
@@ -87,15 +90,34 @@ ACCOUNTS = [
     "Tesla",             # Tesla 官方
     "Amazon",            # Amazon 官方
 
-    # ===== 芯片/硬件官方 =====
-    "AMD",               # AMD 官方
-    "IntelCorp",         # Intel 官方
-    "arm",               # ARM 官方
-    "Qualcomm",          # 高通官方
+    # ===== 政治 / 政策 / 经济机构 =====
+    "realDonaldTrump",   # Trump
+    "POTUS",             # 美国总统官方
+    "WhiteHouse",        # 白宫官方
+    "federalreserve",    # 美联储
+    "IMFNews",           # 国际货币基金组织
+    "WorldBank",         # 世界银行
+    "EU_Commission",     # 欧盟委员会
 
-    # ===== 机器人/自动驾驶官方 =====
-    "Waymo",             # Waymo 自动驾驶
-    "UnitreeRobotics",   # 宇树科技 - 中国机器人
+    # ===== 中国AI公司官方 =====
+    "deepseek_ai",       # DeepSeek 官方
+    "zhipuai",           # 智谱AI 官方
+    "Baidu_Inc",         # 百度官方
+    "BaiduResearch",     # 百度研究院
+    "01ai_yi",           # 零一万物 Yi
+    "SenseTimeGroup",    # 商汤科技
+    "Moonshot_AI",       # Moonshot/Kimi
+
+    # ===== 财经媒体 =====
+    "business",          # Bloomberg 彭博
+    "FT",                # Financial Times 金融时报
+    "TheEconomist",      # The Economist 经济学人
+    "WSJ",               # Wall Street Journal 华尔街日报
+
+    # ===== 中国媒体 =====
+    "CGTNOfficial",      # CGTN 中国国际电视台
+    "XHNews",            # 新华社
+    "PDChina",           # 人民日报
 
     # ===== 科学/研究机构 =====
     "Nature",            # Nature 自然杂志
