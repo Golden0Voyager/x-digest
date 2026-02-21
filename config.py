@@ -119,6 +119,18 @@ ACCOUNTS = [
     "XHNews",            # 新华社
     "PDChina",           # 人民日报
 
+    # ===== AIGC / 生成式AI =====
+    "runwayml",          # Runway - AI视频生成
+    "pika_labs",         # Pika - AI视频生成
+    "sunomusic",         # Suno - AI音乐生成
+    "elevenlabsio",      # ElevenLabs - AI语音
+    "LumaLabsAI",        # Luma AI - 3D生成
+    "adobefirefly",      # Adobe Firefly - AI创意工具
+    "huggingface",       # Hugging Face - 开源AI社区
+    "cursor_ai",         # Cursor - AI编程IDE
+    "v0",                # Vercel v0 - AI前端生成
+    "cognition_labs",    # Cognition Labs - Devin AI编程
+
     # ===== 科学/研究机构 =====
     "Nature",            # Nature 自然杂志
     "ScienceMagazine",   # Science 科学杂志
