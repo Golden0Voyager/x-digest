@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 import tweepy
-from openai import OpenAI
+import dashscope
 from dotenv import load_dotenv
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -20,7 +20,7 @@ load_dotenv()
 
 # 初始化客户端
 twitter_client = tweepy.Client(bearer_token=os.getenv("TWITTER_BEARER_TOKEN"))
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+dashscope.api_key = os.getenv("DASHSCOPE_API_KEY")
 
 # 输出目录
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
@@ -80,8 +80,8 @@ def translate_and_summarize(tweets: list[dict]) -> str:
     
     print("🤖 AI 翻译总结中...")
     
-    response = openai_client.chat.completions.create(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+    response = dashscope.Generation.call(
+        model=os.getenv("DASHSCOPE_MODEL", "qwen-plus"),
         messages=[
             {"role": "system", "content": SUMMARY_PROMPT},
             {"role": "user", "content": input_text},
@@ -89,7 +89,11 @@ def translate_and_summarize(tweets: list[dict]) -> str:
         temperature=0.3,
     )
     
-    return response.choices[0].message.content
+    if response.status_code == 200:
+        return response.output.text
+    else:
+        print(f"⚠️  AI 调用失败：{response.code} - {response.message}")
+        return f"[AI 服务暂时不可用，原始推文见下方]\n\n{input_text}"
 
 
 def save_output(content: str, date: str = None) -> Path:
