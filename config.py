@@ -4,28 +4,31 @@
 
 # 监控的 Twitter 账号列表
 ACCOUNTS = [
-    # ===== AI / 人工智能 =====
+    # ===== AI / 人工智能（核心人物）=====
     "karpathy",          # Andrej Karpathy - 前特斯拉AI总监
     "sama",              # Sam Altman - OpenAI CEO
     "ylecun",            # Yann LeCun - Meta首席科学家
     "drfeifei",          # 李飞飞 - 斯坦福/World Labs
-    "demaborehssabis",    # Demis Hassabis - DeepMind CEO
-    "daborehAmodei",      # Dario Amodei - Anthropic CEO
+    "demishassabis",     # Demis Hassabis - DeepMind CEO
+    "DarioAmodei",       # Dario Amodei - Anthropic CEO
     "DrJimFan",          # Jim Fan - NVIDIA 具身AI
-    "GregBrockman",      # Greg Brockman - OpenAI 联合创始人
-    "kaifulee",          # 李开复 - 创新工场
     "ilyasut",           # Ilya Sutskever - SSI 联合创始人
     "AndrewYNg",         # 吴恩达 - AI教育先驱
+    "mustafasuleyman",   # Mustafa Suleyman - Microsoft AI CEO
+    "hardmaru",          # David Ha - Sakana AI CEO
+
+    # ===== 科技公司 CEO =====
+    "satyanadella",      # Satya Nadella - Microsoft CEO
+    "sundarpichai",      # Sundar Pichai - Google CEO
+    "elonmusk",          # Elon Musk - SpaceX/Tesla/xAI
+    "tim_cook",          # Tim Cook - Apple CEO
 
     # ===== 芯片 / 硬件 =====
     "nvidia",            # NVIDIA 官方
     "LisaSu",            # Lisa Su - AMD CEO
-    "JensenHuang",       # Jensen Huang - NVIDIA CEO
 
     # ===== 航天 =====
-    "elonmusk",          # Elon Musk - SpaceX/Tesla/xAI
     "SpaceX",            # SpaceX 官方
-    "EverydayAstronaut", # Tim Dodd - 航天科普
     "blueorigin",        # Blue Origin 官方
     "NASA",              # NASA 官方
 
@@ -33,7 +36,6 @@ ACCOUNTS = [
     "BostonDynamics",    # Boston Dynamics
     "rodneyabrooks",     # Rodney Brooks - iRobot创始人
     "figure_robot",      # Figure AI - 人形机器人
-    "TeslaAI",           # Tesla AI 官方
 
     # ===== 科技投资 / 经济 =====
     "naval",             # Naval Ravikant - 投资人+哲学
@@ -51,6 +53,17 @@ ACCOUNTS = [
     "technology",        # Bloomberg Technology
     "lexfridman",        # Lex Fridman - 播客/访谈
     "benthompson",       # Ben Thompson - Stratechery
+
+    # ===== 中文科技大V =====
+    "kaifulee",          # 李开复 - 创新工场，AI投资
+    "dotey",             # 宝玉 - AI前沿内容翻译/科普，更新极高频
+    "op7418",            # 歸藏 - AI产品/设计/工具评测
+    "vikingmute",        # Viking - 前端/AI开发实践
+    "FinanceYF5",        # AI Will - 财经/AI分析
+    "9hills",            # 九原客 - 科技投资
+    "0xSunNFT",          # 0xSun - AI+Crypto
+    "mazhengbo",         # 马正波 - AI创业/产品
+    "realGeorgeHotz",    # George Hotz - comma.ai/tinygrad 极客
 
     # ===== 政治 / 政策 =====
     "realDonaldTrump",   # Trump - 政策+经济影响
