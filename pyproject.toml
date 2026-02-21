@@ -10,4 +10,5 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "tenacity>=9.1.4",
     "tweepy>=4.16.0",
+    "twikit>=2.3.3",
 ]
