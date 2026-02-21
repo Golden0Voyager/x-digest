@@ -67,6 +67,40 @@ ACCOUNTS = [
 
     # ===== 政治 / 政策 =====
     "realDonaldTrump",   # Trump - 政策+经济影响
+
+    # ===== AI 公司/实验室官方 =====
+    "OpenAI",            # OpenAI 官方
+    "AnthropicAI",       # Anthropic 官方
+    "GoogleDeepMind",    # Google DeepMind 官方
+    "xAI",               # xAI 官方（Musk）
+    "MistralAI",         # Mistral AI 官方
+    "MetaAI",            # Meta AI 官方
+    "StabilityAI",       # Stability AI 官方
+    "midjourney",        # Midjourney 官方
+    "perplexity_ai",     # Perplexity AI 官方
+
+    # ===== 科技公司官方 =====
+    "Google",            # Google 官方
+    "Microsoft",         # Microsoft 官方
+    "Apple",             # Apple 官方
+    "Meta",              # Meta 官方
+    "Tesla",             # Tesla 官方
+    "Amazon",            # Amazon 官方
+
+    # ===== 芯片/硬件官方 =====
+    "AMD",               # AMD 官方
+    "IntelCorp",         # Intel 官方
+    "arm",               # ARM 官方
+    "Qualcomm",          # 高通官方
+
+    # ===== 机器人/自动驾驶官方 =====
+    "Waymo",             # Waymo 自动驾驶
+    "UnitreeRobotics",   # 宇树科技 - 中国机器人
+
+    # ===== 科学/研究机构 =====
+    "Nature",            # Nature 自然杂志
+    "ScienceMagazine",   # Science 科学杂志
+    "arxiv",             # arXiv 预印本
 ]
 
 # 每个账号最多抓取多少条推文
