@@ -51,7 +51,7 @@ def get_feishu_token() -> str:
     raise Exception(f"获取飞书 token 失败: {data}")
 
 
-def send_feishu_message(text: str):
+def send_feishu_message(text: str, msg_type: str = "text", content: dict | None = None):
     """通过龙虾助手给海宁发飞书消息"""
     if not all([FEISHU_APP_ID, FEISHU_APP_SECRET, FEISHU_USER_ID]):
         print("⚠️  飞书配置不完整，跳过推送")
@@ -59,14 +59,16 @@ def send_feishu_message(text: str):
 
     try:
         token = get_feishu_token()
+        if content is None:
+            content = {"text": text}
         resp = httpx.post(
             "https://open.feishu.cn/open-apis/im/v1/messages",
             params={"receive_id_type": "open_id"},
             headers={"Authorization": f"Bearer {token}"},
             json={
                 "receive_id": FEISHU_USER_ID,
-                "msg_type": "text",
-                "content": json.dumps({"text": text}),
+                "msg_type": msg_type,
+                "content": json.dumps(content),
             },
             timeout=10,
         )
@@ -77,6 +79,134 @@ def send_feishu_message(text: str):
             print(f"⚠️  飞书发送失败: {data.get('msg', data)}")
     except Exception as e:
         print(f"⚠️  飞书发送异常: {e}")
+
+
+def create_feishu_doc(title: str, markdown_content: str) -> str | None:
+    """创建飞书文档并写入内容，返回文档 URL"""
+    if not all([FEISHU_APP_ID, FEISHU_APP_SECRET]):
+        print("⚠️  飞书配置不完整，跳过文档创建")
+        return None
+
+    try:
+        token = get_feishu_token()
+        headers = {"Authorization": f"Bearer {token}"}
+
+        # 1. 创建文档
+        resp = httpx.post(
+            "https://open.feishu.cn/open-apis/docx/v1/documents",
+            headers=headers,
+            json={"title": title},
+            timeout=10,
+        )
+        data = resp.json()
+        if data.get("code") != 0:
+            print(f"⚠️  创建文档失败: {data.get('msg', data)}")
+            return None
+
+        doc_id = data["data"]["document"]["document_id"]
+        doc_url = f"https://bqy26cs08l.feishu.cn/docx/{doc_id}"
+        print(f"📄 文档已创建: {doc_url}")
+
+        # 2. 获取文档根 block_id
+        resp = httpx.get(
+            f"https://open.feishu.cn/open-apis/docx/v1/documents/{doc_id}",
+            headers=headers,
+            timeout=10,
+        )
+        root_data = resp.json()
+        if root_data.get("code") != 0:
+            print(f"⚠️  获取文档信息失败: {root_data.get('msg', root_data)}")
+            return doc_url
+
+        # 3. 将 markdown 分段写入文档（每行一个 block）
+        lines = markdown_content.strip().split("\n")
+        children = []
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+
+            # 判断标题级别
+            if stripped.startswith("### "):
+                children.append({
+                    "block_type": 5,  # heading3
+                    "heading3": {
+                        "elements": [{"text_run": {"content": stripped[4:]}}],
+                        "style": {},
+                    },
+                })
+            elif stripped.startswith("## "):
+                children.append({
+                    "block_type": 4,  # heading2
+                    "heading2": {
+                        "elements": [{"text_run": {"content": stripped[3:]}}],
+                        "style": {},
+                    },
+                })
+            elif stripped.startswith("# "):
+                children.append({
+                    "block_type": 3,  # heading1
+                    "heading1": {
+                        "elements": [{"text_run": {"content": stripped[2:]}}],
+                        "style": {},
+                    },
+                })
+            elif stripped.startswith("---"):
+                children.append({
+                    "block_type": 22,  # divider
+                    "divider": {},
+                })
+            elif stripped.startswith("- "):
+                children.append({
+                    "block_type": 2,  # text (bullet style)
+                    "text": {
+                        "elements": [{"text_run": {"content": f"• {stripped[2:]}"}}],
+                        "style": {},
+                    },
+                })
+            else:
+                # 处理加粗文本
+                elements = []
+                parts = stripped.split("**")
+                for i, part in enumerate(parts):
+                    if not part:
+                        continue
+                    if i % 2 == 1:  # 奇数位是加粗内容
+                        elements.append({
+                            "text_run": {
+                                "content": part,
+                                "text_element_style": {"bold": True},
+                            }
+                        })
+                    else:
+                        elements.append({"text_run": {"content": part}})
+                if not elements:
+                    continue
+                children.append({
+                    "block_type": 2,  # text
+                    "text": {"elements": elements, "style": {}},
+                })
+
+        # 分批写入（每批最多 50 个 block）
+        batch_size = 50
+        for i in range(0, len(children), batch_size):
+            batch = children[i : i + batch_size]
+            resp = httpx.post(
+                f"https://open.feishu.cn/open-apis/docx/v1/documents/{doc_id}/blocks/{doc_id}/children",
+                headers=headers,
+                json={"children": batch},
+                timeout=30,
+            )
+            batch_data = resp.json()
+            if batch_data.get("code") != 0:
+                print(f"⚠️  写入文档内容失败 (batch {i}): {batch_data.get('msg', batch_data)}")
+
+        print(f"✅ 文档内容写入完成")
+        return doc_url
+
+    except Exception as e:
+        print(f"⚠️  飞书文档创建异常: {e}")
+        return None
 
 
 # ===== AI 处理 =====
@@ -170,9 +300,31 @@ def main():
     # 4. 保存本地文件
     save_output(summary, len(all_tweets))
 
-    # 5. 发飞书消息
-    date = datetime.now().strftime("%Y-%m-%d %H:%M")
-    msg = f"""📰 X 科技摘要 · {date}
+    # 5. 创建飞书文档
+    date = datetime.now().strftime("%Y-%m-%d")
+    doc_title = f"X 科技摘要 · {date}"
+    full_md = f"""生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+数据来源：{len(all_tweets)} 条推文
+监控账号：100 个
+
+---
+
+{summary}"""
+    doc_url = create_feishu_doc(doc_title, full_md)
+
+    # 6. 发飞书消息（带文档链接）
+    date_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+    if doc_url:
+        msg = f"""📰 X 科技摘要 · {date_time}
+
+📊 {len(all_tweets)} 条推文 | 100 个账号
+
+🔥 今日亮点：
+{highlights}
+
+📄 完整报告：{doc_url}"""
+    else:
+        msg = f"""📰 X 科技摘要 · {date_time}
 
 📊 {len(all_tweets)} 条推文 | 100 个账号
 

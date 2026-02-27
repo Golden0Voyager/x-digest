@@ -1,0 +1,15 @@
+# 环境变量
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.venv/
+
+# 输出
+output/*.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
