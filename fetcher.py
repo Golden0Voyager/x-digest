@@ -36,17 +36,17 @@ def load_browser_cookies() -> list[dict]:
         pw_cookies.append(pc)
     return pw_cookies
 
-async def scrape_user_tweets(context, username: str) -> list[dict] | None:
+async def scrape_user_tweets(context, username: str, hours_lookback: int = HOURS_LOOKBACK) -> list[dict] | None:
     """抓取指定用户的推文（单次尝试）"""
     page = await context.new_page()
     try:
         # 直接调用单次抓取逻辑
-        result = await _scrape_user_page(page, username)
+        result = await _scrape_user_page(page, username, hours_lookback)
         return result
     finally:
         await page.close()
 
-async def _scrape_user_page(page, username: str) -> list[dict] | None:
+async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOOKBACK) -> list[dict] | None:
     """单次抓取尝试"""
     print(f"📥 抓取 @{username} ...")
 
@@ -105,7 +105,7 @@ async def _scrape_user_page(page, username: str) -> list[dict] | None:
             else:
                 raise e
 
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=HOURS_LOOKBACK)
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=hours_lookback)
         start_time = asyncio.get_event_loop().time()
         
         # 增加一点初始等待，让数据有时间拦截
@@ -134,6 +134,11 @@ async def _scrape_user_page(page, username: str) -> list[dict] | None:
                 if result:
                     print(f"  ✓ 成功抓取 {len(result)} 条推文")
                     return result[:TWEETS_PER_ACCOUNT]
+                else:
+                    # 关键修改：如果收到数据包但没有符合时间限制的内容，
+                    # 说明确实没发推，应视为“扫描成功且无新内容”，直接返回空列表跳过后续循环
+                    print(f"  ✓ @{username} 无符合 {hours_lookback}h 条件的推文")
+                    return []
 
             # B. 智能识别并处理“屏蔽”或“刷新”页面
             body_text = await page.evaluate("document.body ? document.body.innerText : ''")
@@ -159,7 +164,7 @@ async def _scrape_user_page(page, username: str) -> list[dict] | None:
         print(f"  ❌ 抓取 @{username} 失败：{e}")
         return None
 
-async def fetch_all_tweets(accounts_list=None, on_success=None) -> list[dict]:
+async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: int = HOURS_LOOKBACK) -> list[dict]:
     if accounts_list is None: accounts_list = ACCOUNTS
     cookies = load_browser_cookies()
 
@@ -193,7 +198,7 @@ async def fetch_all_tweets(accounts_list=None, on_success=None) -> list[dict]:
                 if is_retry:
                     print(f"🔄 [重试阶段] 正在尝试抓取 @{username} ...")
 
-                tweets = await scrape_user_tweets(context, username)
+                tweets = await scrape_user_tweets(context, username, hours_lookback)
 
                 if tweets is not None:  # 只有不是 None 才是真正扫描成功了
                     async with lock:

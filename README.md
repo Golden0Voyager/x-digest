@@ -1,63 +1,62 @@
-# X-Digest 科技摘要自动生成器
+# 🛰️ X-Digest 科技情报自动汇总系统
 
-这是一个使用 Playwright 抓取 Twitter (X) 大V动态，并通过大语言模型进行自动化摘要和翻译，最后推送到飞书文档与飞书群的工具。
-
-## 🤖 当前使用的 AI 模型
-本项目调用了 **Groq** 的极速推理 API 进行文本总结。
-当前配置的默认大模型为：
-**`llama-3.3-70b-versatile`**
-
-*该模型是 Llama 3.3 的 70B 版本，作为全能型模型，在长上下文和复杂翻译总结任务上表现出色，同时得益于 Groq 的 LPU 硬件加速，能够实现极低延迟的瞬间响应。*
+X-Digest 是一个专为科技从业者设计的推文情报聚合工具。它利用 Playwright 自动化技术突破数据壁垒，结合 **Kimi K2 (moonshotai/kimi-k2-instruct-0905)** 的长上下文理解能力，将 Twitter 上的行业动态转化为精炼、具备深度洞察的中英对照日报。
 
 ---
 
-## 🚀 功能特性
-1. **自动化爬虫**：基于 Playwright 挂载本地登录态 (Cookie)，无需官方昂贵的 API Key 即可批量拉取 100+ 行业领袖和机构的主页推文。
-2. **富内容支持**：不仅抓取纯文本推文，还会自动识别**转发内容**以及**图片链接**，即使是无文字的纯图片推文也不会遗漏。
-3. **极速 AI 总结**：使用 Groq + Llama 3.3 70B 模型，以极高的吞吐量提炼要点、翻译原文、并输出 5 条核心亮点。
-4. **多端发布**：自动生成结构化的飞书在线文档，并通过飞书机器人直接在工作群推送早报。
+## 💎 情报处理哲学：极简三要素
+本项目拒绝信息过载，生成的每一条情报均严格遵循以下三要素：
+1.  **原文直达**：保留 100% 完整推文，正文后紧跟 `[[🔗]](URL)` 链接，一键跳转原帖。
+2.  **智能译文**：仅在原文为非中文时提供高质量编译，原文为中文时自动跳过，保持纯净。
+3.  **启发思考**：`💡 启示` 模块直接点出消息背后的行业价值、潜在机会或技术意义。
 
 ---
 
-## 🛠 依赖配置与运行
+## 🚀 核心技术特性
+- **72h 推文池大合拢**：引入持久化推文池机制，即使每日轮转抓取不同博主，生成的报告也会自动合拢过去 72 小时内的全量存留资讯。
+- **Kimi K2 深度赋能**：利用 90+ 条目的大批次处理能力，在极短时间内完成上百条资讯的关联分析与趋势总结。
+- **PDF 同步渲染**：基于 Playwright 引擎，生成 MD 的同时自动导出符合 **Google Material / 极简主义** 审美的高清 A4 PDF 报告。
+- **自动化运维友好**：具备 9 小时扫描冷却保护，支持通过命令行参数或智能交互控制台灵活切换运行模式。
+
+---
+
+## 🛠 运行指南
 
 ### 环境准备
-项目使用 `uv` 进行环境与依赖管理。
+项目使用 `uv` 进行环境管理。
 ```bash
-# 1. 确保安装了 uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# 安装依赖
+uv pip install -r pyproject.toml
+uv pip install markdown
 
-# 2. 安装浏览器依赖 (首次运行 Playwright 需要)
+# 安装浏览器引擎
 uv run playwright install chromium
 ```
 
-### 必需文件
-运行前，请确保项目根目录下存在以下文件及配置：
-
-1. **`browser_cookies.json`**
-   - 包含你的 Twitter 登录 Cookie (使用浏览器插件如 EditThisCookie 导出为 JSON 格式)。
-
-2. **`.env`** 配置文件，格式如下：
-   ```env
-   # 代理地址 (由于国内网络需要，保障 Playwright 访问 x.com)
-   PROXY=http://127.0.0.1:8118
-   
-   # Groq 极速 API
-   GROQ_API_KEY=gsk_your_api_key_here
-   GROQ_MODEL=llama-3.3-70b-versatile
-   
-   # 飞书应用配置
-   FEISHU_APP_ID=cli_a...
-   FEISHU_APP_SECRET=xxxxxxxxxxxxxxxx
-   FEISHU_USER_ID=ou_xxxxxxx
-   ```
-
-### 运行方式
-执行主程序，全量抓取并生成报告：
+### 智能控制台启动
+直接运行主程序即可进入交互式控制台：
 ```bash
 uv run python main.py
 ```
-单账号测试链路(可快速验证 Cookie 和 爬虫状态)：
-```bash
-uv run python test_scraper.py
-```
+**控制台快捷键：**
+- **`Enter` (A)**：执行默认自动模式（今日轮询批次 + 72h 汇总）。
+- **`F`**：强制全量扫描（扫描 `config.py` 中定义的全部 100+ 账号）。
+- **`1 / 2 / 3`**：手动指定抓取特定的账号批次。
+- **`C`**：进入自定义模式，可灵活调整回溯时长（如生成周报）或强制重扫。
+
+---
+
+## ⚙️ 关键配置 (`config.py`)
+- **`ACCOUNTS`**: 包含博主 ID 及其一句话背景简介的字典。
+- **`ACCOUNT_SCAN_INTERVAL`**: 账号抓取冷却时间（默认 9h），防止请求过密。
+- **`AI_BATCH_SIZE`**: AI 单次处理条数（推荐 90），优化 Token 消耗。
+- **`HOURS_LOOKBACK`**: 默认回溯窗口（72h），确保资讯的实时性与完整性。
+
+---
+
+## 📂 产出示例
+- **Markdown 报告**: `output/2026-03-08-1949.md` (已加入 .gitignore)
+- **PDF 报告**: `output/2026-03-08-1949.pdf` (精美排版，适合阅读器)
+
+---
+*Powered by Gemini AI & Moonshot Kimi K2. Optimized for Modern Tech Insight.*
