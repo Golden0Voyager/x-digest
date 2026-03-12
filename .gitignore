@@ -6,9 +6,16 @@ __pycache__/
 *.py[cod]
 *.venv/
 
-# 输出
+# 登录态与缓存
+browser_cookies.json
+custom_accounts.json
+output/*.json
+output/*.log
+
+# 输出报告
 output/*.md
 output/*.pdf
+output/intermediate/
 
 # IDE
 .vscode/

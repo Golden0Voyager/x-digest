@@ -17,7 +17,7 @@ from config import ACCOUNTS, TWEETS_PER_ACCOUNT, HOURS_LOOKBACK
 
 load_dotenv()
 
-PROXY = os.getenv("PROXY", "http://127.0.0.1:8118")
+PROXY = os.getenv("PROXY", "http://127.0.0.1:7897")
 BROWSER_COOKIES_FILE = "browser_cookies.json"
 
 def load_browser_cookies() -> list[dict]:
@@ -61,11 +61,15 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
                     if isinstance(obj, dict):
                         if obj.get("rest_id") and obj.get("legacy"):
                             legacy = obj["legacy"]
+                            # 提取图片 URL（优先 extended_entities，包含多图）
+                            media_entities = legacy.get("extended_entities", {}).get("media", []) or legacy.get("entities", {}).get("media", [])
+                            images = [m["media_url_https"] for m in media_entities if m.get("type") == "photo" and m.get("media_url_https")]
                             tweet = {
                                 "tweet_id": obj["rest_id"],
                                 "text": legacy.get("full_text", ""),
                                 "datetime_raw": legacy.get("created_at", ""),
                                 "is_retweet": "retweeted_status_result" in obj.get("core", {}) or "retweeted_status_id_str" in legacy,
+                                "images": images,
                             }
                             try:
                                 dt = datetime.strptime(tweet["datetime_raw"], "%a %b %d %H:%M:%S %z %Y")
@@ -97,13 +101,23 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
 
         # 核心优化：改用 domcontentloaded 并在超时后不立即报错
         # 这样即使页面没完全加载（如图片慢），只要 API 数据回来了我们就能拿
-        try:
-            await page.goto(f"https://x.com/{username}", wait_until="domcontentloaded", timeout=25000)
-        except Exception as e:
-            if "Timeout" in str(e):
-                print(f"  ⏳ 页面加载缓慢，尝试从已拦截数据中提取...")
-            else:
-                raise e
+        for attempt in range(3):
+            try:
+                # 随机延迟避免过快重试被封
+                if attempt > 0:
+                    await asyncio.sleep(random.uniform(5, 10))
+                await page.goto(f"https://x.com/{username}", wait_until="domcontentloaded", timeout=25000)
+                break
+            except Exception as e:
+                if "Timeout" in str(e):
+                    print(f"  ⏳ 页面加载缓慢 (尝试 {attempt+1}/3)，尝试从已拦截数据中提取...")
+                    # 如果是最后一次尝试依然超时，跳出循环走下面的截获判断
+                    if attempt == 2:
+                        break
+                else:
+                    if attempt == 2:
+                        raise e
+                    print(f"  ⚠️ 页面访问异常 (尝试 {attempt+1}/3): {e}，准备重试...")
 
         cutoff = datetime.now(timezone.utc) - timedelta(hours=hours_lookback)
         start_time = asyncio.get_event_loop().time()
@@ -127,7 +141,7 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
                         result.append({
                             "tweet_id": uid, "username": username, "text": t["text"],
                             "is_retweet": t["is_retweet"], "created_at": t["datetime"],
-                            "images": [], "likes": 0, "retweets": 0,
+                            "images": t.get("images", []), "likes": 0, "retweets": 0,
                         })
                     except: continue
                 
@@ -155,10 +169,21 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
             # C. 模拟真实浏览行为
             await page.mouse.move(random.randint(100, 600), random.randint(100, 600))
             await page.evaluate(f"window.scrollBy(0, {random.randint(300, 700)})")
-            await asyncio.sleep(random.uniform(3, 5))
+            
+            # 使用更平滑的随机等待，防止在频繁循环中短时间内执行大量 JS
+            await asyncio.sleep(random.uniform(2, 4))
+            
+            # 检查是否触底，触底可以提前退出循环避免不必要的等待
+            at_bottom = await page.evaluate("window.innerHeight + window.scrollY >= document.body.scrollHeight")
+            if at_bottom and (asyncio.get_event_loop().time() - start_time) > 20: 
+                # 已经滑到底部且等待了 20s 以上，基本可以断定没有更多数据加载了
+                print(f"  ✓ @{username} 页面已触底，未发现更早内容")
+                break
 
-        print(f"  ⚠️  超时未截获数据包")
-        return None
+        if not graphql_tweets:
+            print(f"  ⚠️  超时未截获数据包，可能页面已被限制")
+            return None
+        return []
 
     except Exception as e:
         print(f"  ❌ 抓取 @{username} 失败：{e}")
