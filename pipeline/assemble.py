@@ -8,7 +8,12 @@ import json
 import re
 from pathlib import Path
 
+from pipeline import Color
+
 CUSTOM_ACCOUNTS_FILE = Path("custom_accounts.json")
+
+# 质量门控阈值
+_MIN_QUALITY = 3
 
 # 预编译：去除推文中的所有 t.co 短链（Twitter 跟踪链接，在 Markdown 中无用）
 _TCO_RE = re.compile(r"https://t\.co/[a-zA-Z0-9]+")
@@ -56,7 +61,6 @@ def assemble(
     translations: dict,
     insights: dict,
     shortlinks: dict,
-    selected_domains: list[str] | None = None,
 ) -> tuple[str, str]:
     """
     纯 Python 拼装最终 Markdown。
@@ -68,28 +72,6 @@ def assemble(
 
     bios = _load_bios()
 
-    # 建立 Sector 键名到展示标题的模糊映射
-    domain_to_header_map = {
-        "AI_Scientists_&_Academia": "【AI & 算法】",
-        "Tech_Industry_&_CEOs": "【AI & 算法】",
-        "Macro_Finance_&_A-Shares": "【市场 & 投资】",
-        "Tech_Media_&_Deep_Analysis": "【AI & 算法】",
-        "F1_Racing_&_Paddock": "【F1 赛车围场】",
-        "Contemporary_Art_&_Institutions": "【当代艺术】"
-    }
-
-    # 计算本次允许展示的标题白名单
-    allowed_headers = set()
-    if selected_domains:
-        # 始终允许核心头条
-        allowed_headers.add("【核心头条】")
-        for sd in selected_domains:
-            if sd in domain_to_header_map:
-                allowed_headers.add(domain_to_header_map[sd])
-    else:
-        # 如果没传，说明是全量扫描模式，允许所有
-        allowed_headers = {name for name, _ in DISPLAY_CATEGORIES}
-
     category_items: dict[str, list] = {name: [] for name, _ in DISPLAY_CATEGORIES}
     fallback_items: list[str] = []
 
@@ -99,6 +81,15 @@ def assemble(
         if not insight:
             continue
 
+        # ── 质量门控 ──
+        quality = insight.get("quality", 3)
+        if quality < _MIN_QUALITY:
+            continue
+
+        thought = insight.get("thought", "")
+        if thought.upper() == "SKIP":
+            continue
+
         username = t["username"]
         # 原文清理 t.co 链接，避免干扰加粗斜体格式
         original_text = _clean_tco(t["text"].strip())
@@ -106,8 +97,9 @@ def assemble(
         tweet_url = f"https://x.com/{username}/status/{tid}"
         bio = bios.get(username, "博主信息暂无")
 
-        # 组装单条 Markdown
-        entry = f"**@{username}** ({bio})\n\n"
+        # 组装单条 Markdown（quality=5 加高亮标记）
+        highlight = "🔥 " if quality == 5 else ""
+        entry = f"{highlight}**@{username}** ({bio})\n\n"
         if original_text:
             entry += f"🔗 [原推]({tweet_url})：***{original_text}***\n"
         else:
@@ -127,39 +119,22 @@ def assemble(
             trans = _clean_tco(trans)
             entry += f"📝 **译文**：{trans}\n\n"
 
-        thought = insight.get("thought", "")
         if thought:
             thought = thought.replace("启发性思考：", "").replace("启发 & 思考：", "").replace("💡", "").strip()
-            entry += f"💡 **启示**：{thought}"
+            if thought:
+                entry += f"💡 **启示**：{thought}"
 
-        # 归类
+        # 归类：AI 分类直接匹配展示分类，无白名单限制
         cat_val = insight.get("category", "其他动态")
         matched = False
-        
-        # 优化归类逻辑：如果 AI 分类不在允许范围内，但该推文确实来自选中的领域账号，
-        # 则强制归类到该领域下的展示标题。
         for section_name, keywords in DISPLAY_CATEGORIES:
             if any(kw in cat_val for kw in keywords):
-                # 检查该标题是否在本次允许范围内
-                if section_name in allowed_headers:
-                    category_items[section_name].append(entry)
-                    matched = True
-                    break
-                else:
-                    # AI 分类虽然命中了，但用户没选这个领域，落入 fallback 或归类到已选领域
-                    pass
+                category_items[section_name].append(entry)
+                matched = True
+                break
 
         if not matched:
-            # 尝试根据账号所属领域二次归位（针对单选某一领域时的特殊处理）
-            # 这里简单处理，如果未匹配且用户只选了一个特定领域，则优先放入该领域
-            if selected_domains and len(selected_domains) == 1:
-                target_header = domain_to_header_map.get(selected_domains[0])
-                if target_header and target_header in category_items:
-                    category_items[target_header].append(entry)
-                    matched = True
-            
-            if not matched:
-                fallback_items.append(entry)
+            fallback_items.append(entry)
 
     # 拼装最终 Markdown
     sections: list[str] = []
