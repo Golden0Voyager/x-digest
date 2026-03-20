@@ -27,3 +27,10 @@ docs/.pdca-snapshots/
 docs/.pdca-status.json
 docs/.bkit-memory.jsonoutput/*.log
 output/*.json
+
+# --- AI & Metadata ---
+.pdca-status.json
+.bkit-memory.json
+docs/.bkit-memory.json
+.gemini/
+.claude/
