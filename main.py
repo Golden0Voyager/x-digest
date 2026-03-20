@@ -484,7 +484,7 @@ def main():
             print(f" {Color.YELLOW}No signals recorded for this date.{Color.RESET}")
             return
             
-        summary, counts_text = asyncio.run(run_pipeline(selected_tweets, selected_domains=selected_keys))
+        summary, counts_text = asyncio.run(run_pipeline(selected_tweets))
         output_path = save_output(summary, len(selected_tweets), 24, selected_domains=selected_keys, account_count=len(selected_accounts))
         asyncio.run(render_markdown_to_pdf(output_path))
         
@@ -548,7 +548,7 @@ def main():
         print(f" {Color.GREEN}System standby. No new signals.{Color.RESET}")
         return
 
-    summary, counts_text = asyncio.run(run_pipeline(selected_tweets, selected_domains=selected_keys))
+    summary, counts_text = asyncio.run(run_pipeline(selected_tweets))
     output_path = save_output(summary, len(selected_tweets), args.hours, selected_domains=selected_keys, account_count=len(selected_accounts))
     asyncio.run(render_markdown_to_pdf(output_path))
     

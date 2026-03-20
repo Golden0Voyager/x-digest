@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 
 from pipeline import Color, load_json, save_json
+from pipeline.curate import curate
 from pipeline.translate import run_translate
 from pipeline.insights import run_insights
 from pipeline.assemble import assemble
@@ -37,7 +38,6 @@ def _prune_intermediate(intermediate_dir: Path, active_ids: set[str]):
 async def run_pipeline(
     tweets: list[dict],
     force_rerun: bool = False,
-    selected_domains: list[str] | None = None,
 ) -> tuple[str, str]:
     """
     编排整个管道。
@@ -60,6 +60,16 @@ async def run_pipeline(
     fallback_count = len(AI_FALLBACK_PROVIDERS)
     print(f"  {Color.GREY}📡 当前模型: {provider_host}/{AI_MODEL}  (备选: {fallback_count} 个){Color.RESET}")
 
+    # Phase 0: 规则化预过滤（零 LLM 调用）
+    tweets = curate(tweets)
+
+    if not tweets:
+        print(f"\n{Color.RED}⚠️ 预过滤后无剩余推文{Color.RESET}")
+        return "", ""
+
+    # 更新 active_ids（预过滤可能删减了推文）
+    active_ids = {str(t["tweet_id"]) for t in tweets}
+
     # Phase 1: 翻译
     print(f"\n{Color.BOLD}━━━ Phase 1: 翻译 ━━━{Color.RESET}")
     translations = await run_translate(tweets, intermediate_dir, force_rerun)
@@ -70,7 +80,7 @@ async def run_pipeline(
 
     # Phase 3: 纯本地拼装（原推链接直接用 x.com 原始 URL，无需缩链）
     print(f"\n{Color.BOLD}━━━ Phase 3: 本地装配 ━━━{Color.RESET}")
-    markdown, counts = assemble(tweets, translations, insights, {}, selected_domains=selected_domains)
+    markdown, counts = assemble(tweets, translations, insights, {})
 
     print(f"\n{Color.GREEN}✅ 管道完成{Color.RESET}")
     return markdown, counts
