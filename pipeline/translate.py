@@ -9,7 +9,7 @@ import asyncio
 import json
 from pathlib import Path
 
-from config import AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_TRANSLATE
+from config import AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_TRANSLATE, AI_MAX_BATCH_SIZE
 from pipeline import call_ai_with_retry, extract_json, load_json, save_json, Color
 
 TRANSLATE_PROMPT = """\
@@ -63,8 +63,10 @@ async def run_translate(
 
     print(f"  {Color.CYAN}🌐 开始翻译 {len(to_process)} 条推文...{Color.RESET}")
 
-    # ── 2. 分批处理（弹性上限，利用长上下文模型优势） ──
-    safe_batch_size = min(AI_BATCH_SIZE, 30)
+    # ── 2. 分批处理（受 AI_MAX_BATCH_SIZE 保护，防止输出截断） ──
+    safe_batch_size = min(AI_BATCH_SIZE, AI_MAX_BATCH_SIZE)
+    if AI_BATCH_SIZE > AI_MAX_BATCH_SIZE:
+        print(f"  {Color.YELLOW}⚠️ AI_BATCH_SIZE={AI_BATCH_SIZE} 超过安全上限 {AI_MAX_BATCH_SIZE}，已自动限制{Color.RESET}")
     chunks = [to_process[i : i + safe_batch_size] for i in range(0, len(to_process), safe_batch_size)]
 
     for idx, chunk in enumerate(chunks):
@@ -81,6 +83,7 @@ async def run_translate(
                 ],
                 temperature=0.2,
                 model_override=AI_MODEL_TRANSLATE,
+                max_tokens=12288,
             )
             items = extract_json(response.choices[0].message.content)
             for item in items:
@@ -118,13 +121,14 @@ async def run_translate(
                         ],
                         temperature=0.2,
                         model_override=AI_MODEL_TRANSLATE,
+                        max_tokens=2048,
                     )
     
                     return tid, resp.choices[0].message.content.strip()
                 except Exception:
                     return tid, "SKIP" # 失败时记录为 SKIP
 
-        results = await asyncio.gather(*[_translate_one(t) for t in missing[:30]])
+        results = await asyncio.gather(*[_translate_one(t) for t in missing[:AI_MAX_BATCH_SIZE]])
         for tid, trans in results:
             translations[tid] = trans
             raw_cache[tid] = trans

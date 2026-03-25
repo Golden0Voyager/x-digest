@@ -25,19 +25,8 @@ from config import (
     AI_API_KEY, CACHE_RETENTION_HOURS
 )
 from fetcher import fetch_all_tweets
+from pipeline import Color, log_print
 from pipeline.orchestrator import run_pipeline
-
-# ANSI 色彩代码
-class Color:
-    CYAN = "\033[96m"
-    GREEN = "\033[92m"
-    MATRIX_GREEN = "\033[38;5;46m"  # 矩阵经典亮绿
-    YELLOW = "\033[93m"
-    RED = "\033[91m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
-    RESET = "\033[0m"
-    GREY = "\033[90m"
 
 # AI 客户端初始化 (支持任何兼容 OpenAI 协议的服务商)
 if not AI_API_KEY:
@@ -49,7 +38,7 @@ if not AI_API_KEY:
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-# ===== 日志系统 =====
+# ===== 日志系统（配置 file handler，log_print 从 pipeline 导入） =====
 RUN_LOG_FILE = OUTPUT_DIR / "run.log"
 logger = logging.getLogger("x_digest")
 logger.setLevel(logging.INFO)
@@ -57,14 +46,6 @@ if not logger.handlers:
     file_handler = logging.FileHandler(RUN_LOG_FILE, encoding="utf-8")
     file_handler.setFormatter(logging.Formatter('%(asctime)s - [%(levelname)s] - %(message)s'))
     logger.addHandler(file_handler)
-
-def log_print(msg, level="info"):
-    """同时打印到屏幕并存入日志文件（自动剥离 ANSI 颜色代码）"""
-    clean_msg = re.sub(r'\033\[\d+(;\d+)*m', '', str(msg))
-    if level == "info": logger.info(clean_msg)
-    elif level == "error": logger.error(clean_msg)
-    elif level == "warning": logger.warning(clean_msg)
-    print(msg)
 
 CACHE_FILE = OUTPUT_DIR / "processed_tweets.json"
 TWEET_POOL_FILE = OUTPUT_DIR / "raw_tweets_pool.json"

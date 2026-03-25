@@ -60,7 +60,6 @@ def assemble(
     tweets: list[dict],
     translations: dict,
     insights: dict,
-    shortlinks: dict,
 ) -> tuple[str, str]:
     """
     纯 Python 拼装最终 Markdown。
@@ -75,10 +74,13 @@ def assemble(
     category_items: dict[str, list] = {name: [] for name, _ in DISPLAY_CATEGORIES}
     fallback_items: list[str] = []
 
+    skipped_no_insight = 0
+
     for t in tweets:
         tid = str(t["tweet_id"])
         insight = insights.get(tid)
         if not insight:
+            skipped_no_insight += 1
             continue
 
         # ── 质量门控 ──
@@ -135,6 +137,9 @@ def assemble(
 
         if not matched:
             fallback_items.append(entry)
+
+    if skipped_no_insight > 0:
+        print(f"  {Color.YELLOW}⚠️ {skipped_no_insight} 条推文缺少洞察分析，已跳过{Color.RESET}")
 
     # 拼装最终 Markdown
     sections: list[str] = []

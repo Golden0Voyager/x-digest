@@ -18,6 +18,9 @@ ACCOUNT_SCAN_INTERVAL = int(os.getenv("ACCOUNT_SCAN_INTERVAL", "12"))
 # ── AI 管道参数 ───────────────────────────────────────────
 AI_BATCH_SIZE = int(os.getenv("AI_BATCH_SIZE", "15"))
 AI_BATCH_COOLDOWN = int(os.getenv("AI_BATCH_COOLDOWN", "15"))
+# 单批次最大条目数上限（防止输出 token 截断）
+# 默认 30 适配 Groq Kimi K2 (max_output=16K)，除非使用输出上限更高的模型否则不建议调大
+AI_MAX_BATCH_SIZE = int(os.getenv("AI_MAX_BATCH_SIZE", "30"))
 
 # ── AI 供应商降级链 ──────────────────────────────────────────
 AI_PROVIDER_CHAIN = [
@@ -73,6 +76,6 @@ if "AI_API_KEY" not in dir():
     AI_MODEL = ""
 
 # ── 任务特定模型支持 ──────────────────────────────────
-# 允许为不同性质的任务指定不同的模型
-AI_MODEL_TRANSLATE = os.getenv("AI_MODEL_TRANSLATE", AI_MODEL)
-AI_MODEL_INSIGHTS = os.getenv("AI_MODEL_INSIGHTS", AI_MODEL)
+# 允许为不同性质的任务指定不同的模型（为空时回退到主模型）
+AI_MODEL_TRANSLATE = os.getenv("AI_MODEL_TRANSLATE", "") or AI_MODEL
+AI_MODEL_INSIGHTS = os.getenv("AI_MODEL_INSIGHTS", "") or AI_MODEL

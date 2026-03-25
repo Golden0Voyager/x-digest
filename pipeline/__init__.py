@@ -5,6 +5,7 @@ X-Digest 管道处理模块
 """
 
 import json
+import logging
 import re
 import time
 from pathlib import Path
@@ -19,11 +20,26 @@ from config import AI_API_KEY, AI_BASE_URL, AI_MODEL, AI_FALLBACK_PROVIDERS
 class Color:
     CYAN = "\033[96m"
     GREEN = "\033[92m"
+    MATRIX_GREEN = "\033[38;5;46m"
     YELLOW = "\033[93m"
     RED = "\033[91m"
     BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
     GREY = "\033[90m"
     RESET = "\033[0m"
+
+
+# ── 日志工具 ──────────────────────────────────────────────
+
+logger = logging.getLogger("x_digest")
+
+def log_print(msg, level="info"):
+    """同时打印到屏幕并存入日志文件（自动剥离 ANSI 颜色代码）"""
+    clean_msg = re.sub(r'\033\[\d+(;\d+)*m', '', str(msg))
+    if level == "info": logger.info(clean_msg)
+    elif level == "warning": logger.warning(clean_msg)
+    elif level == "error": logger.error(clean_msg)
+    print(msg)
 
 
 # ── JSON 工具 ─────────────────────────────────────────────
@@ -108,13 +124,14 @@ def _get_client(api_key: str, base_url: str) -> OpenAI:
     return _ai_clients[cache_key]
 
 
-def call_ai_with_retry(messages, temperature=0.2, model_override=None):
+def call_ai_with_retry(messages, temperature=0.2, model_override=None, max_tokens=4096):
     """带快速降级的 AI 调用。
 
     主模型 2 次尝试，备选模型各 1 次（每供应商共 3 次），
     全部供应商耗尽后抛出最后一个异常。
-    
+
     model_override: 允许为特定任务覆盖主模型设置
+    max_tokens: 最大输出 token 数，防止响应截断（默认 4096）
     """
     primary_model = model_override if model_override else AI_MODEL
     providers = [
@@ -133,7 +150,12 @@ def call_ai_with_retry(messages, temperature=0.2, model_override=None):
                     model=provider["model"],
                     messages=messages,
                     temperature=temperature,
+                    max_tokens=max_tokens,
                 )
+                # token 用量统计
+                if result.usage:
+                    u = result.usage
+                    print(f"  {Color.GREY}📊 Token: {u.prompt_tokens} in / {u.completion_tokens} out / {u.total_tokens} total{Color.RESET}")
                 # 降级成功时提示当前实际服务的模型
                 if i > 0 or attempt > 1:
                     print(f"  {Color.GREEN}✓ [{provider['name']}] {provider['model']} 响应成功{Color.RESET}")

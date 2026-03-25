@@ -20,7 +20,7 @@ cp .env.example .env
 
 # 获取浏览器 Cookie（用于绕过登录验证）
 # 使用浏览器插件（EditThisCookie 或 Cookie-Editor）导出 X 的 Cookie
-# 保存为 browser_cookies.json
+# 保存为 x_cookies_1.json（多账号：x_cookies_2.json, x_cookies_3.json ...）
 
 # 运行摘要生成
 python fetcher.py
@@ -34,7 +34,7 @@ x_digest/
 ├── config.py               # 配置管理（账户列表、主题分类）
 ├── custom_accounts.json    # 自定义关注账户列表
 ├── custom_accounts.json.example  # 模板
-├── browser_cookies.json    # X 浏览器 Cookie（.gitignore 忽略）
+├── x_cookies_*.json        # X 浏览器 Cookie（.gitignore 忽略，支持多账号）
 ├── .env                    # API Key（.gitignore 忽略）
 ├── .env.example            # 环境变量模板
 ├── requirements.txt        # Python 依赖
@@ -138,7 +138,7 @@ MAX_RETRIES=3
 ### Cookie 管理
 - X 可能要求登录验证 → 需要浏览器 Cookie
 - Cookie 过期时间：通常数周
-- 失效后：重新导出 `browser_cookies.json`
+- 失效后：重新导出 `x_cookies_*.json`
 
 ### 速率限制
 - X API 有请求限制（通常 450 请求/15分钟）
@@ -168,7 +168,7 @@ MAX_RETRIES=3
 ### 隐私和合规
 - 尊重 X 的服务条款（不可用于商业用途的大规模爬取）
 - 存储推文时需要注意版权
-- `.gitignore` 必须忽略：`browser_cookies.json`, `.env`, 缓存文件
+- `.gitignore` 必须忽略：`x_cookies_*.json`, `.env`, 缓存文件
 
 ## 中文支持
 

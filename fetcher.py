@@ -8,8 +8,7 @@ import os
 import random
 import hashlib
 import glob
-import re
-import logging
+import time
 from datetime import datetime, timezone, timedelta
 
 from playwright_stealth import Stealth
@@ -17,35 +16,12 @@ from playwright.async_api import async_playwright
 from dotenv import load_dotenv
 
 from config import ACCOUNTS, TWEETS_PER_ACCOUNT, HOURS_LOOKBACK
+from pipeline import Color, log_print
 
 load_dotenv()
 
-# ANSI 色彩代码
-class Color:
-    CYAN = "\033[96m"
-    GREEN = "\033[92m"
-    YELLOW = "\033[93m"
-    RED = "\033[91m"
-    RESET = "\033[0m"
-    GREY = "\033[90m"
-
-# 获取与 main.py 共享的日志记录器
-logger = logging.getLogger("x_digest")
-
-def log_print(msg, level="info"):
-    """辅助函数：同时向终端和日志文件输出"""
-    # 剥离 ANSI 颜色代码后写入日志文件
-    clean_msg = re.sub(r'\033\[\d+(;\d+)*m', '', str(msg))
-    if level == "info":
-        logger.info(clean_msg)
-    elif level == "warning":
-        logger.warning(clean_msg)
-    elif level == "error":
-        logger.error(clean_msg)
-    print(msg)
-
 PROXY = os.getenv("PROXY", "http://127.0.0.1:7897")
-BROWSER_COOKIES_FILE = "browser_cookies.json"
+COOKIE_FILE_PATTERN = "x_cookies_*.json"
 
 def load_browser_cookies(file_path: str) -> list[dict]:
     if not os.path.exists(file_path):
@@ -101,13 +77,15 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
                             try:
                                 dt = datetime.strptime(tweet["datetime_raw"], "%a %b %d %H:%M:%S %z %Y")
                                 tweet["datetime"] = dt.isoformat()
-                            except: tweet["datetime"] = tweet["datetime_raw"]
+                            except (ValueError, TypeError):
+                                tweet["datetime"] = tweet["datetime_raw"]
                             graphql_tweets.append(tweet)
                         for v in obj.values(): extract_tweets(v)
                     elif isinstance(obj, list):
                         for item in obj: extract_tweets(item)
                 extract_tweets(data)
-            except: pass
+            except Exception as e:
+                log_print(f"  {Color.GREY}⚠️ GraphQL 响应解析异常: {type(e).__name__}: {str(e)[:100]}{Color.RESET}", "warning")
 
     page.on("response", handle_response)
 
@@ -144,13 +122,13 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
                     print(f"  ⚠️ 页面访问异常 (尝试 {attempt+1}/3): {e}，准备重试...")
 
         cutoff = datetime.now(timezone.utc) - timedelta(hours=hours_lookback)
-        start_time = asyncio.get_event_loop().time()
+        start_time = time.monotonic()
 
         # 增加一点初始等待，让数据有时间拦截
         await asyncio.sleep(5)
 
         # 截获窗口增加到 60 秒
-        while (asyncio.get_event_loop().time() - start_time) < 60:
+        while (time.monotonic() - start_time) < 60:
             # A. 检查 GraphQL 是否已经截获数据
             if graphql_tweets:
                 result = []
@@ -195,7 +173,7 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
 
             # 检查是否触底
             at_bottom = await page.evaluate("window.innerHeight + window.scrollY >= document.body.scrollHeight")
-            if at_bottom and (asyncio.get_event_loop().time() - start_time) > 20:
+            if at_bottom and (time.monotonic() - start_time) > 20:
                 print(f"  ✓ @{username} 页面已触底，未发现更早内容")
                 break
 
@@ -211,15 +189,15 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
 async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: int = HOURS_LOOKBACK) -> list[dict]:
     if accounts_list is None: accounts_list = ACCOUNTS
 
-    cookie_files = sorted(glob.glob("browser_cookies*.json"))
+    cookie_files = sorted(glob.glob(COOKIE_FILE_PATTERN))
     if not cookie_files:
-        print("  ⚠️  未发现任何 browser_cookies*.json 文件")
+        print(f"  ⚠️  未发现任何 {COOKIE_FILE_PATTERN} 文件")
         cookie_data_list = [[]]
     else:
         cookie_data_list = [load_browser_cookies(f) for f in cookie_files]
 
     num_contexts = len(cookie_data_list)
-    print(f"  🔑 已加载 {num_contexts} 组 Cookie（{'双账号并发模式' if num_contexts >= 2 else '单账号模式'}）")
+    print(f"  🔑 已加载 {num_contexts} 组 Cookie（{f'{num_contexts} 账号并发模式' if num_contexts >= 2 else '单账号模式'}）")
 
     async with Stealth().use_async(async_playwright()) as p:
         browser = await p.chromium.launch(headless=True, proxy={"server": PROXY}, args=["--disable-blink-features=AutomationControlled"])

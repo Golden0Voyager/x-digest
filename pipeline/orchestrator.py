@@ -80,7 +80,7 @@ async def run_pipeline(
 
     # Phase 3: 纯本地拼装（原推链接直接用 x.com 原始 URL，无需缩链）
     print(f"\n{Color.BOLD}━━━ Phase 3: 本地装配 ━━━{Color.RESET}")
-    markdown, counts = assemble(tweets, translations, insights, {})
+    markdown, counts = assemble(tweets, translations, insights)
 
     print(f"\n{Color.GREEN}✅ 管道完成{Color.RESET}")
     return markdown, counts

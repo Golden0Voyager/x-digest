@@ -9,7 +9,7 @@ import json
 from datetime import date
 from pathlib import Path
 
-from config import AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_INSIGHTS
+from config import AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_INSIGHTS, AI_MAX_BATCH_SIZE
 from pipeline import call_ai_with_retry, extract_json, load_json, save_json, Color
 
 INSIGHTS_PROMPT_TEMPLATE = """\
@@ -68,8 +68,10 @@ async def run_insights(
     # 注入当前日期到 prompt
     insights_prompt = INSIGHTS_PROMPT_TEMPLATE.format(current_date=date.today().isoformat())
 
-    # ── 2. 分批处理（弹性上限，利用长上下文模型优势） ──
-    safe_batch_size = min(AI_BATCH_SIZE, 30)
+    # ── 2. 分批处理（受 AI_MAX_BATCH_SIZE 保护，防止输出截断） ──
+    safe_batch_size = min(AI_BATCH_SIZE, AI_MAX_BATCH_SIZE)
+    if AI_BATCH_SIZE > AI_MAX_BATCH_SIZE:
+        print(f"  {Color.YELLOW}⚠️ AI_BATCH_SIZE={AI_BATCH_SIZE} 超过安全上限 {AI_MAX_BATCH_SIZE}，已自动限制{Color.RESET}")
     chunks = [to_process[i : i + safe_batch_size] for i in range(0, len(to_process), safe_batch_size)]
 
     for idx, chunk in enumerate(chunks):
@@ -95,6 +97,7 @@ async def run_insights(
                 ],
                 temperature=0.3,
                 model_override=AI_MODEL_INSIGHTS,
+                max_tokens=12288,
             )
             items = extract_json(response.choices[0].message.content)
             for item in items:
@@ -105,6 +108,46 @@ async def run_insights(
                         "category": item.get("category", "其他动态"),
                         "quality": int(item.get("quality", 3)),
                     }
+
+            # 截断补抓：检查本批缺失的条目，小批量重试
+            expected_ids = {str(t["tweet_id"]) for t in chunk}
+            returned_ids = {str(item.get("id", "")) for item in items}
+            missing_ids = expected_ids - returned_ids
+            if missing_ids:
+                missing_tweets = [t for t in chunk if str(t["tweet_id"]) in missing_ids]
+                print(f"  {Color.YELLOW}⚠️ 批次 {idx+1} 缺失 {len(missing_ids)} 条，补抓中...{Color.RESET}")
+                retry_input = []
+                for t in missing_tweets:
+                    tid = str(t["tweet_id"])
+                    entry = {"id": tid, "text": t["text"]}
+                    trans = translations.get(tid, "SKIP")
+                    if trans and trans.upper() != "SKIP":
+                        entry["translation"] = trans
+                    retry_input.append(entry)
+                retry_text = json.dumps(retry_input, ensure_ascii=False)
+                try:
+                    retry_resp = await asyncio.to_thread(
+                        call_ai_with_retry,
+                        messages=[
+                            {"role": "system", "content": insights_prompt},
+                            {"role": "user", "content": retry_text},
+                        ],
+                        temperature=0.3,
+                        model_override=AI_MODEL_INSIGHTS,
+                        max_tokens=4096,
+                    )
+                    retry_items = extract_json(retry_resp.choices[0].message.content)
+                    for item in retry_items:
+                        tid = str(item.get("id", ""))
+                        if tid:
+                            insights[tid] = {
+                                "thought": item.get("thought", ""),
+                                "category": item.get("category", "其他动态"),
+                                "quality": int(item.get("quality", 3)),
+                            }
+                    print(f"  {Color.GREEN}✓ 补抓成功 {len(retry_items)} 条{Color.RESET}")
+                except Exception as retry_e:
+                    print(f"  {Color.RED}⚠️ 补抓失败: {retry_e}{Color.RESET}")
 
             # 持久化全量缓存
             raw_cache.update(insights)
