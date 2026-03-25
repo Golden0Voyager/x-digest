@@ -7,7 +7,7 @@ __pycache__/
 *.venv/
 
 # 登录态与缓存
-browser_cookies.json
+browser_cookies*.json
 custom_accounts.json
 output/*.json
 output/*.log

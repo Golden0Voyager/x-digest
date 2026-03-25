@@ -68,8 +68,8 @@ async def run_insights(
     # 注入当前日期到 prompt
     insights_prompt = INSIGHTS_PROMPT_TEMPLATE.format(current_date=date.today().isoformat())
 
-    # ── 2. 分批处理（洞察分析耗费 Token 极多，强制更小的批次） ──
-    safe_batch_size = min(AI_BATCH_SIZE, 12)
+    # ── 2. 分批处理（弹性上限，利用长上下文模型优势） ──
+    safe_batch_size = min(AI_BATCH_SIZE, 30)
     chunks = [to_process[i : i + safe_batch_size] for i in range(0, len(to_process), safe_batch_size)]
 
     for idx, chunk in enumerate(chunks):

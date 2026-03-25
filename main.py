@@ -11,6 +11,7 @@ import re
 import time
 import argparse
 import sys
+import logging
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -48,8 +49,26 @@ if not AI_API_KEY:
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
 OUTPUT_DIR.mkdir(exist_ok=True)
 
+# ===== 日志系统 =====
+RUN_LOG_FILE = OUTPUT_DIR / "run.log"
+logger = logging.getLogger("x_digest")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    file_handler = logging.FileHandler(RUN_LOG_FILE, encoding="utf-8")
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - [%(levelname)s] - %(message)s'))
+    logger.addHandler(file_handler)
+
+def log_print(msg, level="info"):
+    """同时打印到屏幕并存入日志文件（自动剥离 ANSI 颜色代码）"""
+    clean_msg = re.sub(r'\033\[\d+(;\d+)*m', '', str(msg))
+    if level == "info": logger.info(clean_msg)
+    elif level == "error": logger.error(clean_msg)
+    elif level == "warning": logger.warning(clean_msg)
+    print(msg)
+
 CACHE_FILE = OUTPUT_DIR / "processed_tweets.json"
 TWEET_POOL_FILE = OUTPUT_DIR / "raw_tweets_pool.json"
+STATS_FILE = OUTPUT_DIR / "account_stats.json"
 
 FEISHU_APP_ID = os.getenv("FEISHU_APP_ID", "")
 FEISHU_APP_SECRET = os.getenv("FEISHU_APP_SECRET", "")
@@ -95,6 +114,77 @@ def clean_pool(pool: dict, hours: int) -> dict:
                 new_pool[tid] = tweet
         except: continue
     return new_pool
+
+
+# ===== 账号健康度统计 =====
+
+def update_account_health(username: str, tweets_found: list | None):
+    """更新账号扫描健康度统计"""
+    stats = load_json(STATS_FILE)
+    now = datetime.now(timezone.utc).isoformat()
+    if username not in stats:
+        stats[username] = {
+            "first_seen": now, "total_scans": 0, "success_scans": 0,
+            "empty_scans": 0, "error_count": 0, "last_tweet_date": None,
+            "tweet_counts_history": []
+        }
+    s = stats[username]
+    s["total_scans"] += 1
+    if tweets_found is not None:
+        s["success_scans"] += 1
+        s["error_count"] = 0
+        count = len(tweets_found)
+        if count > 0:
+            s["last_tweet_date"] = now
+        else:
+            s["empty_scans"] += 1
+        s["tweet_counts_history"] = (s.get("tweet_counts_history", []) + [count])[-10:]
+    else:
+        s["error_count"] += 1
+    save_json(STATS_FILE, stats)
+
+
+def generate_health_report(force=False):
+    """生成账号健康审计报告（每 7 天自动触发一次）"""
+    stats = load_json(STATS_FILE)
+    if not stats:
+        return
+    report_flag = OUTPUT_DIR / ".last_health_report"
+    if not force and report_flag.exists():
+        try:
+            if datetime.now(timezone.utc) - datetime.fromisoformat(report_flag.read_text().strip()) < timedelta(days=7):
+                return
+        except:
+            pass
+    log_print(f"\n {Color.CYAN}📋 生成账号健康审计报告...{Color.RESET}")
+    ghosts, dormant, ranks = [], [], []
+    now = datetime.now(timezone.utc)
+    for u, d in stats.items():
+        if d.get("error_count", 0) >= 5:
+            ghosts.append(f"- @{u} (连续失败 {d['error_count']} 次)")
+        elif d.get("last_tweet_date"):
+            if now - datetime.fromisoformat(d["last_tweet_date"]) > timedelta(days=14):
+                dormant.append(f"- @{u}")
+        h = d.get("tweet_counts_history", [])
+        if h:
+            ranks.append((u, sum(h) / len(h)))
+    ranks.sort(key=lambda x: x[1], reverse=True)
+    report_md = [
+        "# 🛡️ X-Digest 账号审计报告",
+        f"> 日期：{datetime.now().strftime('%Y-%m-%d')}",
+        "",
+        "## 🚨 僵尸号（连续失败 5 次以上）",
+        "\n".join(ghosts) if ghosts else "- 暂无",
+        "",
+        "## 💤 沉寂号（14 天无新推文）",
+        "\n".join(dormant) if dormant else "- 暂无",
+        "",
+        "## 🔥 活跃度 TOP 10",
+        "\n".join([f"- @{u} (平均 {r:.1f} 条/次)" for u, r in ranks[:10]]),
+    ]
+    (OUTPUT_DIR / "health_report.md").write_text("\n".join(report_md), encoding="utf-8")
+    report_flag.write_text(now.isoformat())
+    log_print(f" {Color.GREEN}✅ 审计报告已生成: {OUTPUT_DIR / 'health_report.md'}{Color.RESET}")
 
 
 # ===== 飞书 API =====
@@ -342,26 +432,20 @@ def main():
     args = parser.parse_args()
 
     # 1. 矩阵风格开屏
-    if not any([args.manual, args.hours is not None, args.force]):
+    if not args.manual and sys.stdin.isatty():
         os.system('clear' if os.name == 'posix' else 'cls')
-        
-        print(f"\n {Color.MATRIX_GREEN} [  LOADING X-DIGEST CORE...  ]{Color.RESET}")
-        time.sleep(0.3)
-        print(f" {Color.MATRIX_GREEN} > Establishing secure tunnel...{Color.RESET}")
-        time.sleep(0.4)
-        print(f" {Color.MATRIX_GREEN} > Synchronizing with X-Network...{Color.RESET}")
-        time.sleep(0.3)
-        
-        # 完美对齐的中空风格 ASCII Art
-        matrix_logo = rf"""{Color.MATRIX_GREEN}{Color.BOLD}
-  __  __      _____  _____  _____  ______  _____  _______ 
-  \ \/ /     |  __ \|_   _|/ ____||  ____|/ ____||__   __|
-   \  /______| |  | | | | | |  __ | |__  | (___     | |   
-   /  \______| |  | | | | | | |_ ||  __|  \___ \    | |   
-  / /\ \     | |__| |_| |_| |__| || |____ ____) |   | |   
- /_/  \_\    |_____/|_____|\_____||______|_____/    |_|   {Color.RESET}"""
-        print(matrix_logo)
-        print(f"\n {Color.MATRIX_GREEN} {Color.BOLD}COMMAND CENTER v2.2 // NEURAL LINK ACTIVE{Color.RESET}")
+
+        print(f"{Color.MATRIX_GREEN}")
+        logo = [
+            r" ██╗  ██╗       ██████╗ ██╗ ██████╗ ███████╗███████╗████████╗",
+            r" ╚██╗██╔╝       ██╔══██╗██║██╔════╝ ██╔════╝██╔════╝╚══██╔══╝",
+            r"  ╚███╔╝███████╗██║  ██║██║██║  ███╗█████╗  ███████╗   ██║   ",
+            r"  ██╔██╗╚══════╝██║  ██║██║██║   ██║██╔══╝  ╚════██║   ██║   ",
+            r" ██╔╝ ██╗       ██████╔╝██║╚██████╔╝███████╗███████║   ██║   ",
+            r" ╚═╝  ╚═╝       ╚═════╝ ╚═╝ ╚═════╝ ╚══════╝╚══════╝   ╚═╝   "
+        ]
+        for line in logo: print(line)
+        print(f"\n {Color.BOLD}COMMAND CENTER v3.0 // NEURAL LINK ACTIVE{Color.RESET}")
         print(f" {Color.MATRIX_GREEN} ──────────────────────────────────────────────────{Color.RESET}")
 
         print(f"\n {Color.RED}{Color.BOLD} [!] LEGAL COMPLIANCE PROTOCOL{Color.RESET}")
@@ -444,17 +528,19 @@ def main():
         
         args.force = questionary.confirm("Bypass Cooldown?", default=False).ask() if not args.target_date else False
     else:
-        # 非交互模式
-        selected_keys = None
+        # 非交互模式：自动选前 4 个领域
         CUSTOM_ACCOUNTS_FILE = Path("custom_accounts.json")
         if CUSTOM_ACCOUNTS_FILE.exists():
             raw_data = json.loads(CUSTOM_ACCOUNTS_FILE.read_text(encoding="utf-8"))
+            selected_keys = list(raw_data.keys())[:4]
             selected_accounts = {}
-            for v in raw_data.values():
+            for key in selected_keys:
+                v = raw_data.get(key, {})
                 if isinstance(v, dict): selected_accounts.update(v)
         else:
             from config import ACCOUNTS
             selected_accounts = ACCOUNTS
+            selected_keys = None
         if not hasattr(args, "target_date"):
             args.target_date = None
 
@@ -516,6 +602,9 @@ def main():
     print(f"\n {Color.CYAN}✨ Deployment Initiated:{Color.RESET} {len(active_accounts)} active nodes | {args.hours}h window")
 
     def on_fetch_success(username, tweets_found):
+        update_account_health(username, tweets_found)
+        if tweets_found is None:
+            return
         now_iso = datetime.now(timezone.utc).isoformat()
         cache[f"SCAN_{username}"] = now_iso
         for t in tweets_found:
@@ -557,6 +646,7 @@ def main():
     
     msg = f"📰 X 情报汇总报告 ({args.hours}h)\n\n📊 领域分布：\n{counts_text}\n\n📄 完整情报：{doc_url if doc_url else '见本地 output/'}"
     send_feishu_message(msg)
+    generate_health_report()
     print(f"\n {Color.GREEN}✅ Mission Accomplished.{Color.RESET}")
 
 if __name__ == "__main__":

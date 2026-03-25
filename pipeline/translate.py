@@ -63,8 +63,8 @@ async def run_translate(
 
     print(f"  {Color.CYAN}🌐 开始翻译 {len(to_process)} 条推文...{Color.RESET}")
 
-    # ── 2. 分批处理（增加防御性限制） ──
-    safe_batch_size = min(AI_BATCH_SIZE, 12)
+    # ── 2. 分批处理（弹性上限，利用长上下文模型优势） ──
+    safe_batch_size = min(AI_BATCH_SIZE, 30)
     chunks = [to_process[i : i + safe_batch_size] for i in range(0, len(to_process), safe_batch_size)]
 
     for idx, chunk in enumerate(chunks):
