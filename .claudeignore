@@ -1,0 +1,17 @@
+# 忽略项目输出和日志
+output/
+launchd.log
+
+# 忽略环境和缓存
+.venv/
+__pycache__/
+.DS_Store
+.env
+
+# 忽略敏感和大型数据文件
+browser_cookies.json
+*.db
+*.sqlite
+
+# 忽略 Git 历史
+.git/

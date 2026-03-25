@@ -13,9 +13,7 @@ output/*.json
 output/*.log
 
 # 输出报告
-output/*.md
-output/*.pdf
-output/intermediate/
+output/
 
 # IDE
 .vscode/
