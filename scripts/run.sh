@@ -2,8 +2,8 @@
 # X-Digest 定时运行脚本
 
 # 设置代理
-export https_proxy=http://127.0.0.1:8118
-export http_proxy=http://127.0.0.1:8118
+export https_proxy=http://127.0.0.1:7897
+export http_proxy=http://127.0.0.1:7897
 
 # Playwright 需要的环境
 export HOME=/Users/hainingyu

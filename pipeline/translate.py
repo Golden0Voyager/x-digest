@@ -83,7 +83,7 @@ async def run_translate(
                 ],
                 temperature=0.2,
                 model_override=AI_MODEL_TRANSLATE,
-                max_tokens=12288,
+                max_tokens=4000,
             )
             items = extract_json(response.choices[0].message.content)
             for item in items:
