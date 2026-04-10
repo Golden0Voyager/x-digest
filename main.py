@@ -214,10 +214,12 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
                 json={"receive_id": FEISHU_USER_ID, "msg_type": msg_type, "content": json.dumps(content)},
                 timeout=30, # 增加到 30s
             )
-            if resp.json().get("code") == 0:
-                print(f"{Color.CYAN}📨 飞书消息推送成功！{Color.RESET}")
+            data = resp.json()
+            if data.get("code") == 0:
+                msg_id = data.get("data", {}).get("message_id", "N/A")
+                print(f"{Color.CYAN}📨 飞书消息推送成功！ (ID: {msg_id}){Color.RESET}")
             else:
-                print(f"{Color.RED}⚠️  飞书消息推送失败: {resp.json()}{Color.RESET}")
+                print(f"{Color.RED}⚠️  飞书消息推送失败: {data}{Color.RESET}")
     except Exception as e:
         print(f"{Color.RED}⚠️  飞书发送异常: {e}{Color.RESET}")
 
