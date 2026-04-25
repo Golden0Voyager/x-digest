@@ -23,17 +23,36 @@ TRANSLATE_PROMPT = """\
 5. **链接清理**：移除原文中的所有 t.co 链接，不要在译文中体现。
 6. **格式一致**：严格输出 JSON 数组，确保输入中的每个 ID 都在输出中出现。
 
-### 示例对照：
-- 输入: {"id": "1", "text": "RT @ylecun: Proud to be part of the adventure!"}
-  输出: {"id": "1", "translation": "转发自 @ylecun: 为能成为这段冒险的一部分而自豪！"}
-- 输入: {"id": "2", "text": "Next-gen H100 is shipping soon."}
-  输出: {"id": "2", "translation": "下一代 H100 即将出货。"}
-- 输入: {"id": "3", "text": "今天天气不错 ☀️"}
-  输出: {"id": "3", "translation": "SKIP"}
-- 输入: {"id": "4", "text": "Exactly!"}
-  输出: {"id": "4", "translation": "正是如此！"}
+### 格式要求（必须严格遵守）：
+- 输出必须是合法的 JSON 数组
+- 每个元素格式为：{"id": "原始ID", "translation": "翻译结果或SKIP"}
+- 数组首尾用方括号 [] 包裹
+- 元素之间用逗号分隔
+- 不要包含任何 Markdown 代码块标记（如 ```json）
+- 不要添加任何解释文字或注释
 
-输出严格的 JSON 数组，不要包含任何 Markdown 代码块标签（如 ```json）或任何解释文字。"""
+### 正确示例：
+输入：
+[{"id": "1", "text": "RT @ylecun: Proud to be part of the adventure!"}, {"id": "2", "text": "Next-gen H100 is shipping soon."}]
+
+输出：
+[{"id": "1", "translation": "转发自 @ylecun: 为能成为这段冒险的一部分而自豪！"}, {"id": "2", "translation": "下一代 H100 即将出货。"}]
+
+### 错误示例（绝对不要这样输出）：
+❌ 包含解释文字：Here is the translation: [{"id": "1"...
+❌ Markdown 代码块：```json [{"id": "1"...
+❌ 缺少逗号：[{"id": "1" "translation": ...} {"id": "2"...]
+❌ 括号不匹配：[{"id": "1", "translation": "..."}
+❌ 字段名错误：{"ID": "1", "text": "..."}
+❌ 输出纯文本列表：1. ... 2. ...
+
+### 特殊场景处理：
+- 纯中文：{"id": "3", "text": "今天天气不错"} → {"id": "3", "translation": "SKIP"}
+- 纯英文：{"id": "4", "text": "Amazing!"} → {"id": "4", "translation": "太棒了！"}
+- 混合内容：{"id": "5", "text": "AI first mindset is crucial"} → {"id": "5", "translation": "AI优先思维至关重要"}
+- RT 格式：{"id": "6", "text": "RT @elonmusk: Mars soon!"} → {"id": "6", "translation": "转发自 @elonmusk: 火星很快就要来了！"}
+
+再次强调：只输出合法的 JSON 数组，不要任何其他内容。"""
 
 
 async def run_translate(

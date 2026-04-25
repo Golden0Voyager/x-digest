@@ -100,9 +100,48 @@ def extract_json(text: str) -> list:
             obj = json.loads(m.group(0))
             found_objects.append(obj)
         except: pass
-    
+
     if found_objects:
         print(f"  {Color.YELLOW}⚠️ JSON 结构受损，正则抢救出 {len(found_objects)} 条记录{Color.RESET}")
+        return found_objects
+
+    # 5. 终极抢救：处理对象内部有嵌套结构的情况
+    # 使用计数法匹配完整的 {...} 块
+    found_objects = []
+    i = 0
+    while i < len(text):
+        if text[i] == '{':
+            depth = 1
+            j = i + 1
+            in_string = False
+            escape = False
+            while j < len(text) and depth > 0:
+                c = text[j]
+                if escape:
+                    escape = False
+                elif c == '\\':
+                    escape = True
+                elif c == '"' and not escape:
+                    in_string = not in_string
+                elif not in_string:
+                    if c == '{':
+                        depth += 1
+                    elif c == '}':
+                        depth -= 1
+                j += 1
+            if depth == 0:
+                try:
+                    obj = json.loads(text[i:j])
+                    if isinstance(obj, dict) and 'id' in obj:
+                        found_objects.append(obj)
+                except:
+                    pass
+            i = j
+        else:
+            i += 1
+
+    if found_objects:
+        print(f"  {Color.YELLOW}⚠️ JSON 结构严重受损，深度解析抢救出 {len(found_objects)} 条记录{Color.RESET}")
         return found_objects
 
     raise ValueError(f"无法从 LLM 响应中提取 JSON 数组: {text[:200]}...")
