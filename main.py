@@ -375,6 +375,25 @@ async def render_markdown_to_pdf(md_path: Path):
         print(f"{Color.YELLOW}⚠️  PDF 生成失败: {e}{Color.RESET}")
         return None
 
+def sync_to_wiki(topic: str, content: str, metadata: dict):
+    """将摘要同步到 agent_platform 的 WikiAgent"""
+    try:
+        url = "http://localhost:8000/api/v1/wiki/ingest"
+        payload = {
+            "source_project": "x_digest",
+            "topic": topic,
+            "content": content,
+            "metadata": metadata
+        }
+        with httpx.Client() as client:
+            resp = client.post(url, json=payload, timeout=30)
+            if resp.status_code == 200:
+                print(f" {Color.GREEN}📡 WikiAgent Sync Successful!{Color.RESET}")
+            else:
+                print(f" {Color.YELLOW}⚠️ WikiAgent Sync Failed: {resp.status_code}{Color.RESET}")
+    except Exception as e:
+        print(f" {Color.RED}⚠️ WikiAgent Connection Error: {e}{Color.RESET}")
+
 def save_output(content: str, tweet_count: int, hours: int, selected_domains: list[str] | None = None, account_count: int = 0) -> Path:
     date = datetime.now().strftime("%Y-%m-%d")
     time_str = datetime.now().strftime("%H%M")
@@ -622,6 +641,10 @@ def main():
 
     summary, counts_text = asyncio.run(run_pipeline(selected_tweets))
     output_path = save_output(summary, len(selected_tweets), args.hours, selected_domains=selected_keys, account_count=len(selected_accounts))
+    
+    # 同步至 WikiAgent
+    sync_to_wiki(topic=f"X情报汇总_{args.hours}h", content=summary, metadata={"domains": selected_keys, "tweet_count": len(selected_tweets)})
+    
     asyncio.run(render_markdown_to_pdf(output_path))
     
     date_label = datetime.now().strftime("%Y-%m-%d")
