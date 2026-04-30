@@ -125,7 +125,7 @@ Cookie #N 队列：...
 采用 **供应商降级链** 架构，支持任意 OpenAI 协议兼容服务商热切换：
 
 ```
-主模型 (Kimi K2) ──失败──> 备选 1 (Groq) ──失败──> 备选 2 (ZhipuAI) ──...
+主模型 (OpenRouter hy3-preview:free) ──失败──> 备选 1 (Groq) ──失败──> 备选 2 (ZhipuAI) ──...
 ```
 
 每条推文经过三层处理：
@@ -256,7 +256,7 @@ x_digest/
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `PROXY` | `http://127.0.0.1:7897` | 代理地址（国内必填） |
-| `AI_PROVIDER_CHAIN` | `GROQ,OPENROUTER,ZHIPUAI` | AI 供应商降级链 |
+| `AI_PROVIDER_CHAIN` | `OPENROUTER,GROQ,ZHIPUAI` | AI 供应商降级链 |
 | `HOURS_LOOKBACK` | `72` | 推文回溯时长（小时） |
 | `TWEETS_PER_ACCOUNT` | `30` | 每账号最大抓取条数 |
 | `AI_BATCH_SIZE` | `30` | AI 处理批次大小 |
