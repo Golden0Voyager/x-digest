@@ -208,9 +208,20 @@ def call_ai_with_retry(messages, temperature=0.2, model_override=None, max_token
                         print(f"  {Color.YELLOW}⚠️ [{provider['name']}] 失败，降级到 [{next_name}]{Color.RESET}")
                     break
 
+                err_str = str(e).lower()
+                # 硬配额耗尽 / 模型不存在 / 认证失败 → 立刻降级，无需等待
+                is_hard_fail = any(k in err_str for k in [
+                    "资源包余量已用尽", "quota", "3008",
+                    "no endpoints found", "404",
+                    "令牌已过期", "authentication", "401",
+                ])
+                if is_hard_fail:
+                    print(f"  {Color.YELLOW}⚠️ [{provider['name']}] 调用失败: {e}{Color.RESET}")
+                    break  # 直接跳出内层循环，进入下一个 provider
+
                 # 仅主模型第 1 次失败时短暂等待后重试
                 wait_sec = 3
-                is_rate_limit = "RateLimitError" in type(e).__name__ or "rate" in str(e).lower()
+                is_rate_limit = "RateLimitError" in type(e).__name__ or "rate" in err_str
                 if hasattr(e, "response") and hasattr(e.response, "headers"):
                     retry_after = e.response.headers.get("retry-after")
                     if retry_after:
