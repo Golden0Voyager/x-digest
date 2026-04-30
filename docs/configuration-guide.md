@@ -17,7 +17,7 @@ PROXY=http://127.0.0.1:7897
 ## 2. AI 供应商降级链
 
 ```bash
-AI_PROVIDER_CHAIN=GROQ,OPENROUTER,ZHIPUAI
+AI_PROVIDER_CHAIN=OPENROUTER,GROQ,ZHIPUAI
 ```
 
 **工作原理：** 逗号分隔的供应商前缀列表。第一个为主模型，后续为备选。主模型失败时自动降级到下一个。
@@ -31,15 +31,15 @@ AI_PROVIDER_CHAIN=GROQ,OPENROUTER,ZHIPUAI
 ### 预置供应商示例
 
 ```bash
-# ── Groq（推荐首选，极速推理） ──
+# ── OpenRouter（推荐首选 — 限免模型聚合平台）──
+OPENROUTER_API_KEY=sk-or-v1-xxxx
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=tencent/hy3-preview:free
+
+# ── Groq（降级备选 — 极速推理）──
 GROQ_API_KEY=gsk_xxxx
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=moonshotai/kimi-k2-instruct-0905
-
-# ── OpenRouter（多模型聚合平台） ──
-OPENROUTER_API_KEY=sk-or-v1-xxxx
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=qwen/qwen3-next-80b-a3b-instruct:free
 
 # ── ZhipuAI / 智谱（国产，中文能力强） ──
 ZHIPUAI_API_KEY=xxxx.xxxx
@@ -57,9 +57,11 @@ DEEPSEEK_MODEL=deepseek-chat
 如果你希望翻译用快模型、洞察用强模型：
 
 ```bash
-AI_MODEL_TRANSLATE=moonshotai/kimi-k2-instruct-0905   # 翻译：用快的
-AI_MODEL_INSIGHTS=moonshotai/kimi-k2-instruct-0905    # 洞察：用强的
+AI_MODEL_TRANSLATE=openrouter/free                    # 翻译：用免费自动路由（快）
+AI_MODEL_INSIGHTS=tencent/hy3-preview:free            # 洞察：用混元 3.0（强）
 ```
+
+默认两者都使用主模型，只在需要差异化时配置。
 
 默认两者都使用主模型，只在需要差异化时配置。
 
@@ -164,7 +166,22 @@ FEISHU_USER_ID=ou_xxxx
 
 ## 6. 常见配置组合
 
-### 场景 A：Groq 免费用户（推荐起手配置）
+### 场景 A：OpenRouter 限免模型（推荐起手配置，零费用）
+
+```bash
+AI_PROVIDER_CHAIN=OPENROUTER
+OPENROUTER_API_KEY=sk-or-v1-xxxx
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=tencent/hy3-preview:free
+OPENROUTER_FALLBACK_MODEL=openrouter/free
+AI_BATCH_SIZE=30
+AI_MAX_BATCH_SIZE=30
+AI_BATCH_COOLDOWN=20
+```
+
+> `tencent/hy3-preview:free` 为腾讯混元 3.0 预览版，上下文长达 262K，长文本总结与逻辑推理极强。`openrouter/free` 为万能免费路由，自动分发至当前性能最强的免费模型。
+
+### 场景 B：Groq 免费用户（极速推理备选）
 
 ```bash
 AI_PROVIDER_CHAIN=GROQ
@@ -176,23 +193,11 @@ AI_MAX_BATCH_SIZE=30
 AI_BATCH_COOLDOWN=15
 ```
 
-### 场景 B：OpenRouter 免费模型
-
-```bash
-AI_PROVIDER_CHAIN=OPENROUTER
-OPENROUTER_API_KEY=sk-or-v1-xxxx
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=qwen/qwen3-next-80b-a3b-instruct:free
-AI_BATCH_SIZE=15
-AI_MAX_BATCH_SIZE=20
-AI_BATCH_COOLDOWN=30
-```
-
 ### 场景 C：多供应商降级链（高可用）
 
 ```bash
-AI_PROVIDER_CHAIN=GROQ,OPENROUTER,ZHIPUAI
-# 主模型挂了 → 自动切 OpenRouter → 再挂切智谱
+AI_PROVIDER_CHAIN=OPENROUTER,GROQ,ZHIPUAI
+# OpenRouter 限免挂了 → 自动切 Groq → 再挂切智谱
 # 三要素分别配置...
 AI_BATCH_SIZE=30
 AI_MAX_BATCH_SIZE=30
