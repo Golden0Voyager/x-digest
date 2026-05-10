@@ -47,8 +47,13 @@ def _add_provider_fallbacks(
 
 
 AI_FALLBACK_PROVIDERS: list[dict] = []
+AI_API_KEY: str | None = None
+AI_BASE_URL: str = ""
+AI_MODEL: str = ""
 
-for _i, _prefix in enumerate(AI_PROVIDER_CHAIN):
+# 链中第一个拿到有效 key 的供应商即为主模型，其余按顺序进入降级列表。
+# 这样调链头时不需保证每个前缀都已配 key——CI 环境下尤其关键。
+for _prefix in AI_PROVIDER_CHAIN:
     _key = os.getenv(f"{_prefix}_API_KEY")
     if not _key:
         continue
@@ -56,7 +61,7 @@ for _i, _prefix in enumerate(AI_PROVIDER_CHAIN):
     _model = os.getenv(f"{_prefix}_MODEL", "")
     _name = os.getenv(f"{_prefix}_NAME", _prefix)
 
-    if _i == 0:
+    if AI_API_KEY is None:
         AI_API_KEY = _key
         AI_BASE_URL = _url
         AI_MODEL = _model
@@ -69,11 +74,6 @@ for _i, _prefix in enumerate(AI_PROVIDER_CHAIN):
             "is_primary": True,
         })
     _add_provider_fallbacks(_name, _key, _url, _prefix)
-
-if "AI_API_KEY" not in dir():
-    AI_API_KEY = None
-    AI_BASE_URL = ""
-    AI_MODEL = ""
 
 # ── 任务特定模型支持 ──────────────────────────────────
 # 允许为不同性质的任务指定不同的模型（为空时回退到主模型）
