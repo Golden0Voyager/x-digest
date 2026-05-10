@@ -2,7 +2,7 @@ name: Daily X-Digest
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # 每天 UTC 23:00 (北京时间早上 7:00) 运行
+    - cron: '0 7 * * *'  # 每天北京时间下午 3:00 运行 (UTC 07:00)
   workflow_dispatch:      # 允许手动触发执行
 
 jobs:
