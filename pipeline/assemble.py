@@ -13,7 +13,9 @@ from pipeline import Color
 CUSTOM_ACCOUNTS_FILE = Path("custom_accounts.json")
 
 # 质量门控阈值
-_MIN_QUALITY = 3
+_MIN_QUALITY = 80
+# 最终精选的最大条目数
+_MAX_DIGEST_ITEMS = 60
 
 # 预编译：去除推文中的所有 t.co 短链（Twitter 跟踪链接，在 Markdown 中无用）
 _TCO_RE = re.compile(r"https://t\.co/[a-zA-Z0-9]+")
@@ -71,9 +73,10 @@ def assemble(
 
     bios = _load_bios()
 
+    # ── 归类装配 ──
     category_items: dict[str, list] = {name: [] for name, _ in DISPLAY_CATEGORIES}
     fallback_items: list[str] = []
-
+    
     skipped_no_insight = 0
 
     for t in tweets:
@@ -83,50 +86,46 @@ def assemble(
             skipped_no_insight += 1
             continue
 
-        # ── 质量门控 ──
-        quality = insight.get("quality", 3)
-        if quality < _MIN_QUALITY:
-            continue
-
+        quality = insight.get("quality", 0)
         thought = insight.get("thought", "")
         if thought.upper() == "SKIP":
-            continue
+            # 即使没有深度启示，也要归类展示推文内容
+            thought = ""
 
         username = t["username"]
-        # 原文清理 t.co 链接，避免干扰加粗斜体格式
         original_text = _clean_tco(t["text"].strip())
-
         tweet_url = f"https://x.com/{username}/status/{tid}"
         bio = bios.get(username, "博主信息暂无")
 
-        # 组装单条 Markdown（quality=5 加高亮标记）
-        highlight = "🔥 " if quality == 5 else ""
+        # 组装单条 Markdown（quality>=95 加高亮标记）
+        highlight = "🔥 " if quality >= 95 else ""
         entry = f"{highlight}**@{username}** ({bio})\n\n"
         if original_text:
             entry += f"🔗 [原推]({tweet_url})：***{original_text}***\n"
         else:
-            # 即使原文为空（纯图），也保留链接
             entry += f"🔗 [原推]({tweet_url})\n"
 
-        # 展示推文附图（紧跟正文/链接）
         images = t.get("images", [])
         if images:
             entry += " ".join(f"![推文配图]({url})" for url in images) + "\n"
         
-        entry += "\n" # 增加段落间距
+        entry += "\n"
 
         trans = translations.get(tid, "SKIP")
         if trans and trans.upper() != "SKIP":
-            # 译文中清除 t.co 链接，保持干净
             trans = _clean_tco(trans)
             entry += f"📝 **译文**：{trans}\n\n"
+
+        background = insight.get("background", "")
+        if background and background.upper() != "SKIP":
+            entry += f"💡 **小贴士**：{background.strip()}\n\n"
 
         if thought:
             thought = thought.replace("启发性思考：", "").replace("启发 & 思考：", "").replace("💡", "").strip()
             if thought:
-                entry += f"💡 **启示**：{thought}"
-
-        # 归类：AI 分类直接匹配展示分类，无白名单限制
+                entry += f"🧠 **启示**：{thought}"
+                
+        # 归类
         cat_val = insight.get("category", "其他动态")
         matched = False
         for section_name, keywords in DISPLAY_CATEGORIES:

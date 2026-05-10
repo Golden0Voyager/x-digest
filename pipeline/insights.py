@@ -1,7 +1,8 @@
 """
-Step 3: 专注洞察与分类
+Step 3: 专注洞察与分类 (科普增强版)
 
-在翻译完成后运行，LLM 拿到原文 + 翻译上下文，专注于深度分析和分类。
+在联合打分和翻译完成后运行。
+利用 DeepSeek-R1 的推理能力，为非专业人士补全背景常识。
 """
 
 import asyncio
@@ -13,28 +14,25 @@ from config import AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_INSIGHTS, AI_MAX_B
 from pipeline import call_ai_with_retry, extract_json, load_json, save_json, Color
 
 INSIGHTS_PROMPT_TEMPLATE = """\
-你是资深科技情报分析师。对每条推文进行质量评估、深度分析和分类。
+你是资深科技情报分析师。对这些精选推文进行深度分析、科普和分类。
 当前日期：{current_date}
 
-输出要求：
-- quality: 1-5 信息价值评分
-  5 = 重大事件/独家数据/突破性技术（如融资、产品发布、政策变动）
-  4 = 有实质内容的行业观点或趋势分析
-  3 = 有一定参考价值的信息或评论
-  2 = 碎片化信息、转发无附加观点、泛泛而谈
-  1 = 无信息量（纯表情、纯链接、广告、闲聊）
+你的目标是：让非专业人士也能读懂硬核的科技/金融推文。
 
-- thought: 针对 quality >= 3 的推文，写 2-3 句精炼分析。
-  根据内容性质选择分析角度（技术趋势/商业影响/政策含义/行业格局），
-  不要对每条都强行套投资逻辑。
-  quality < 3 的推文，thought 输出 "SKIP"。
+输出要求：
+- background: 术语科普与背景补充。
+  识别推文中的专业术语、缩写、技术架构或特定人物/事件背景（例如：MoE, H100, Fed Pivot, 某初创公司背景等）。
+  用一句话、最通俗的语言进行“大白话”科普。
+  如果没有需要科普的内容，请输入 "SKIP"。
+
+- thought: 针对推文写 2-3 句精炼分析。
+  结合当前的行业趋势，说明为什么这条推文重要。
+  不要强行套用模板。如果实在没啥分析价值，请输入 "SKIP"。
 
 - category: 从以下选最匹配的：
-  核心头条（仅限：重大产品发布、大额融资、政策变动、突发事件等具有广泛影响力的头条新闻）
-  AI & 算法、芯片 & 硬件、航天 & 自动驾驶、
-  市场 & 投资、政治 & 政策、F1 赛车、当代艺术
+  核心头条、AI & 算法、芯片 & 硬件、航天 & 自动驾驶、市场 & 投资、政治 & 政策、F1 赛车、当代艺术
 
-输出严格的 JSON 数组: [{{"id": "推文ID", "quality": 数字, "thought": "...", "category": "..."}}]
+输出严格的 JSON 数组: [{{"id": "推文ID", "background": "...", "thought": "...", "category": "..."}}]
 不要输出任何 JSON 之外的内容"""
 
 
@@ -47,35 +45,32 @@ async def run_insights(
     """
     生成洞察与分类。
 
-    返回 {tweet_id: {"thought": str, "category": str, "quality": int}}
+    返回 {tweet_id: {"thought": str, "category": str, "quality": int, "background": str}}
     """
-    # ── 1. 加载并过滤缓存（会话隔离） ──
     cache_file = intermediate_dir / "insights.json"
     raw_cache: dict = {} if force_rerun else load_json(cache_file)
     
     active_ids = {str(t["tweet_id"]) for t in tweets}
-    # 仅保留本次需要的缓存，防止 30 天前的历史数据干扰条数统计
     insights = {k: v for k, v in raw_cache.items() if k in active_ids}
 
     to_process = [t for t in tweets if str(t["tweet_id"]) not in insights]
 
     if not to_process:
-        print(f"  {Color.GREEN}✓ 洞察缓存命中，跳过分析步骤{Color.RESET}")
+        print(f"  {Color.GREEN}✓ 洞察缓存命中{Color.RESET}")
+        for t in tweets:
+            tid = str(t["tweet_id"])
+            if tid in insights:
+                insights[tid]["quality"] = t.get("quality", 80)
         return insights
 
-    print(f"  {Color.CYAN}🧠 开始分析 {len(to_process)} 条推文...{Color.RESET}")
+    print(f"  {Color.CYAN}🧠 开始分析并科普 {len(to_process)} 条精选推文...{Color.RESET}")
 
-    # 注入当前日期到 prompt
     insights_prompt = INSIGHTS_PROMPT_TEMPLATE.format(current_date=date.today().isoformat())
 
-    # ── 2. 分批处理（受 AI_MAX_BATCH_SIZE 保护，防止输出截断） ──
     safe_batch_size = min(AI_BATCH_SIZE, AI_MAX_BATCH_SIZE)
-    if AI_BATCH_SIZE > AI_MAX_BATCH_SIZE:
-        print(f"  {Color.YELLOW}⚠️ AI_BATCH_SIZE={AI_BATCH_SIZE} 超过安全上限 {AI_MAX_BATCH_SIZE}，已自动限制{Color.RESET}")
     chunks = [to_process[i : i + safe_batch_size] for i in range(0, len(to_process), safe_batch_size)]
 
     for idx, chunk in enumerate(chunks):
-        # 构造输入：原文 + 翻译
         tweet_input = []
         for t in chunk:
             tid = str(t["tweet_id"])
@@ -97,59 +92,20 @@ async def run_insights(
                 ],
                 temperature=0.3,
                 model_override=AI_MODEL_INSIGHTS,
-                max_tokens=12288,
+                max_tokens=10000, # R1 需要稍多 token 处理推理
             )
             items = extract_json(response.choices[0].message.content)
             for item in items:
                 tid = str(item.get("id", ""))
                 if tid:
+                    original_tweet = next((t for t in chunk if str(t["tweet_id"]) == tid), {})
                     insights[tid] = {
+                        "background": item.get("background", ""),
                         "thought": item.get("thought", ""),
                         "category": item.get("category", "其他动态"),
-                        "quality": int(item.get("quality", 3)),
+                        "quality": original_tweet.get("quality", 80),
                     }
 
-            # 截断补抓：检查本批缺失的条目，小批量重试
-            expected_ids = {str(t["tweet_id"]) for t in chunk}
-            returned_ids = {str(item.get("id", "")) for item in items}
-            missing_ids = expected_ids - returned_ids
-            if missing_ids:
-                missing_tweets = [t for t in chunk if str(t["tweet_id"]) in missing_ids]
-                print(f"  {Color.YELLOW}⚠️ 批次 {idx+1} 缺失 {len(missing_ids)} 条，补抓中...{Color.RESET}")
-                retry_input = []
-                for t in missing_tweets:
-                    tid = str(t["tweet_id"])
-                    entry = {"id": tid, "text": t["text"]}
-                    trans = translations.get(tid, "SKIP")
-                    if trans and trans.upper() != "SKIP":
-                        entry["translation"] = trans
-                    retry_input.append(entry)
-                retry_text = json.dumps(retry_input, ensure_ascii=False)
-                try:
-                    retry_resp = await asyncio.to_thread(
-                        call_ai_with_retry,
-                        messages=[
-                            {"role": "system", "content": insights_prompt},
-                            {"role": "user", "content": retry_text},
-                        ],
-                        temperature=0.3,
-                        model_override=AI_MODEL_INSIGHTS,
-                        max_tokens=4096,
-                    )
-                    retry_items = extract_json(retry_resp.choices[0].message.content)
-                    for item in retry_items:
-                        tid = str(item.get("id", ""))
-                        if tid:
-                            insights[tid] = {
-                                "thought": item.get("thought", ""),
-                                "category": item.get("category", "其他动态"),
-                                "quality": int(item.get("quality", 3)),
-                            }
-                    print(f"  {Color.GREEN}✓ 补抓成功 {len(retry_items)} 条{Color.RESET}")
-                except Exception as retry_e:
-                    print(f"  {Color.RED}⚠️ 补抓失败: {retry_e}{Color.RESET}")
-
-            # 持久化全量缓存
             raw_cache.update(insights)
             save_json(cache_file, raw_cache)
 
@@ -159,5 +115,5 @@ async def run_insights(
         except Exception as e:
             print(f"  {Color.RED}⚠️ 分析批次 {idx + 1} 失败: {e}{Color.RESET}")
 
-    print(f"  {Color.GREEN}✓ 分析完成：{len(insights)} 条{Color.RESET}")
+    print(f"  {Color.GREEN}✓ 分析与科普完成：{len(insights)} 条{Color.RESET}")
     return insights

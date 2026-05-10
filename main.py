@@ -54,6 +54,8 @@ STATS_FILE = OUTPUT_DIR / "account_stats.json"
 FEISHU_APP_ID = os.getenv("FEISHU_APP_ID", "")
 FEISHU_APP_SECRET = os.getenv("FEISHU_APP_SECRET", "")
 FEISHU_USER_ID = os.getenv("FEISHU_USER_ID", "")
+FEISHU_CHAT_ID = os.getenv("FEISHU_CHAT_ID", "") # 新增：群聊 ID
+FEISHU_WEBHOOK_URL = os.getenv("FEISHU_WEBHOOK_URL", "") # 新增：Webhook 机器人 URL
 
 
 # ===== 数据管理 (Cache & Pool) =====
@@ -194,11 +196,15 @@ def get_feishu_token() -> str:
     
     raise Exception("多次尝试获取飞书 token 失败")
 
-def send_feishu_message(text: str, msg_type: str = "text", content: dict | None = None):
-    if not all([FEISHU_APP_ID, FEISHU_APP_SECRET, FEISHU_USER_ID]):
+def send_feishu_message(text: str, msg_type: str = "text", content: dict | None = None, receive_id: str = None):
+    # 优先使用传入的 receive_id，否则回退到配置文件
+    target_id = receive_id or FEISHU_USER_ID
+    if not all([FEISHU_APP_ID, FEISHU_APP_SECRET, target_id]):
         print(f"{Color.GREY}⚠️  飞书配置不完整，跳过推送{Color.RESET}")
         return
     
+    receive_id_type = "chat_id" if target_id.startswith("oc_") else "open_id"
+
     # 飞书消息安全截断
     if text and len(text) > 28000:
         text = text[:28000] + "\n\n... (内容过长已截断)"
@@ -209,10 +215,10 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
         with httpx.Client(trust_env=True) as client:
             resp = client.post(
                 "https://open.feishu.cn/open-apis/im/v1/messages",
-                params={"receive_id_type": "open_id"},
+                params={"receive_id_type": receive_id_type},
                 headers={"Authorization": f"Bearer {token}"},
-                json={"receive_id": FEISHU_USER_ID, "msg_type": msg_type, "content": json.dumps(content)},
-                timeout=30, # 增加到 30s
+                json={"receive_id": target_id, "msg_type": msg_type, "content": json.dumps(content)},
+                timeout=30,
             )
             data = resp.json()
             if data.get("code") == 0:
@@ -222,6 +228,95 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
                 print(f"{Color.RED}⚠️  飞书消息推送失败: {data}{Color.RESET}")
     except Exception as e:
         print(f"{Color.RED}⚠️  飞书发送异常: {e}{Color.RESET}")
+
+
+def send_feishu_webhook_card(title: str, doc_url: str, counts_text: str, hours: int, tweet_count: int):
+    """通过 Webhook 发送精美的交互式卡片"""
+    if not FEISHU_WEBHOOK_URL: return
+    
+    # 格式化领域统计，去掉 bullet 点以便卡片展示
+    clean_counts = counts_text.replace("• ", "▫️ ")
+    
+    card_payload = {
+        "msg_type": "interactive",
+        "card": {
+            "config": {"wide_screen_mode": True},
+            "header": {
+                "title": {"tag": "plain_text", "content": f"🛰️ {title}"},
+                "template": "blue"
+            },
+            "elements": [
+                {
+                    "tag": "div",
+                    "text": {
+                        "tag": "lark_md",
+                        "content": f"**📊 汇总窗口**：过去 {hours} 小时\n**📡 发现信号**：{tweet_count} 条精选情报"
+                    }
+                },
+                {"tag": "hr"},
+                {
+                    "tag": "div",
+                    "text": {
+                        "tag": "lark_md",
+                        "content": f"**领域分布**：\n{clean_counts}"
+                    }
+                },
+                {
+                    "tag": "action",
+                    "actions": [
+                        {
+                            "tag": "button",
+                            "text": {"tag": "plain_text", "content": "📖 阅读完整内参"},
+                            "type": "primary",
+                            "url": doc_url
+                        }
+                    ]
+                },
+                {
+                    "tag": "note",
+                    "elements": [{"tag": "plain_text", "content": "Powered by x-digest (DeepSeek-R1 Enhanced)"}]
+                }
+            ]
+        }
+    }
+    
+    try:
+        with httpx.Client(trust_env=True) as client:
+            resp = client.post(FEISHU_WEBHOOK_URL, json=card_payload, timeout=20)
+            data = resp.json()
+            if data.get("StatusCode") == 0 or data.get("code") == 0:
+                print(f"{Color.CYAN}🪝 Webhook 卡片发送成功！{Color.RESET}")
+            else:
+                print(f"{Color.RED}⚠️ Webhook 发送失败: {data}{Color.RESET}")
+    except Exception as e:
+        print(f"{Color.RED}⚠️ Webhook 调用异常: {e}{Color.RESET}")
+
+
+def upload_feishu_file(file_path: Path) -> str | None:
+    """上传本地文件到飞书，返回 file_key"""
+    if not file_path.exists(): return None
+    try:
+        token = get_feishu_token()
+        url = "https://open.feishu.cn/open-apis/im/v1/files"
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        # 飞书上传文件需要 multipart/form-data
+        files = {
+            "file_type": (None, "pdf"),
+            "file_name": (None, file_path.name),
+            "file": (file_path.name, open(file_path, "rb"), "application/pdf")
+        }
+        
+        with httpx.Client(trust_env=True) as client:
+            resp = client.post(url, headers=headers, files=files, timeout=60)
+            data = resp.json()
+            if data.get("code") == 0:
+                return data["data"]["file_key"]
+            else:
+                print(f"  {Color.RED}⚠️  飞书文件上传失败: {data}{Color.RESET}")
+    except Exception as e:
+        print(f"  {Color.RED}⚠️  飞书上传异常: {e}{Color.RESET}")
+    return None
 
 
 def create_feishu_doc(title: str, markdown_content: str) -> str | None:
@@ -651,7 +746,25 @@ def main():
     doc_url = create_feishu_doc(f"X 情报大合拢 ({args.hours}h) · {date_label}", summary)
     
     msg = f"📰 X 情报汇总报告 ({args.hours}h)\n\n📊 领域分布：\n{counts_text}\n\n📄 完整情报：{doc_url if doc_url else '见本地 output/'}"
+    
+    # 1. 发送私聊文字消息
     send_feishu_message(msg)
+    
+    # 2. 发送 Webhook 卡片（如果配置了 URL）
+    if FEISHU_WEBHOOK_URL and doc_url:
+        send_feishu_webhook_card(f"X-Digest 科技汇总日报", doc_url, counts_text, args.hours, len(selected_tweets))
+    
+    # 3. 如果配置了群 ID，发送 PDF 文件到群
+    if FEISHU_CHAT_ID and output_path:
+        pdf_path = output_path.with_suffix(".pdf")
+        if pdf_path.exists():
+            print(f" {Color.GREY}📦 正在上传 PDF 报告至飞书群...{Color.RESET}")
+            file_key = upload_feishu_file(pdf_path)
+            if file_key:
+                send_feishu_message("", msg_type="file", content={"file_key": file_key}, receive_id=FEISHU_CHAT_ID)
+                # 同时在群里发一条文字说明
+                send_feishu_message(f"📊 以上是今日 X-Digest PDF 报告\n回溯窗口：{args.hours}h\n推文总数：{len(selected_tweets)}", receive_id=FEISHU_CHAT_ID)
+
     generate_health_report()
     print(f"\n {Color.GREEN}✅ Mission Accomplished.{Color.RESET}")
 
