@@ -67,7 +67,16 @@ async def run_pipeline(
         print(f"\n{Color.RED}⚠️ 预过滤后无剩余推文{Color.RESET}")
         return "", ""
 
-    # 更新 active_ids（预过滤可能删减了推文）
+    # Phase 0.5: 联合打分与精选（三模型并行）
+    print(f"\n{Color.BOLD}━━━ Phase 0.5: 多模型联合打分 ━━━{Color.RESET}")
+    from pipeline.score import run_score
+    tweets = await run_score(tweets, intermediate_dir, force_rerun)
+
+    if not tweets:
+        print(f"\n{Color.RED}⚠️ 联合打分后无剩余推文（全低于 80 分）{Color.RESET}")
+        return "", ""
+
+    # 更新 active_ids（预过滤和打分可能大幅删减了推文）
     active_ids = {str(t["tweet_id"]) for t in tweets}
 
     # Phase 1: 翻译

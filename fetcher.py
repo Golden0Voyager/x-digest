@@ -20,7 +20,11 @@ from pipeline import Color, log_print
 
 load_dotenv()
 
-PROXY = os.getenv("PROXY", "http://127.0.0.1:7897")
+if os.getenv("GITHUB_ACTIONS") == "true":
+    PROXY = None
+else:
+    PROXY = os.getenv("PROXY", "http://127.0.0.1:7897")
+
 COOKIE_FILE_PATTERN = "x_cookies_*.json"
 
 def load_browser_cookies(file_path: str) -> list[dict]:
@@ -200,7 +204,8 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
     print(f"  🔑 已加载 {num_contexts} 组 Cookie（{f'{num_contexts} 账号并发模式' if num_contexts >= 2 else '单账号模式'}）")
 
     async with Stealth().use_async(async_playwright()) as p:
-        browser = await p.chromium.launch(headless=True, proxy={"server": PROXY}, args=["--disable-blink-features=AutomationControlled"])
+        proxy_config = {"server": PROXY} if PROXY else None
+        browser = await p.chromium.launch(headless=True, proxy=proxy_config, args=["--disable-blink-features=AutomationControlled"])
 
         contexts = []
         for i, cookies in enumerate(cookie_data_list):
