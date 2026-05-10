@@ -45,6 +45,12 @@ jobs:
 
       - name: Run x-digest pipeline
         env:
+          # AI 管线配置
+          AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
+          AI_MODEL_TRANSLATE: DeepSeek-R1
+          AI_MODEL_INSIGHTS: DeepSeek-R1
+          
+          # 飞书与 API Keys
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_USER_ID: ${{ secrets.FEISHU_USER_ID }}
