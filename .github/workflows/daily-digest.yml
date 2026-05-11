@@ -5,6 +5,10 @@ on:
     - cron: '0 7 * * *'  # 每天北京时间下午 3:00 运行 (UTC 07:00)
   workflow_dispatch:      # 允许手动触发执行
 
+concurrency:
+  group: daily-x-digest-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   run-digest:
     runs-on: ubuntu-latest
@@ -67,6 +71,7 @@ jobs:
 
       - name: Commit and push generated digests
         run: |
+          set -euo pipefail
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add -f output/
@@ -74,5 +79,19 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "📝 Auto Digest: $(date +'%Y-%m-%d') [skip ci]"
-            git push
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then
+                echo "Push succeeded on attempt ${attempt}"
+                exit 0
+              fi
+
+              if [ "${attempt}" -eq 3 ]; then
+                echo "Push failed after 3 attempts"
+                exit 1
+              fi
+
+              echo "Push failed due to branch race; retrying (${attempt}/3)..."
+              sleep $((attempt * 5))
+            done
           fi
