@@ -180,7 +180,7 @@ def get_feishu_token() -> str:
             # 允许使用系统代理 (trust_env=True)
             with httpx.Client(trust_env=True) as client:
                 resp = client.post(
-                    "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
+                    "https://open.feishu.cn/open-apis/auth/v3/tenant_access_tokens/internal",
                     json={"app_id": FEISHU_APP_ID, "app_secret": FEISHU_APP_SECRET},
                     timeout=20, # 增加超时到 20s
                 )
@@ -190,10 +190,10 @@ def get_feishu_token() -> str:
                 print(f"  {Color.YELLOW}⚠️  飞书 Token 响应异常 (尝试 {attempt+1}/{max_retries}): {data}{Color.RESET}")
         except Exception as e:
             print(f"  {Color.YELLOW}⚠️  飞书 Token 获取网络异常 (尝试 {attempt+1}/{max_retries}): {e}{Color.RESET}")
-        
+
         if attempt < max_retries - 1:
             time.sleep(2) # 重试前等待
-    
+
     raise Exception("多次尝试获取飞书 token 失败")
 
 def send_feishu_message(text: str, msg_type: str = "text", content: dict | None = None, receive_id: str = None):
@@ -202,7 +202,7 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
     if not all([FEISHU_APP_ID, FEISHU_APP_SECRET, target_id]):
         print(f"{Color.GREY}⚠️  飞书配置不完整，跳过推送{Color.RESET}")
         return
-    
+
     receive_id_type = "chat_id" if target_id.startswith("oc_") else "open_id"
 
     # 飞书消息安全截断
@@ -233,10 +233,10 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
 def send_feishu_webhook_card(title: str, doc_url: str, counts_text: str, hours: int, tweet_count: int):
     """通过 Webhook 发送精美的交互式卡片"""
     if not FEISHU_WEBHOOK_URL: return
-    
+
     # 格式化领域统计，去掉 bullet 点以便卡片展示
     clean_counts = counts_text.replace("• ", "▫️ ")
-    
+
     card_payload = {
         "msg_type": "interactive",
         "card": {
@@ -279,7 +279,7 @@ def send_feishu_webhook_card(title: str, doc_url: str, counts_text: str, hours: 
             ]
         }
     }
-    
+
     try:
         with httpx.Client(trust_env=True) as client:
             resp = client.post(FEISHU_WEBHOOK_URL, json=card_payload, timeout=20)
@@ -299,14 +299,14 @@ def upload_feishu_file(file_path: Path) -> str | None:
         token = get_feishu_token()
         url = "https://open.feishu.cn/open-apis/im/v1/files"
         headers = {"Authorization": f"Bearer {token}"}
-        
+
         # 飞书上传文件需要 multipart/form-data
         files = {
             "file_type": (None, "pdf"),
             "file_name": (None, file_path.name),
             "file": (file_path.name, open(file_path, "rb"), "application/pdf")
         }
-        
+
         with httpx.Client(trust_env=True) as client:
             resp = client.post(url, headers=headers, files=files, timeout=60)
             data = resp.json()
@@ -330,16 +330,16 @@ def create_feishu_doc(title: str, markdown_content: str) -> str | None:
             try:
                 resp = client.post("https://open.feishu.cn/open-apis/docx/v1/documents", json={"title": title}, timeout=60)
                 data = resp.json()
-                if data.get("code") != 0: 
+                if data.get("code") != 0:
                     print(f"  {Color.RED}⚠️  飞书文档创建失败: {data}{Color.RESET}")
                     return None
             except (httpx.TimeoutException, httpx.ConnectError) as e:
                 print(f"  {Color.RED}⚠️  飞书文档创建网络异常: {e}{Color.RESET}")
                 return None
-                
+
             doc_id = data["data"]["document"]["document_id"]
             doc_url = f"https://www.feishu.cn/docx/{doc_id}"
-            
+
             lines = markdown_content.strip().split("\n")
             children = []
             # ... (解析逻辑保持不变，但增加容错)
@@ -364,7 +364,7 @@ def create_feishu_doc(title: str, markdown_content: str) -> str | None:
                     for match in re.finditer(pattern, stripped):
                         if match.start() > last_end:
                             elements.append({"text_run": {"content": stripped[last_end:match.start()]}})
-                        
+
                         full_match = match.group(0)
                         if full_match.startswith("**_") and full_match.endswith("_**"):
                             elements.append({"text_run": {"content": match.group(2), "text_element_style": {"bold": True, "italic": True}}})
@@ -373,10 +373,10 @@ def create_feishu_doc(title: str, markdown_content: str) -> str | None:
                         elif full_match.startswith("_") and full_match.endswith("_"):
                             elements.append({"text_run": {"content": match.group(6), "text_element_style": {"italic": True}}})
                         last_end = match.end()
-                    
+
                     if last_end < len(stripped):
                         elements.append({"text_run": {"content": stripped[last_end:]}})
-                    
+
                     children.append({"block_type": 2, "text": {"elements": elements if elements else [{"text_run": {"content": stripped}}], "style": {}}})
 
             # 2. 批量写入块 (使用更稳健的分批逻辑和重试)
@@ -387,14 +387,14 @@ def create_feishu_doc(title: str, markdown_content: str) -> str | None:
                 for attempt in range(3): # 增加重试到 3 次
                     try:
                         resp = client.post(
-                            f"https://open.feishu.cn/open-apis/docx/v1/documents/{doc_id}/blocks/{doc_id}/children", 
-                            json={"children": chunk}, 
+                            f"https://open.feishu.cn/open-apis/docx/v1/documents/{doc_id}/blocks/{doc_id}/children",
+                            json={"children": chunk},
                             timeout=60
                         )
                         # 防御空响应或异常响应
                         if not resp or not resp.text:
                             raise Exception("飞书返回空响应 (可能是代理或网络波动)")
-                        
+
                         data = resp.json()
                         if data.get("code") == 0:
                             success = True
@@ -405,12 +405,12 @@ def create_feishu_doc(title: str, markdown_content: str) -> str | None:
                         print(f"  {Color.YELLOW}⚠️  块写入网络/超时异常 (尝试 {attempt+1}/3): {e}{Color.RESET}")
                     except Exception as e:
                         print(f"  {Color.YELLOW}⚠️  块写入未知异常 (尝试 {attempt+1}/3): {e}{Color.RESET}")
-                    
+
                     time.sleep(1.5 * (attempt + 1)) # 指数级后退
-                
+
                 if not success:
                     print(f"  {Color.RED}❌ 部分文档块写入最终失败，文档可能不完整{Color.RESET}")
-                
+
                 # 批次之间增加微小延迟，防止触发频率限制
                 time.sleep(0.5)
 
@@ -460,7 +460,7 @@ async def render_markdown_to_pdf(md_path: Path):
                     print(f"  {Color.YELLOW}⚠️  PDF 渲染中部分图片加载超时，将继续生成已有内容...{Color.RESET}")
                 else:
                     raise e
-                    
+
             await page.wait_for_timeout(2000) # 额外多等 2s 确保渲染
             await page.pdf(path=str(pdf_path), format="A4", margin={"top": "20mm", "bottom": "20mm", "left": "20mm", "right": "20mm"}, print_background=True)
             await browser.close()
@@ -495,7 +495,7 @@ def save_output(content: str, tweet_count: int, hours: int, selected_domains: li
     date = datetime.now().strftime("%Y-%m-%d")
     time_str = datetime.now().strftime("%H%M")
     output_path = OUTPUT_DIR / f"{date}-{time_str}.md"
-    
+
     # 构造领域描述
     domain_mapping = {
         "AI_Scientists_&_Academia": "AI 科学家",
@@ -515,7 +515,7 @@ def save_output(content: str, tweet_count: int, hours: int, selected_domains: li
     header += f"> **📅 生成时间**：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
     header += f"> **📊 汇总窗口**：过去 {hours} 小时 | {domain_str} ({account_count} 账号) | {tweet_count} 条推文\n"
     header += f"> **📡 数据来源**：X.com (中英对照版)\n\n---\n\n"
-    
+
     output_path.write_text(header + content, encoding="utf-8")
     print(f"{Color.GREEN}💾 已保存精美排版报告：{output_path}{Color.RESET}")
     return output_path
@@ -528,7 +528,13 @@ def main():
     parser.add_argument("--manual", action="store_true", help="手动模式：扫描所有领域")
     parser.add_argument("--hours", type=int, default=None, help=f"回溯小时数 (默认 {HOURS_LOOKBACK})")
     parser.add_argument("--force", action="store_true", help="强制模式：忽略冷却时间")
+    parser.add_argument("--fetch-only", action="store_true", help="仅执行抓取，不运行 AI 管线")
+    parser.add_argument("--pipeline-only", action="store_true", help="仅运行 AI 管线，读取已有缓存")
     args = parser.parse_args()
+
+    if args.fetch_only and args.pipeline_only:
+        print(f"{Color.RED}❌ --fetch-only 和 --pipeline-only 不能同时指定{Color.RESET}")
+        return
 
     # 1. 矩阵风格开屏
     if not args.manual and sys.stdin.isatty():
@@ -611,7 +617,7 @@ def main():
         selected_accounts = {}
         for key in selected_keys:
             selected_accounts.update(categorized_accounts.get(key, {}))
-            
+
         # 历史回看模式选择
         args.target_date = None
         if questionary.confirm("Generate a report for a specific historical date?", default=False).ask():
@@ -624,7 +630,7 @@ def main():
                 args.hours = int(questionary.text("Retroactive Hours:", default=str(HOURS_LOOKBACK)).ask())
         else:
             args.hours = int(questionary.text("Retroactive Hours:", default=str(HOURS_LOOKBACK)).ask())
-        
+
         args.force = questionary.confirm("Bypass Cooldown?", default=False).ask() if not args.target_date else False
     else:
         # 非交互模式：分组结构默认选择全部领域
@@ -664,17 +670,17 @@ def main():
             args.target_date = None
 
     # 3. 引擎启动与账号过滤
-    if args.hours is None and not args.target_date: 
+    if args.hours is None and not args.target_date:
         args.hours = HOURS_LOOKBACK
-    
+
     cache = load_json(CACHE_FILE)
     pool = load_json(TWEET_POOL_FILE)
-    
+
     if args.target_date:
         print(f"\n {Color.CYAN}✨ Historical Mode Initiated:{Color.RESET} Extracting signals from {args.target_date}")
         target_start = datetime.strptime(args.target_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
         target_end = target_start + timedelta(days=1)
-        
+
         selected_tweets = []
         for tweet in pool.values():
             try:
@@ -682,62 +688,72 @@ def main():
                 if target_start <= ts < target_end and tweet["username"] in selected_accounts:
                     selected_tweets.append(tweet)
             except: pass
-            
+
         print(f"\n {Color.BOLD}📊 Data Aggregation:{Color.RESET} {len(selected_tweets)} valid signal(s) found for {args.target_date}.")
-        
+
         if not selected_tweets:
             print(f" {Color.YELLOW}No signals recorded for this date.{Color.RESET}")
             return
-            
+
         summary, counts_text = asyncio.run(run_pipeline(selected_tweets))
         output_path = save_output(summary, len(selected_tweets), 24, selected_domains=selected_keys, account_count=len(selected_accounts))
         asyncio.run(render_markdown_to_pdf(output_path))
-        
+
         doc_url = create_feishu_doc(f"X 情报大合拢 ({args.target_date})", summary)
         msg = f"📰 X 情报历史报告 ({args.target_date})\n\n📊 领域分布：\n{counts_text}\n\n📄 完整情报：{doc_url if doc_url else '见本地 output/'}"
         send_feishu_message(msg)
         print(f"\n {Color.GREEN}✅ Historical Report Accomplished.{Color.RESET}")
         return
 
-    # 过滤冷却时间内的账号 (仅在非历史模式)
-    active_accounts = []
-    if not args.force:
-        for acc in selected_accounts.keys():
-            scan_key = f"SCAN_{acc}"
-            if scan_key in cache:
-                try:
-                    last_scan = datetime.fromisoformat(cache[scan_key])
-                    if datetime.now(timezone.utc) - last_scan < timedelta(hours=ACCOUNT_SCAN_INTERVAL):
-                        # 仅在交互模式下提示跳过
-                        continue
-                except: pass
-            active_accounts.append(acc)
-        skipped_count = len(selected_accounts) - len(active_accounts)
-        if skipped_count > 0:
-            print(f" {Color.GREY}⏩ Skipping {skipped_count} nodes recently synced. (Cooldown Active){Color.RESET}")
-    else:
-        active_accounts = list(selected_accounts.keys())
+    # ===== 抓取阶段（可被 --pipeline-only 跳过） =====
+    if not args.pipeline_only:
+        # 过滤冷却时间内的账号
+        active_accounts = []
+        if not args.force:
+            for acc in selected_accounts.keys():
+                scan_key = f"SCAN_{acc}"
+                if scan_key in cache:
+                    try:
+                        last_scan = datetime.fromisoformat(cache[scan_key])
+                        if datetime.now(timezone.utc) - last_scan < timedelta(hours=ACCOUNT_SCAN_INTERVAL):
+                            continue
+                    except: pass
+                active_accounts.append(acc)
+            skipped_count = len(selected_accounts) - len(active_accounts)
+            if skipped_count > 0:
+                print(f" {Color.GREY}⏩ Skipping {skipped_count} nodes recently synced. (Cooldown Active){Color.RESET}")
+        else:
+            active_accounts = list(selected_accounts.keys())
 
-    print(f"\n {Color.CYAN}✨ Deployment Initiated:{Color.RESET} {len(active_accounts)} active nodes | {args.hours}h window")
+        print(f"\n {Color.CYAN}✨ Deployment Initiated:{Color.RESET} {len(active_accounts)} active nodes | {args.hours}h window")
 
-    def on_fetch_success(username, tweets_found):
-        update_account_health(username, tweets_found)
-        if tweets_found is None:
-            return
-        now_iso = datetime.now(timezone.utc).isoformat()
-        cache[f"SCAN_{username}"] = now_iso
-        for t in tweets_found:
-            if t["tweet_id"] not in cache: cache[t["tweet_id"]] = now_iso
-            pool[t["tweet_id"]] = t
-        save_json(CACHE_FILE, clean_cache(cache, CACHE_RETENTION_HOURS))
-        save_json(TWEET_POOL_FILE, clean_pool(pool, CACHE_RETENTION_HOURS))
+        def on_fetch_success(username, tweets_found):
+            update_account_health(username, tweets_found)
+            if tweets_found is None:
+                return
+            now_iso = datetime.now(timezone.utc).isoformat()
+            cache[f"SCAN_{username}"] = now_iso
+            for t in tweets_found:
+                if t["tweet_id"] not in cache: cache[t["tweet_id"]] = now_iso
+                pool[t["tweet_id"]] = t
+            save_json(CACHE_FILE, clean_cache(cache, CACHE_RETENTION_HOURS))
+            save_json(TWEET_POOL_FILE, clean_pool(pool, CACHE_RETENTION_HOURS))
 
-    print(f" {Color.GREY}📡 Syncing live data from {len(active_accounts)} targets...{Color.RESET}\n")
-    asyncio.run(fetch_all_tweets(accounts_list=active_accounts, on_success=on_fetch_success, hours_lookback=args.hours))
+        print(f" {Color.GREY}📡 Syncing live data from {len(active_accounts)} targets...{Color.RESET}\n")
+        asyncio.run(fetch_all_tweets(accounts_list=active_accounts, on_success=on_fetch_success, hours_lookback=args.hours))
 
-    pool = clean_pool(pool, CACHE_RETENTION_HOURS)
-    save_json(TWEET_POOL_FILE, pool)
-    
+        pool = clean_pool(pool, CACHE_RETENTION_HOURS)
+        save_json(TWEET_POOL_FILE, pool)
+
+    if args.fetch_only:
+        print(f"\n {Color.GREEN}✅ Fetch-only 模式完成，已更新缓存。{Color.RESET}")
+        return
+
+    if args.pipeline_only:
+        pool = load_json(TWEET_POOL_FILE)
+        print(f"\n {Color.CYAN}🔄 Pipeline-only 模式：从缓存加载 {len(pool)} 条推文{Color.RESET}")
+
+    # ===== 管线阶段（可被 --fetch-only 跳过） =====
     # 仅保留本次选中的账号，且在回看时间窗口内的推文
     now = datetime.now(timezone.utc)
     lookback_delta = timedelta(hours=args.hours)
@@ -757,7 +773,7 @@ def main():
         status_msg = (
             f"🟡 X 情报汇总状态更新 ({args.hours}h)\n\n"
             f"- 扫描账号：{len(selected_accounts)}\n"
-            f"- 活跃节点：{len(active_accounts)}\n"
+            f"- 活跃节点：{'N/A (pipeline-only)' if args.pipeline_only else len(active_accounts)}\n"
             f"- 新信号：0\n\n"
             "本次窗口内未发现新推文，系统已待机。"
         )
@@ -766,24 +782,24 @@ def main():
 
     summary, counts_text = asyncio.run(run_pipeline(selected_tweets))
     output_path = save_output(summary, len(selected_tweets), args.hours, selected_domains=selected_keys, account_count=len(selected_accounts))
-    
+
     # 同步至 WikiAgent
     sync_to_wiki(topic=f"X情报汇总_{args.hours}h", content=summary, metadata={"domains": selected_keys, "tweet_count": len(selected_tweets)})
-    
+
     asyncio.run(render_markdown_to_pdf(output_path))
-    
+
     date_label = datetime.now().strftime("%Y-%m-%d")
     doc_url = create_feishu_doc(f"X 情报大合拢 ({args.hours}h) · {date_label}", summary)
-    
+
     msg = f"📰 X 情报汇总报告 ({args.hours}h)\n\n📊 领域分布：\n{counts_text}\n\n📄 完整情报：{doc_url if doc_url else '见本地 output/'}"
-    
+
     # 1. 发送私聊文字消息
     send_feishu_message(msg)
-    
+
     # 2. 发送 Webhook 卡片（如果配置了 URL）
     if FEISHU_WEBHOOK_URL and doc_url:
         send_feishu_webhook_card(f"X-Digest 科技汇总日报", doc_url, counts_text, args.hours, len(selected_tweets))
-    
+
     # 3. 如果配置了群 ID，发送 PDF 文件到群
     if FEISHU_CHAT_ID and output_path:
         pdf_path = output_path.with_suffix(".pdf")
