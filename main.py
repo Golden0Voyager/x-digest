@@ -28,12 +28,6 @@ from fetcher import fetch_all_tweets
 from pipeline import Color, log_print
 from pipeline.orchestrator import run_pipeline
 
-# AI 客户端初始化 (支持任何兼容 OpenAI 协议的服务商)
-if not AI_API_KEY:
-    print(f"\n {Color.RED}🚨 CRITICAL ERROR: AI_API_KEY Not Found.{Color.RESET}")
-    print(f" {Color.GREY}└─ {Color.RESET}Please check your .env file and ensure AI_API_KEY is properly set.")
-    sys.exit(1)
-
 # 输出目录
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -748,6 +742,12 @@ def main():
     if args.fetch_only:
         print(f"\n {Color.GREEN}✅ Fetch-only 模式完成，已更新缓存。{Color.RESET}")
         return
+
+    # AI 管线需要 API Key，在此处检查避免 fetch-only 模式也被阻断
+    if not AI_API_KEY:
+        print(f"\n {Color.RED}🚨 CRITICAL ERROR: AI_API_KEY Not Found.{Color.RESET}")
+        print(f" {Color.GREY}└─ {Color.RESET}Please check your .env file and ensure AI_API_KEY is properly set.")
+        sys.exit(1)
 
     if args.pipeline_only:
         pool = load_json(TWEET_POOL_FILE)
