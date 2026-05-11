@@ -9,7 +9,6 @@ __pycache__/
 # 登录态与缓存
 x_cookies_*.json
 browser_cookies*.json
-custom_accounts.json
 output/*.json
 output/*.log
 
