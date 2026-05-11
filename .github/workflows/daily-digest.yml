@@ -29,8 +29,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
+      - name: Create virtual environment
+        run: uv venv
+
       - name: Install dependencies
-        run: uv sync
+        run: uv pip install -r requirements.txt
 
       - name: Install Playwright browsers
         run: uv run playwright install chromium
@@ -51,9 +54,16 @@ jobs:
         env:
           # AI 管线配置
           AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
+          AI_MODEL: DeepSeek-R1
           AI_MODEL_TRANSLATE: DeepSeek-R1
           AI_MODEL_INSIGHTS: DeepSeek-R1
-          
+
+          # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
+          SENSENOVA_BASE_URL: https://api.sensenova.cn/compatible-mode/v2
+          SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
+          GROQ_BASE_URL: https://api.groq.com/openai/v1
+          OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+
           # 飞书与 API Keys
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
@@ -67,7 +77,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run main.py --manual --force --hours 36
+        run: uv run python main.py --manual --force --hours 36
 
       - name: Commit and push generated digests
         run: |
