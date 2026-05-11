@@ -625,7 +625,7 @@ def main():
         
         args.force = questionary.confirm("Bypass Cooldown?", default=False).ask() if not args.target_date else False
     else:
-        # 非交互模式：自动选前 4 个领域
+        # 非交互模式：分组结构默认选择全部领域
         custom_accounts_file = Path("custom_accounts.json")
         default_accounts_file = Path("defaults/suggested_accounts.json")
 
@@ -643,7 +643,7 @@ def main():
             # 2) 扁平结构: {"user1": "...", "user2": "...", ...}
             sample_val = next(iter(raw_data.values()))
             if isinstance(sample_val, dict):
-                selected_keys = list(raw_data.keys())[:4]
+                selected_keys = list(raw_data.keys())
                 selected_accounts = {}
                 for key in selected_keys:
                     v = raw_data.get(key, {})
