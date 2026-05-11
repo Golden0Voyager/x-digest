@@ -51,6 +51,17 @@ AI_API_KEY: str | None = None
 AI_BASE_URL: str = ""
 AI_MODEL: str = ""
 
+# 已知供应商默认地址（CI 环境下未注入 BASE_URL 时的兜底）
+_DEFAULT_BASE_URLS = {
+    "SENSENOVA": "https://api.sensenova.cn/compatible-mode/v2",
+    "SILICONFLOW": "https://api.siliconflow.cn/v1",
+    "GROQ": "https://api.groq.com/openai/v1",
+    "OPENROUTER": "https://openrouter.ai/api/v1",
+    "DEEPSEEK": "https://api.deepseek.com/v1",
+    "ZHIPUAI": "https://open.bigmodel.cn/api/paas/v4",
+    "OPENAI": "https://api.openai.com/v1",
+}
+
 # 链中第一个拿到有效 key 的供应商即为主模型，其余按顺序进入降级列表。
 # 这样调链头时不需保证每个前缀都已配 key——CI 环境下尤其关键。
 for _prefix in AI_PROVIDER_CHAIN:
@@ -58,6 +69,8 @@ for _prefix in AI_PROVIDER_CHAIN:
     if not _key:
         continue
     _url = os.getenv(f"{_prefix}_BASE_URL", "")
+    if not _url and _prefix in _DEFAULT_BASE_URLS:
+        _url = _DEFAULT_BASE_URLS[_prefix]
     _model = os.getenv(f"{_prefix}_MODEL", "")
     _name = os.getenv(f"{_prefix}_NAME", _prefix)
 
@@ -79,3 +92,18 @@ for _prefix in AI_PROVIDER_CHAIN:
 # 允许为不同性质的任务指定不同的模型（为空时回退到主模型）
 AI_MODEL_TRANSLATE = os.getenv("AI_MODEL_TRANSLATE", "") or AI_MODEL
 AI_MODEL_INSIGHTS = os.getenv("AI_MODEL_INSIGHTS", "") or AI_MODEL
+
+# ── CI 环境预检查 ────────────────────────────────────────
+if os.getenv("GITHUB_ACTIONS") == "true":
+    _missing = []
+    if not AI_API_KEY:
+        _missing.append("AI_API_KEY (如 OPENROUTER_API_KEY)")
+    if not AI_BASE_URL:
+        _missing.append("AI_BASE_URL (如 OPENROUTER_BASE_URL)")
+    if not AI_MODEL:
+        _missing.append("AI_MODEL (如 OPENROUTER_MODEL)")
+    if _missing:
+        print(f"\n[CI-DIAG] GitHub Actions 检测到以下关键环境变量未注入：")
+        for m in _missing:
+            print(f"  - {m}")
+        print("[CI-DIAG] 请前往仓库 Settings → Secrets → Actions 中配置，并在 workflow 的 env 中传入。\n")
