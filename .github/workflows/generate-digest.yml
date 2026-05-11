@@ -1,0 +1,105 @@
+name: Generate X-Digest
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # 每天北京时间下午 3:00 运行 (UTC 07:00)
+  workflow_dispatch:      # 允许手动触发执行
+  workflow_run:
+    workflows: ["Fetch Tweets"]
+    types: [completed]
+
+concurrency:
+  group: generate-x-digest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install dependencies
+        run: uv pip install -r requirements.txt
+
+      - name: Run digest pipeline
+        env:
+          # AI 管线配置
+          AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
+          AI_MODEL: DeepSeek-R1
+          AI_MODEL_TRANSLATE: DeepSeek-R1
+          AI_MODEL_INSIGHTS: DeepSeek-R1
+
+          # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
+          SENSENOVA_BASE_URL: https://api.sensenova.cn/compatible-mode/v2
+          SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
+          GROQ_BASE_URL: https://api.groq.com/openai/v1
+          OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+
+          # 飞书与 API Keys
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_USER_ID: ${{ secrets.FEISHU_USER_ID }}
+          FEISHU_CHAT_ID: ${{ secrets.FEISHU_CHAT_ID }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
+          SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: uv run python main.py --pipeline-only --hours 36
+
+      - name: Commit and push generated digests
+        run: |
+          set -euo pipefail
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -f output/*.md output/*.pdf output/intermediate/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📝 Auto Digest: $(date +'%Y-%m-%d') [skip ci]"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then
+                echo "Push succeeded on attempt ${attempt}"
+                exit 0
+              fi
+
+              if [ "${attempt}" -eq 3 ]; then
+                echo "Push failed after 3 attempts"
+                exit 1
+              fi
+
+              echo "Push failed due to branch race; retrying (${attempt}/3)..."
+              sleep $((attempt * 5))
+            done
+          fi
+
+      - name: Notify on failure
+        if: failure() && env.FEISHU_WEBHOOK_URL
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+        run: |
+          curl -X POST "${FEISHU_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"❌ X-Digest generate-digest 运行失败\n运行ID: ${{ github.run_id }}\n链接: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}}"
