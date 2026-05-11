@@ -11,6 +11,7 @@ from pathlib import Path
 from pipeline import Color
 
 CUSTOM_ACCOUNTS_FILE = Path("custom_accounts.json")
+DEFAULT_ACCOUNTS_FILE = Path("defaults/suggested_accounts.json")
 
 # 质量门控阈值
 _MIN_QUALITY = 80
@@ -33,18 +34,29 @@ DISPLAY_CATEGORIES = [
 
 
 def _load_bios() -> dict:
-    """从 custom_accounts.json 加载所有账号的 bio"""
-    if not CUSTOM_ACCOUNTS_FILE.exists():
-        return {}
-    try:
-        raw = json.loads(CUSTOM_ACCOUNTS_FILE.read_text(encoding="utf-8"))
-        bios = {}
-        for val in raw.values():
-            if isinstance(val, dict):
-                bios.update(val)
-        return bios
-    except Exception:
-        return {}
+    """从 custom_accounts.json 加载 bio，不存在则回退到 defaults/suggested_accounts.json"""
+    files_to_try = [CUSTOM_ACCOUNTS_FILE, DEFAULT_ACCOUNTS_FILE]
+    for file in files_to_try:
+        if not file.exists():
+            continue
+        try:
+            raw = json.loads(file.read_text(encoding="utf-8"))
+            if not raw:
+                continue
+            sample_val = next(iter(raw.values()))
+            if isinstance(sample_val, dict):
+                # 分组结构: {"DomainA": {"user1": "bio", ...}, ...}
+                bios = {}
+                for val in raw.values():
+                    if isinstance(val, dict):
+                        bios.update(val)
+                return bios
+            else:
+                # 扁平结构: {"user1": "bio", "user2": "bio", ...}
+                return raw
+        except Exception:
+            continue
+    return {}
 
 
 def _clean_tco(text: str) -> str:
@@ -95,11 +107,12 @@ def assemble(
         username = t["username"]
         original_text = _clean_tco(t["text"].strip())
         tweet_url = f"https://x.com/{username}/status/{tid}"
-        bio = bios.get(username, "博主信息暂无")
+        bio = bios.get(username, "")
 
         # 组装单条 Markdown（quality>=95 加高亮标记）
         highlight = "🔥 " if quality >= 95 else ""
-        entry = f"{highlight}**@{username}** ({bio})\n\n"
+        bio_suffix = f" ({bio})" if bio and bio != "博主信息暂无" else ""
+        entry = f"{highlight}**@{username}**{bio_suffix}\n\n"
         if original_text:
             entry += f"🔗 [原推]({tweet_url})：***{original_text}***\n"
         else:
