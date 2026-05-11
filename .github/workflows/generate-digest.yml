@@ -39,17 +39,6 @@ jobs:
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('requirements.txt') }}
-
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: uv run playwright install chromium
-
       - name: Run digest pipeline
         env:
           # AI 管线配置
@@ -77,14 +66,14 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run python main.py --pipeline-only --hours 36
+        run: uv run python main.py --pipeline-only --hours 36 --no-pdf
 
       - name: Commit and push generated digests
         run: |
           set -euo pipefail
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add -f output/*.md output/*.pdf output/intermediate/
+          git add -f output/*.md output/intermediate/
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
