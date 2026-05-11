@@ -312,3 +312,49 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
         await browser.close()
 
     return all_tweets
+
+
+def validate_cookies():
+    """验证所有 Cookie 文件是否有效。若全部失效则抛出 RuntimeError。"""
+    cookie_files = sorted(glob.glob(COOKIE_FILE_PATTERN))
+    if not cookie_files:
+        raise RuntimeError("未找到任何 Cookie 文件")
+
+    cookie_data_list = [load_browser_cookies(f) for f in cookie_files]
+
+    async def _check():
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            results = []
+            for i, cookies in enumerate(cookie_data_list):
+                ctx = await browser.new_context(
+                    user_agent=f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/13{i}.0.0.0 Safari/537.36",
+                    viewport={"width": 1280, "height": 800}, locale="en-US", timezone_id="UTC", color_scheme='dark',
+                )
+                if cookies:
+                    await ctx.add_cookies(cookies)
+                page = await ctx.new_page()
+                try:
+                    await page.goto("https://x.com/home", wait_until="domcontentloaded", timeout=15000)
+                    await asyncio.sleep(2)
+                    body = await page.evaluate("document.body ? document.body.innerText : ''")
+                    if any(kw in body for kw in ["Home", "For you", "Following", "推荐", "首页"]):
+                        log_print(f"  ✓ Cookie #{i+1} ({cookie_files[i]}) 有效")
+                        results.append((cookie_files[i], True))
+                    else:
+                        log_print(f"  ⚠️  Cookie #{i+1} ({cookie_files[i]}) 可能已失效", "warning")
+                        results.append((cookie_files[i], False))
+                except Exception as e:
+                    log_print(f"  ❌ Cookie #{i+1} ({cookie_files[i]}) 验证失败: {e}", "warning")
+                    results.append((cookie_files[i], False))
+                finally:
+                    await page.close()
+                    await ctx.close()
+            await browser.close()
+            return results
+
+    results = asyncio.run(_check())
+    valid_count = sum(1 for _, ok in results if ok)
+    if valid_count == 0:
+        raise RuntimeError(f"所有 {len(results)} 组 Cookie 均已失效，请重新导出")
+    print(f"✅ Cookie 验证完成：{valid_count}/{len(results)} 组有效")
