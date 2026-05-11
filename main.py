@@ -638,16 +638,26 @@ def main():
             print(f" {Color.GREY}📚 非交互模式账号源：defaults/suggested_accounts.json{Color.RESET}")
 
         if isinstance(raw_data, dict) and raw_data:
-            selected_keys = list(raw_data.keys())[:4]
-            selected_accounts = {}
-            for key in selected_keys:
-                v = raw_data.get(key, {})
-                if isinstance(v, dict):
-                    selected_accounts.update(v)
+            # 兼容两种格式：
+            # 1) 分组结构: {"DomainA": {"user1": "...", ...}, ...}
+            # 2) 扁平结构: {"user1": "...", "user2": "...", ...}
+            sample_val = next(iter(raw_data.values()))
+            if isinstance(sample_val, dict):
+                selected_keys = list(raw_data.keys())[:4]
+                selected_accounts = {}
+                for key in selected_keys:
+                    v = raw_data.get(key, {})
+                    if isinstance(v, dict):
+                        selected_accounts.update(v)
+            else:
+                selected_accounts = raw_data
+                selected_keys = None
         else:
             from config import ACCOUNTS
             selected_accounts = ACCOUNTS
             selected_keys = None
+
+        print(f" {Color.GREY}📌 非交互模式已加载 {len(selected_accounts)} 个账号{Color.RESET}")
         if not hasattr(args, "target_date"):
             args.target_date = None
 
