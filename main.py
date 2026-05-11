@@ -524,6 +524,7 @@ def main():
     parser.add_argument("--force", action="store_true", help="强制模式：忽略冷却时间")
     parser.add_argument("--fetch-only", action="store_true", help="仅执行抓取，不运行 AI 管线")
     parser.add_argument("--pipeline-only", action="store_true", help="仅运行 AI 管线，读取已有缓存")
+    parser.add_argument("--no-pdf", action="store_true", help="跳过 PDF 生成，仅输出 Markdown")
     args = parser.parse_args()
 
     if args.fetch_only and args.pipeline_only:
@@ -786,7 +787,8 @@ def main():
     # 同步至 WikiAgent
     sync_to_wiki(topic=f"X情报汇总_{args.hours}h", content=summary, metadata={"domains": selected_keys, "tweet_count": len(selected_tweets)})
 
-    asyncio.run(render_markdown_to_pdf(output_path))
+    if not args.no_pdf:
+        asyncio.run(render_markdown_to_pdf(output_path))
 
     date_label = datetime.now().strftime("%Y-%m-%d")
     doc_url = create_feishu_doc(f"X 情报大合拢 ({args.hours}h) · {date_label}", summary)
