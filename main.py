@@ -626,14 +626,24 @@ def main():
         args.force = questionary.confirm("Bypass Cooldown?", default=False).ask() if not args.target_date else False
     else:
         # 非交互模式：自动选前 4 个领域
-        CUSTOM_ACCOUNTS_FILE = Path("custom_accounts.json")
-        if CUSTOM_ACCOUNTS_FILE.exists():
-            raw_data = json.loads(CUSTOM_ACCOUNTS_FILE.read_text(encoding="utf-8"))
+        custom_accounts_file = Path("custom_accounts.json")
+        default_accounts_file = Path("defaults/suggested_accounts.json")
+
+        raw_data = None
+        if custom_accounts_file.exists():
+            raw_data = json.loads(custom_accounts_file.read_text(encoding="utf-8"))
+            print(f" {Color.GREY}📚 非交互模式账号源：custom_accounts.json{Color.RESET}")
+        elif default_accounts_file.exists():
+            raw_data = json.loads(default_accounts_file.read_text(encoding="utf-8"))
+            print(f" {Color.GREY}📚 非交互模式账号源：defaults/suggested_accounts.json{Color.RESET}")
+
+        if isinstance(raw_data, dict) and raw_data:
             selected_keys = list(raw_data.keys())[:4]
             selected_accounts = {}
             for key in selected_keys:
                 v = raw_data.get(key, {})
-                if isinstance(v, dict): selected_accounts.update(v)
+                if isinstance(v, dict):
+                    selected_accounts.update(v)
         else:
             from config import ACCOUNTS
             selected_accounts = ACCOUNTS
@@ -732,6 +742,14 @@ def main():
 
     if not selected_tweets:
         print(f" {Color.GREEN}System standby. No new signals.{Color.RESET}")
+        status_msg = (
+            f"🟡 X 情报汇总状态更新 ({args.hours}h)\n\n"
+            f"- 扫描账号：{len(selected_accounts)}\n"
+            f"- 活跃节点：{len(active_accounts)}\n"
+            f"- 新信号：0\n\n"
+            "本次窗口内未发现新推文，系统已待机。"
+        )
+        send_feishu_message(status_msg)
         return
 
     summary, counts_text = asyncio.run(run_pipeline(selected_tweets))

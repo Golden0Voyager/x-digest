@@ -63,7 +63,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run main.py
+        run: uv run main.py --manual --force --hours 36
 
       - name: Commit and push generated digests
         run: |
