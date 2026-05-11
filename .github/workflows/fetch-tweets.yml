@@ -1,0 +1,116 @@
+name: Fetch Tweets
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'  # 每 12 小时运行一次
+  workflow_dispatch:        # 允许手动触发执行
+
+concurrency:
+  group: fetch-tweets-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fetch-tweets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install dependencies
+        run: uv pip install -r requirements.txt
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('requirements.txt') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: uv run playwright install chromium
+
+      - name: Prepare Twitter cookies
+        run: |
+          if [ -n "${{ secrets.X_COOKIES_1 }}" ]; then
+            echo "${{ secrets.X_COOKIES_1 }}" | base64 -d > x_cookies_1.json
+          fi
+          if [ -n "${{ secrets.X_COOKIES_2 }}" ]; then
+            echo "${{ secrets.X_COOKIES_2 }}" | base64 -d > x_cookies_2.json
+          fi
+          if [ -n "${{ secrets.X_COOKIES_3 }}" ]; then
+            echo "${{ secrets.X_COOKIES_3 }}" | base64 -d > x_cookies_3.json
+          fi
+
+      - name: Validate cookies
+        run: uv run python -c "from fetcher import validate_cookies; validate_cookies()"
+
+      - name: Fetch tweets
+        env:
+          # 飞书与 API Keys（抓取阶段仅需基础配置，但保留完整环境变量以兼容）
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_USER_ID: ${{ secrets.FEISHU_USER_ID }}
+          FEISHU_CHAT_ID: ${{ secrets.FEISHU_CHAT_ID }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
+          SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: uv run python main.py --fetch-only --hours 36
+
+      - name: Commit and push tweet cache
+        run: |
+          set -euo pipefail
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -f output/raw_tweets_pool.json output/processed_tweets.json output/account_stats.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🗃️ Auto Fetch: $(date +'%Y-%m-%d %H:%M') [skip ci]"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then
+                echo "Push succeeded on attempt ${attempt}"
+                exit 0
+              fi
+
+              if [ "${attempt}" -eq 3 ]; then
+                echo "Push failed after 3 attempts"
+                exit 1
+              fi
+
+              echo "Push failed due to branch race; retrying (${attempt}/3)..."
+              sleep $((attempt * 5))
+            done
+          fi
+
+      - name: Notify on failure
+        if: failure() && env.FEISHU_WEBHOOK_URL
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+        run: |
+          curl -X POST "${FEISHU_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"❌ X-Digest fetch-tweets 运行失败\n运行ID: ${{ github.run_id }}\n链接: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}}"
