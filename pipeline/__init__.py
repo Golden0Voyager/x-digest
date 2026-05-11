@@ -6,10 +6,12 @@ X-Digest 管道处理模块
 
 import json
 import logging
+import os
 import re
 import time
 from pathlib import Path
 
+import httpx
 from openai import OpenAI
 
 from config import AI_API_KEY, AI_BASE_URL, AI_MODEL, AI_FALLBACK_PROVIDERS
@@ -153,13 +155,28 @@ _ai_clients: dict[str, OpenAI] = {}
 
 
 def _get_client(api_key: str, base_url: str) -> OpenAI:
-    cache_key = f"{base_url}"
+    # 空字符串转为 None，避免 OpenAI 客户端解析异常
+    if not base_url:
+        base_url = None
+
+    cache_key = f"{base_url or 'default'}:{api_key[:8]}"
     if cache_key not in _ai_clients:
-        _ai_clients[cache_key] = OpenAI(
-            api_key=api_key,
-            base_url=base_url,
-            timeout=180,
+        client_kwargs: dict = {
+            "api_key": api_key,
+            "base_url": base_url,
+            "timeout": 180,
+        }
+        # CI / 服务器环境代理支持：优先读取 PROXY，其次标准环境变量
+        proxy_url = (
+            os.getenv("PROXY")
+            or os.getenv("HTTPS_PROXY")
+            or os.getenv("HTTP_PROXY")
+            or os.getenv("ALL_PROXY")
         )
+        if proxy_url:
+            client_kwargs["http_client"] = httpx.Client(proxy=proxy_url, timeout=180)
+
+        _ai_clients[cache_key] = OpenAI(**client_kwargs)
     return _ai_clients[cache_key]
 
 
@@ -201,6 +218,18 @@ def call_ai_with_retry(messages, temperature=0.2, model_override=None, max_token
                 return result
             except Exception as e:
                 last_error = e
+                err_str = str(e).lower()
+                err_type = type(e).__name__
+
+                # 连接级别失败快速诊断
+                if "connection" in err_type.lower() or "connect" in err_str:
+                    p_url = provider.get("base_url", "")
+                    if not p_url:
+                        print(f"  {Color.RED}⚠️ [{provider['name']}] BASE_URL 为空，正在使用 OpenAI 默认地址，请确认该地址在当前网络可连通{Color.RESET}")
+                    elif "127.0.0.1" in p_url or "localhost" in p_url:
+                        print(f"  {Color.RED}⚠️ [{provider['name']}] BASE_URL 指向本地地址 ({p_url})，在 CI/服务器环境不可达。请检查环境变量注入或更换为公网 API 地址{Color.RESET}")
+                    if os.getenv("GITHUB_ACTIONS") == "true":
+                        print(f"  {Color.GREY}    提示：GitHub Actions 需在仓库 Settings → Secrets → Actions 中配置 {provider['name']} 相关环境变量{Color.RESET}")
 
                 if attempt == max_attempts:
                     if i < len(providers) - 1:
@@ -208,7 +237,6 @@ def call_ai_with_retry(messages, temperature=0.2, model_override=None, max_token
                         print(f"  {Color.YELLOW}⚠️ [{provider['name']}] 失败，降级到 [{next_name}]{Color.RESET}")
                     break
 
-                err_str = str(e).lower()
                 # 硬配额耗尽 / 模型不存在 / 认证失败 → 立刻降级，无需等待
                 is_hard_fail = any(k in err_str for k in [
                     "资源包余量已用尽", "quota", "3008",
@@ -221,7 +249,7 @@ def call_ai_with_retry(messages, temperature=0.2, model_override=None, max_token
 
                 # 仅主模型第 1 次失败时短暂等待后重试
                 wait_sec = 3
-                is_rate_limit = "RateLimitError" in type(e).__name__ or "rate" in err_str
+                is_rate_limit = "RateLimitError" in err_type or "rate" in err_str
                 if hasattr(e, "response") and hasattr(e.response, "headers"):
                     retry_after = e.response.headers.get("retry-after")
                     if retry_after:
