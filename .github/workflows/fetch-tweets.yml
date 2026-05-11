@@ -64,7 +64,17 @@ jobs:
 
       - name: Fetch tweets
         env:
-          # 飞书与 API Keys（抓取阶段仅需基础配置，但保留完整环境变量以兼容）
+          # AI 管线配置（消除 CI-DIAG 警告，fetch-only 模式不实际调用）
+          AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
+          AI_MODEL: DeepSeek-R1
+
+          # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
+          SENSENOVA_BASE_URL: https://api.sensenova.cn/compatible-mode/v2
+          SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
+          GROQ_BASE_URL: https://api.groq.com/openai/v1
+          OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+
+          # 飞书与 API Keys
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_USER_ID: ${{ secrets.FEISHU_USER_ID }}
