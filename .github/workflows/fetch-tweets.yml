@@ -99,15 +99,18 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "🗃️ Auto Fetch: $(date +'%Y-%m-%d %H:%M') [skip ci]"
+            git stash push --include-untracked -m "auto-stash" || true
             for attempt in 1 2 3; do
               git pull --rebase origin main
               if git push origin HEAD:main; then
                 echo "Push succeeded on attempt ${attempt}"
+                git stash pop || true
                 exit 0
               fi
 
               if [ "${attempt}" -eq 3 ]; then
                 echo "Push failed after 3 attempts"
+                git stash pop || true
                 exit 1
               fi
 
