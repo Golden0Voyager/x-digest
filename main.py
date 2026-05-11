@@ -472,6 +472,8 @@ async def render_markdown_to_pdf(md_path: Path):
 
 def sync_to_wiki(topic: str, content: str, metadata: dict):
     """将摘要同步到 agent_platform 的 WikiAgent"""
+    if os.getenv("GITHUB_ACTIONS") == "true":
+        return
     try:
         url = "http://localhost:8000/api/v1/wiki/ingest"
         payload = {
