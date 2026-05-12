@@ -171,22 +171,37 @@ def get_feishu_token() -> str:
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            # 允许使用系统代理 (trust_env=True)
             with httpx.Client(trust_env=True) as client:
                 resp = client.post(
                     "https://open.feishu.cn/open-apis/auth/v3/tenant_access_tokens/internal",
                     json={"app_id": FEISHU_APP_ID, "app_secret": FEISHU_APP_SECRET},
-                    timeout=20, # 增加超时到 20s
+                    timeout=20,
                 )
-                data = resp.json()
+                # 先检查 HTTP 状态码，避免对 HTML 错误页调用 .json()
+                if resp.status_code != 200:
+                    body_preview = resp.text[:200].replace("\n", " ")
+                    print(f"  {Color.YELLOW}⚠️  飞书 Token HTTP {resp.status_code} (尝试 {attempt+1}/{max_retries}): {body_preview}{Color.RESET}")
+                    if attempt < max_retries - 1:
+                        time.sleep(2)
+                    continue
+
+                try:
+                    data = resp.json()
+                except Exception as parse_err:
+                    body_preview = resp.text[:200].replace("\n", " ")
+                    print(f"  {Color.YELLOW}⚠️  飞书 Token JSON 解析失败 (尝试 {attempt+1}/{max_retries}): {parse_err} | 原始响应: {body_preview}{Color.RESET}")
+                    if attempt < max_retries - 1:
+                        time.sleep(2)
+                    continue
+
                 if data.get("code") == 0:
                     return data["tenant_access_token"]
-                print(f"  {Color.YELLOW}⚠️  飞书 Token 响应异常 (尝试 {attempt+1}/{max_retries}): {data}{Color.RESET}")
+                print(f"  {Color.YELLOW}⚠️  飞书 Token 业务码异常 (尝试 {attempt+1}/{max_retries}): {data}{Color.RESET}")
         except Exception as e:
-            print(f"  {Color.YELLOW}⚠️  飞书 Token 获取网络异常 (尝试 {attempt+1}/{max_retries}): {e}{Color.RESET}")
+            print(f"  {Color.YELLOW}⚠️  飞书 Token 请求异常 (尝试 {attempt+1}/{max_retries}): {e}{Color.RESET}")
 
         if attempt < max_retries - 1:
-            time.sleep(2) # 重试前等待
+            time.sleep(2)
 
     raise Exception("多次尝试获取飞书 token 失败")
 
@@ -214,7 +229,18 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
                 json={"receive_id": target_id, "msg_type": msg_type, "content": json.dumps(content)},
                 timeout=30,
             )
-            data = resp.json()
+            if resp.status_code != 200:
+                body_preview = resp.text[:200].replace("\n", " ")
+                print(f"{Color.RED}⚠️  飞书消息 HTTP {resp.status_code}: {body_preview}{Color.RESET}")
+                return
+
+            try:
+                data = resp.json()
+            except Exception as parse_err:
+                body_preview = resp.text[:200].replace("\n", " ")
+                print(f"{Color.RED}⚠️  飞书消息 JSON 解析失败: {parse_err} | 原始响应: {body_preview}{Color.RESET}")
+                return
+
             if data.get("code") == 0:
                 msg_id = data.get("data", {}).get("message_id", "N/A")
                 print(f"{Color.CYAN}📨 飞书消息推送成功！ (ID: {msg_id}){Color.RESET}")
@@ -277,7 +303,18 @@ def send_feishu_webhook_card(title: str, doc_url: str, counts_text: str, hours: 
     try:
         with httpx.Client(trust_env=True) as client:
             resp = client.post(FEISHU_WEBHOOK_URL, json=card_payload, timeout=20)
-            data = resp.json()
+            if resp.status_code != 200:
+                body_preview = resp.text[:200].replace("\n", " ")
+                print(f"{Color.RED}⚠️ Webhook HTTP {resp.status_code}: {body_preview}{Color.RESET}")
+                return
+
+            try:
+                data = resp.json()
+            except Exception as parse_err:
+                body_preview = resp.text[:200].replace("\n", " ")
+                print(f"{Color.RED}⚠️ Webhook JSON 解析失败: {parse_err} | 原始响应: {body_preview}{Color.RESET}")
+                return
+
             if data.get("StatusCode") == 0 or data.get("code") == 0:
                 print(f"{Color.CYAN}🪝 Webhook 卡片发送成功！{Color.RESET}")
             else:
@@ -303,7 +340,18 @@ def upload_feishu_file(file_path: Path) -> str | None:
 
         with httpx.Client(trust_env=True) as client:
             resp = client.post(url, headers=headers, files=files, timeout=60)
-            data = resp.json()
+            if resp.status_code != 200:
+                body_preview = resp.text[:200].replace("\n", " ")
+                print(f"  {Color.RED}⚠️  飞书文件上传 HTTP {resp.status_code}: {body_preview}{Color.RESET}")
+                return None
+
+            try:
+                data = resp.json()
+            except Exception as parse_err:
+                body_preview = resp.text[:200].replace("\n", " ")
+                print(f"  {Color.RED}⚠️  飞书文件上传 JSON 解析失败: {parse_err} | 原始响应: {body_preview}{Color.RESET}")
+                return None
+
             if data.get("code") == 0:
                 return data["data"]["file_key"]
             else:
