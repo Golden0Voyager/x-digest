@@ -173,7 +173,7 @@ def get_feishu_token() -> str:
         try:
             with httpx.Client(trust_env=True) as client:
                 resp = client.post(
-                    "https://open.feishu.cn/open-apis/auth/v3/tenant_access_tokens/internal",
+                    "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
                     json={"app_id": FEISHU_APP_ID, "app_secret": FEISHU_APP_SECRET},
                     timeout=20,
                 )
