@@ -1,10 +1,10 @@
 # 🛡️ X-Digest 账号审计报告
-> 日期：2026-05-18
+> 日期：2026-05-19
 
 ## 🚨 僵尸号（连续失败 5 次以上）
 - @elevenlabsio (连续失败 6 次)
-- @hansulrichobrist (连续失败 30 次)
-- @galerieperrotin (连续失败 30 次)
+- @hansulrichobrist (连续失败 32 次)
+- @galerieperrotin (连续失败 32 次)
 
 ## 💤 沉寂号（14 天无新推文）
 - 暂无
