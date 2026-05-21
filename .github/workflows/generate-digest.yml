@@ -1,8 +1,6 @@
 name: Generate X-Digest
 
 on:
-  schedule:
-    - cron: '0 7 * * *'  # 每天北京时间下午 3:00 运行 (UTC 07:00)
   workflow_dispatch:      # 允许手动触发执行
   workflow_run:
     workflows: ["Fetch Tweets"]
@@ -66,7 +64,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run python main.py --pipeline-only --hours 36 --no-pdf
+        run: uv run python main.py --pipeline-only --hours 12 --no-pdf
 
       - name: Commit and push generated digests
         run: |
