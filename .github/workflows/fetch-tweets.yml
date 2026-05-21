@@ -87,7 +87,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run python main.py --fetch-only --hours 36
+        run: uv run python main.py --fetch-only --hours 12
 
       - name: Commit and push tweet cache
         run: |
