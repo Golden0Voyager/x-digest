@@ -2,7 +2,7 @@ name: Fetch Tweets
 
 on:
   schedule:
-    - cron: '0 */12 * * *'  # 每 12 小时运行一次
+    - cron: '30 2 * * *'  # 每天北京时间 10:30 运行一次
   workflow_dispatch:        # 允许手动触发执行
 
 concurrency:
@@ -87,7 +87,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run python main.py --fetch-only --hours 12
+        run: uv run python main.py --fetch-only --hours 24
 
       - name: Commit and push tweet cache
         run: |
