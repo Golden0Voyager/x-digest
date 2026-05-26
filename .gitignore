@@ -29,3 +29,6 @@ output/*.json
 .gemini/
 .claude/
 .DS_Store
+# Skill-generated analysis artifacts
+.understand-anything/
+.codegraph/
