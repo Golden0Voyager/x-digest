@@ -1,13 +1,29 @@
 # 🛡️ X-Digest 账号审计报告
-> 日期：2026-05-25
+> 日期：2026-05-26
 
 ## 🚨 僵尸号（连续失败 5 次以上）
 - @elevenlabsio (连续失败 6 次)
-- @hansulrichobrist (连续失败 56 次)
-- @galerieperrotin (连续失败 56 次)
+- @hansulrichobrist (连续失败 58 次)
+- @galerieperrotin (连续失败 58 次)
 
 ## 💤 沉寂号（14 天无新推文）
-- 暂无
+- @rodneyabrooks
+- @pmarca
+- @chamath
+- @paulg
+- @kaifulee
+- @FinanceYF5
+- @WhiteHouse
+- @POTUS
+- @EU_Commission
+- @Baidu_Inc
+- @business
+- @CGTNOfficial
+- @PDChina
+- @XHNews
+- @huggingface
+- @AlbertFabrega
+- @OconEsteban
 
 ## 🔥 活跃度 TOP 10
 - @pmarca (平均 30.0 条/次)
@@ -19,4 +35,4 @@
 - @WSJ (平均 20.0 条/次)
 - @CGTNOfficial (平均 20.0 条/次)
 - @XHNews (平均 20.0 条/次)
-- @FT (平均 19.8 条/次)
+- @FT (平均 19.9 条/次)
