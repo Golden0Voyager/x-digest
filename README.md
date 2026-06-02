@@ -125,8 +125,11 @@ Cookie #N 队列：...
 采用 **供应商降级链** 架构，支持任意 OpenAI 协议兼容服务商热切换：
 
 ```
-主模型 (SenseNova DeepSeek-V3-1) ──失败──> 备选 (SenseNova DeepSeek-R1) ──失败──> 备选 2 (Groq) ──失败──> 备选 3 (OpenRouter) ──...
+任务首选（写死） ──失败──> 兜底 (SenseNova DeepSeek-V3-1) ──失败──> 备选 1 (SenseNova DeepSeek-R1) ──失败──> 备选 2 (Groq) ──失败──> 备选 3 (OpenRouter) ──...
 ```
+
+> **任务首选**（见下表）通常是评分/翻译/洞察三个任务各自 hardcode 的模型。  
+> **V3-1** 是降级链兜底，仅当首选全部失败时启用。
 
 默认走 **SenseNova（商汤）DeepSeek 全系 + Token Plan**（国内直连、零费用）：
 
@@ -267,8 +270,8 @@ x_digest/
 |------|--------|------|
 | `PROXY` | `http://127.0.0.1:7897` | 代理地址（国内必填） |
 | `AI_PROVIDER_CHAIN` | `SENSENOVA,GROQ,OPENROUTER` | AI 供应商降级链（SenseNova 优先） |
-| `SENSENOVA_MODEL` | `DeepSeek-V3-1` | 主模型 |
-| `SENSENOVA_FALLBACK_MODEL` | `DeepSeek-R1` | 同账号内备选 |
+| `SENSENOVA_MODEL` | `DeepSeek-V3-1` | 降级链兜底（任务首选全失败时启用） |
+| `SENSENOVA_FALLBACK_MODEL` | `DeepSeek-R1` | 同账号内降级 |
 | `AI_MODEL_TRANSLATE` | `DeepSeek-R1-Distill-Qwen-14B` | 翻译专用（永久免费） |
 | `AI_MODEL_INSIGHTS` | `sensenova-6.7-flash-lite` | 洞察专用（走 Token Plan） |
 | `SENSENOVA_TP_BASE_URL` | `https://token.sensenova.cn/v1` | Token Plan 端点 |
