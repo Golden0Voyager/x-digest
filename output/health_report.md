@@ -1,10 +1,10 @@
 # 🛡️ X-Digest 账号审计报告
-> 日期：2026-06-01
+> 日期：2026-06-02
 
 ## 🚨 僵尸号（连续失败 5 次以上）
 - @elevenlabsio (连续失败 6 次)
-- @hansulrichobrist (连续失败 70 次)
-- @galerieperrotin (连续失败 70 次)
+- @hansulrichobrist (连续失败 72 次)
+- @galerieperrotin (连续失败 72 次)
 
 ## 💤 沉寂号（14 天无新推文）
 - @rodneyabrooks
@@ -32,8 +32,8 @@
 - @elonmusk (平均 28.0 条/次)
 - @Reuters (平均 20.2 条/次)
 - @TheEconomist (平均 20.1 条/次)
+- @Forbes (平均 20.1 条/次)
 - @business (平均 20.0 条/次)
 - @WSJ (平均 20.0 条/次)
 - @CGTNOfficial (平均 20.0 条/次)
 - @XHNews (平均 20.0 条/次)
-- @Forbes (平均 19.8 条/次)
