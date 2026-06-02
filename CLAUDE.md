@@ -16,7 +16,7 @@ uv pip install -r requirements.txt
 cp .env.example .env
 # 编辑 .env，填入：
 # - X API Key / Bearer Token
-# - AI 模型 API Key（OpenAI / Gemini / DeepSeek 等）
+# - AI 模型 API Key（默认走 SenseNova 商汤 DeepSeek 免费模型）
 
 # 获取浏览器 Cookie（用于绕过登录验证）
 # 使用浏览器插件（EditThisCookie 或 Cookie-Editor）导出 X 的 Cookie

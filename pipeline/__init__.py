@@ -180,7 +180,14 @@ def _get_client(api_key: str, base_url: str) -> OpenAI:
     return _ai_clients[cache_key]
 
 
-def call_ai_with_retry(messages, temperature=0.2, model_override=None, max_tokens=4096):
+def call_ai_with_retry(
+    messages,
+    temperature=0.2,
+    model_override=None,
+    max_tokens=4096,
+    base_url_override=None,
+    api_key_override=None,
+):
     """带快速降级的 AI 调用。
 
     主模型 2 次尝试，备选模型各 1 次（每供应商共 3 次），
@@ -188,10 +195,18 @@ def call_ai_with_retry(messages, temperature=0.2, model_override=None, max_token
 
     model_override: 允许为特定任务覆盖主模型设置
     max_tokens: 最大输出 token 数，防止响应截断（默认 4096）
+    base_url_override: 覆盖主供应商的 base_url（用于独立端点如 Token Plan）
+    api_key_override: 覆盖主供应商的 api_key
     """
     primary_model = model_override if model_override else AI_MODEL
     providers = [
-        {"name": "主模型", "api_key": AI_API_KEY, "base_url": AI_BASE_URL, "model": primary_model, "is_primary": True},
+        {
+            "name": "主模型",
+            "api_key": api_key_override or AI_API_KEY,
+            "base_url": base_url_override or AI_BASE_URL,
+            "model": primary_model,
+            "is_primary": True,
+        },
         *AI_FALLBACK_PROVIDERS,
     ]
 

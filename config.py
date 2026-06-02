@@ -93,15 +93,31 @@ for _prefix in AI_PROVIDER_CHAIN:
 AI_MODEL_TRANSLATE = os.getenv("AI_MODEL_TRANSLATE", "") or AI_MODEL
 AI_MODEL_INSIGHTS = os.getenv("AI_MODEL_INSIGHTS", "") or AI_MODEL
 
+# ── SenseNova Token Plan（独立端点，专供洞察任务）─────────
+# 文档：docs/api/sensenova-token-plan-usage.md
+# 与传统 api.sensenova.cn 不同的服务：
+#   - 端点：token.sensenova.cn/v1（非 api.sensenova.cn/compatible-mode/v2）
+#   - 限速：每 5h 1500 次（vs 原 1 QPS）
+#   - 鉴权：单独 Token Plan Key（可在控制台与原 Key 分别创建）
+SENSENOVA_TP_BASE_URL = os.getenv(
+    "SENSENOVA_TP_BASE_URL", "https://token.sensenova.cn/v1"
+)
+# API Key 留空时回退到 SENSENOVA_API_KEY，方便复用凭据
+SENSENOVA_TP_API_KEY = (
+    os.getenv("SENSENOVA_TP_API_KEY")
+    or os.getenv("SENSENOVA_API_KEY")
+    or ""
+)
+
 # ── CI 环境预检查 ────────────────────────────────────────
 if os.getenv("GITHUB_ACTIONS") == "true":
     _missing = []
     if not AI_API_KEY:
-        _missing.append("AI_API_KEY (如 OPENROUTER_API_KEY)")
+        _missing.append("AI_API_KEY (如 SENSENOVA_API_KEY)")
     if not AI_BASE_URL:
-        _missing.append("AI_BASE_URL (如 OPENROUTER_BASE_URL)")
+        _missing.append("AI_BASE_URL (如 SENSENOVA_BASE_URL)")
     if not AI_MODEL:
-        _missing.append("AI_MODEL (如 OPENROUTER_MODEL)")
+        _missing.append("AI_MODEL (如 SENSENOVA_MODEL)")
     if _missing:
         print(f"\n[CI-DIAG] GitHub Actions 检测到以下关键环境变量未注入：")
         for m in _missing:

@@ -125,8 +125,16 @@ Cookie #N 队列：...
 采用 **供应商降级链** 架构，支持任意 OpenAI 协议兼容服务商热切换：
 
 ```
-主模型 (OpenRouter hy3-preview:free) ──失败──> 备选 1 (Groq) ──失败──> 备选 2 (ZhipuAI) ──...
+主模型 (SenseNova DeepSeek-V3-1) ──失败──> 备选 (SenseNova DeepSeek-R1) ──失败──> 备选 2 (Groq) ──失败──> 备选 3 (OpenRouter) ──...
 ```
+
+默认走 **SenseNova（商汤）DeepSeek 全系 + Token Plan**（国内直连、零费用）：
+
+| 阶段 | 模型 | 端点 |
+|------|------|------|
+| 联合打分 | `sensenova-6.7-flash-lite` + `DeepSeek-R1-Distill-Qwen-14B` | **跨端点并行**（TP + 主链，避免互相限流） |
+| 翻译 | `DeepSeek-R1-Distill-Qwen-14B` | 主链（永久免费） |
+| 洞察分析 | `sensenova-6.7-flash-lite` | Token Plan（5h/1500 次配额，256K 上下文） |
 
 每条推文经过三层处理：
 
@@ -135,6 +143,8 @@ Cookie #N 队列：...
 | 原文层 | 完整保留推文 + `[🔗]` 链接 | 一键直达原帖 |
 | 翻译层 | 智能识别语言，非中文自动编译 | 中英对照 |
 | 洞察层 | `💡 深度启示` — 行业价值与趋势解读 | 投资/技术决策参考 |
+
+> 限免截止 2026-08-09，到期可无缝切换到永久免费的 `DeepSeek-R1-Distill-Qwen-14B/32B`。详见 `docs/configuration-guide.md`。
 
 ### 3. 72h 推文池滚动合拢
 
@@ -177,7 +187,7 @@ cp .env.example .env
 # 详细配置说明见 docs/configuration-guide.md
 ```
 
-**AI 供应商支持**：Kimi K2 / Groq / OpenRouter / ZhipuAI / DeepSeek 等任意 OpenAI 协议兼容服务商。在 `.env` 中配置 `AI_PROVIDER_CHAIN` 即可设置降级链。
+**AI 供应商支持**：SenseNova (商汤 DeepSeek 免费) / Groq / OpenRouter / ZhipuAI / DeepSeek 等任意 OpenAI 协议兼容服务商。在 `.env` 中配置 `AI_PROVIDER_CHAIN` 即可设置降级链。**默认首选 SenseNova 国内直连、零费用**。
 
 ### 3. 导出 Twitter Cookie
 
@@ -256,10 +266,17 @@ x_digest/
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `PROXY` | `http://127.0.0.1:7897` | 代理地址（国内必填） |
-| `AI_PROVIDER_CHAIN` | `OPENROUTER,GROQ,ZHIPUAI` | AI 供应商降级链 |
+| `AI_PROVIDER_CHAIN` | `SENSENOVA,GROQ,OPENROUTER` | AI 供应商降级链（SenseNova 优先） |
+| `SENSENOVA_MODEL` | `DeepSeek-V3-1` | 主模型 |
+| `SENSENOVA_FALLBACK_MODEL` | `DeepSeek-R1` | 同账号内备选 |
+| `AI_MODEL_TRANSLATE` | `DeepSeek-R1-Distill-Qwen-14B` | 翻译专用（永久免费） |
+| `AI_MODEL_INSIGHTS` | `sensenova-6.7-flash-lite` | 洞察专用（走 Token Plan） |
+| `SENSENOVA_TP_BASE_URL` | `https://token.sensenova.cn/v1` | Token Plan 端点 |
+| `SENSENOVA_TP_API_KEY` | （留空回退到 SENSENOVA_API_KEY） | Token Plan 凭据 |
 | `HOURS_LOOKBACK` | `72` | 推文回溯时长（小时） |
 | `TWEETS_PER_ACCOUNT` | `30` | 每账号最大抓取条数 |
-| `AI_BATCH_SIZE` | `30` | AI 处理批次大小 |
+| `AI_BATCH_SIZE` | `15` | AI 处理批次大小（SenseNova 限流 1 QPS） |
+| `AI_BATCH_COOLDOWN` | `15` | 批次间冷却秒数 |
 | `ACCOUNT_SCAN_INTERVAL` | `12` | 扫描冷却时间（小时） |
 | `CACHE_RETENTION_HOURS` | `720` | 推文池保留时长（30 天） |
 
@@ -276,7 +293,7 @@ x_digest/
 | 层级 | 技术 |
 |------|------|
 | 浏览器自动化 | Playwright + playwright-stealth |
-| AI 推理 | OpenAI 协议（Kimi K2 / Groq / ZhipuAI 等） |
+| AI 推理 | SenseNova (商汤 DeepSeek) / OpenAI 协议兼容 |
 | 数据处理 | Python asyncio + httpx |
 | 报告渲染 | Markdown + Playwright PDF |
 | 消息推送 | 飞书开放平台 API |
