@@ -17,7 +17,7 @@ PROXY=http://127.0.0.1:7897
 ## 2. AI 供应商降级链
 
 ```bash
-AI_PROVIDER_CHAIN=OPENROUTER,GROQ,ZHIPUAI
+AI_PROVIDER_CHAIN=SENSENOVA,GROQ,OPENROUTER
 ```
 
 **工作原理：** 逗号分隔的供应商前缀列表。第一个为主模型，后续为备选。主模型失败时自动降级到下一个。
@@ -31,39 +31,45 @@ AI_PROVIDER_CHAIN=OPENROUTER,GROQ,ZHIPUAI
 ### 预置供应商示例
 
 ```bash
-# ── OpenRouter（推荐首选 — 限免模型聚合平台）──
-OPENROUTER_API_KEY=sk-or-v1-xxxx
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=tencent/hy3-preview:free
+# ── SenseNova / 商汤（首选 — 国内直连，DeepSeek 全系免费）──
+#   文档：docs/api/sensenova-best-practices.md
+#   免费模型：
+#     DeepSeek-V3-1            通用对话 32K    主模型首选
+#     DeepSeek-R1              原生推理 8K     翻译/洞察专用
+#     DeepSeek-R1-Distill-Qwen-32B  蒸馏推理 8K   永久免费
+#     DeepSeek-R1-Distill-Qwen-14B  蒸馏推理 32K  永久免费
+#   限流：1 QPS / 6 RPM / 128K TPM — 并行调用需主动控制并发度
+SENSENOVA_API_KEY=sk-xxxxxxxxxxxxxxxx
+SENSENOVA_BASE_URL=https://api.sensenova.cn/compatible-mode/v2
+SENSENOVA_MODEL=DeepSeek-V3-1
+SENSENOVA_FALLBACK_MODEL=DeepSeek-R1
 
 # ── Groq（降级备选 — 极速推理）──
 GROQ_API_KEY=gsk_xxxx
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=moonshotai/kimi-k2-instruct-0905
 
-# ── ZhipuAI / 智谱（国产，中文能力强） ──
-ZHIPUAI_API_KEY=xxxx.xxxx
-ZHIPUAI_BASE_URL=https://open.bigmodel.cn/api/paas/v4
-ZHIPUAI_MODEL=glm-4.7-flash
-
-# ── DeepSeek ──
-DEEPSEEK_API_KEY=sk-xxx
-DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
-DEEPSEEK_MODEL=deepseek-chat
+# ── OpenRouter（降级备选 — 限免模型聚合平台）──
+OPENROUTER_API_KEY=sk-or-v1-xxxx
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=openrouter/free
 ```
 
 ### 为翻译和洞察指定不同模型
 
-如果你希望翻译用快模型、洞察用强模型：
+利用 SenseNova 文档推荐的模型分工：通用任务用 V3-1，翻译用永久免费的 Distill-14B，洞察走 Token Plan 上的 sensenova-6.7-flash-lite：
 
 ```bash
-AI_MODEL_TRANSLATE=openrouter/free                    # 翻译：用免费自动路由（快）
-AI_MODEL_INSIGHTS=tencent/hy3-preview:free            # 洞察：用混元 3.0（强）
+AI_MODEL_TRANSLATE=DeepSeek-R1-Distill-Qwen-14B   # 翻译：永久免费，术语保留 67%
+AI_MODEL_INSIGHTS=sensenova-6.7-flash-lite         # 洞察：走 Token Plan，科普质量极佳
 ```
 
 默认两者都使用主模型，只在需要差异化时配置。
 
-默认两者都使用主模型，只在需要差异化时配置。
+> ⚠️ **限流提醒**：
+> - 主链 1 QPS / 6 RPM，并行使用 R1 + V3-1 调用极易触发 429
+> - pipeline/score.py 采用**跨端点双引擎**（sensenova-6.7-flash-lite @ token.sensenova.cn + DeepSeek-R1-Distill-Qwen-14B @ api.sensenova.cn）规避互相限流
+> - Token Plan 每 5h 1500 次配额独立，不消耗主链额度
 
 ---
 
@@ -166,20 +172,31 @@ FEISHU_USER_ID=ou_xxxx
 
 ## 6. 常见配置组合
 
-### 场景 A：OpenRouter 限免模型（推荐起手配置，零费用）
+### 场景 A：SenseNova / 商汤（推荐起手配置，零费用 + 国内直连）
 
 ```bash
-AI_PROVIDER_CHAIN=OPENROUTER
-OPENROUTER_API_KEY=sk-or-v1-xxxx
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=tencent/hy3-preview:free
-OPENROUTER_FALLBACK_MODEL=openrouter/free
-AI_BATCH_SIZE=30
+AI_PROVIDER_CHAIN=SENSENOVA,GROQ,OPENROUTER
+
+SENSENOVA_API_KEY=sk-xxxxxxxxxxxxxxxx
+SENSENOVA_BASE_URL=https://api.sensenova.cn/compatible-mode/v2
+SENSENOVA_MODEL=DeepSeek-V3-1
+SENSENOVA_FALLBACK_MODEL=DeepSeek-R1
+
+# 任务差异化（跨端点双引擎：避免互相限流）
+AI_MODEL_TRANSLATE=DeepSeek-R1-Distill-Qwen-14B   # 主链，永久免费
+AI_MODEL_INSIGHTS=sensenova-6.7-flash-lite         # Token Plan，5h 1500 次
+
+# Token Plan 独立端点
+SENSENOVA_TP_BASE_URL=https://token.sensenova.cn/v1
+SENSENOVA_TP_API_KEY=    # 留空时复用 SENSENOVA_API_KEY
+
+# SenseNova 限流 1 QPS / 6 RPM，保守设置
+AI_BATCH_SIZE=15
 AI_MAX_BATCH_SIZE=30
-AI_BATCH_COOLDOWN=20
+AI_BATCH_COOLDOWN=15
 ```
 
-> `tencent/hy3-preview:free` 为腾讯混元 3.0 预览版，上下文长达 262K，长文本总结与逻辑推理极强。`openrouter/free` 为万能免费路由，自动分发至当前性能最强的免费模型。
+> 适用：所有国内用户。**打分**：跨端点双引擎（sensenova-6.7-flash-lite + Distill-14B）；**翻译**：Distill-14B；**洞察**：sensenova-6.7-flash-lite。pipeline/score.py 的双引擎跨端点并行不互相限流，Token Plan 配额独立。
 
 ### 场景 B：Groq 免费用户（极速推理备选）
 
@@ -196,10 +213,10 @@ AI_BATCH_COOLDOWN=15
 ### 场景 C：多供应商降级链（高可用）
 
 ```bash
-AI_PROVIDER_CHAIN=OPENROUTER,GROQ,ZHIPUAI
-# OpenRouter 限免挂了 → 自动切 Groq → 再挂切智谱
+AI_PROVIDER_CHAIN=SENSENOVA,GROQ,OPENROUTER
+# SenseNova 限流 → 自动切 Groq → 再挂切 OpenRouter
 # 三要素分别配置...
-AI_BATCH_SIZE=30
+AI_BATCH_SIZE=15
 AI_MAX_BATCH_SIZE=30
 ```
 
@@ -215,6 +232,17 @@ AI_MAX_BATCH_SIZE=50    # GPT-4o 支持 16K output
 AI_BATCH_COOLDOWN=5     # 付费用户速率限制更宽松
 ```
 
+### 场景 E：长期稳定运行（SenseNova 限免到期后）
+
+```bash
+SENSENOVA_MODEL=DeepSeek-R1-Distill-Qwen-14B     # 永久免费，32K 上下文
+SENSENOVA_FALLBACK_MODEL=DeepSeek-R1-Distill-Qwen-32B
+AI_MODEL_TRANSLATE=DeepSeek-R1-Distill-Qwen-14B
+AI_MODEL_INSIGHTS=DeepSeek-R1-Distill-Qwen-14B
+```
+
+> 适用：担心 2026-08-09 限免到期、需要长期稳定运行的场景。Distill 系列推理能力弱于原生 R1，但永久免费 + 32K 上下文已能覆盖 99% 翻译/洞察任务。
+
 ---
 
 ## 7. 故障排查
@@ -224,5 +252,7 @@ AI_BATCH_COOLDOWN=5     # 付费用户速率限制更宽松
 | `⚠️ JSON 结构受损，正则抢救出 N 条` | 批次太大，AI 输出被截断 | 调小 `AI_MAX_BATCH_SIZE` |
 | `⚠️ [主模型] 失败，降级到 [xxx]` | 主模型 API 故障或限流 | 检查 API Key / 等待限流恢复 |
 | `⚠️ AI_BATCH_SIZE=50 超过安全上限 30` | 配置超限 | 同步调大 `AI_MAX_BATCH_SIZE` 或调小 `AI_BATCH_SIZE` |
+| SenseNova `429 Rate Limit Exceeded` | 触发 1 QPS / 6 RPM 限流 | 调大 `AI_BATCH_COOLDOWN`、减小 `AI_BATCH_SIZE` |
+| SenseNova `400 reasoning_content is required` | R1 多轮对话特有（本项目单轮不触发） | 确认使用场景为单轮（打分/翻译/洞察）；如做多轮，参考 docs/api/sensenova-best-practices.md §3.1 |
 | 翻译/洞察结果缺失 | 补抓失败或缓存过期 | 删除 `output/intermediate/` 重新运行 |
 | 飞书推送失败 | Token 过期或网络问题 | 检查飞书配置三要素 |

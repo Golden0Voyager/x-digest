@@ -2,7 +2,14 @@
 Step 3: 专注洞察与分类 (科普增强版)
 
 在联合打分和翻译完成后运行。
-利用 DeepSeek-R1 的推理能力，为非专业人士补全背景常识。
+利用 sensenova-6.7-flash-lite（SenseNova Token Plan）的多模态 + 长上下文能力，
+为非专业人士补全背景常识。
+
+参考：
+  - docs/api/sensenova-token-plan-usage.md
+  - 端点：https://token.sensenova.cn/v1（与原 api.sensenova.cn 不同的服务）
+  - 限速：每 5h 1500 次（远比原 1 QPS 宽松）
+  - 降级：首选失败时自动回退到主链（V3-1 / R1）
 """
 
 import asyncio
@@ -10,7 +17,10 @@ import json
 from datetime import date
 from pathlib import Path
 
-from config import AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_INSIGHTS, AI_MAX_BATCH_SIZE
+from config import (
+    AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_INSIGHTS, AI_MAX_BATCH_SIZE,
+    SENSENOVA_TP_API_KEY, SENSENOVA_TP_BASE_URL,
+)
 from pipeline import call_ai_with_retry, extract_json, load_json, save_json, Color
 
 INSIGHTS_PROMPT_TEMPLATE = """\
@@ -92,7 +102,11 @@ async def run_insights(
                 ],
                 temperature=0.3,
                 model_override=AI_MODEL_INSIGHTS,
-                max_tokens=10000, # R1 需要稍多 token 处理推理
+                # 洞察任务走独立 Token Plan 端点（与主链 api.sensenova.cn 不同）
+                # 失败时自动降级到主链的 V3-1 / R1
+                base_url_override=SENSENOVA_TP_BASE_URL,
+                api_key_override=SENSENOVA_TP_API_KEY,
+                max_tokens=10000, # Token Plan 上下文 256K，输出上限更宽
             )
             items = extract_json(response.choices[0].message.content)
             for item in items:

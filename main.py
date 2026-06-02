@@ -294,7 +294,7 @@ def send_feishu_webhook_card(title: str, doc_url: str, counts_text: str, hours: 
                 },
                 {
                     "tag": "note",
-                    "elements": [{"tag": "plain_text", "content": "Powered by x-digest (DeepSeek-R1 Enhanced)"}]
+                    "elements": [{"tag": "plain_text", "content": "Powered by x-digest · SenseNova (Token Plan + Distill) Enhanced"}]
                 }
             ]
         }

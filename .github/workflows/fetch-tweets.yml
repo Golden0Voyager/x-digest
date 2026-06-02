@@ -66,10 +66,11 @@ jobs:
         env:
           # AI 管线配置（消除 CI-DIAG 警告，fetch-only 模式不实际调用）
           AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
-          AI_MODEL: DeepSeek-R1
+          AI_MODEL: DeepSeek-V3-1
 
           # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
           SENSENOVA_BASE_URL: https://api.sensenova.cn/compatible-mode/v2
+          SENSENOVA_TP_BASE_URL: https://token.sensenova.cn/v1
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
           GROQ_BASE_URL: https://api.groq.com/openai/v1
           OPENROUTER_BASE_URL: https://openrouter.ai/api/v1

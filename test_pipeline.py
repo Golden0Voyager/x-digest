@@ -33,16 +33,16 @@ async def test_full_ai_logic():
     intermediate_dir = Path("./output/test_intermediate")
     intermediate_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1. 测试打分 (V3 + R1)
+    # 1. 测试打分 (sensenova-6.7-flash-lite + DeepSeek-R1-Distill-Qwen-14B 跨端点双引擎)
     print(f"{Color.CYAN}Step 1: 联合打分海选...{Color.RESET}")
     top_tweets = await run_score(MOCK_TWEETS, intermediate_dir, force_rerun=True)
-    
-    # 2. 测试翻译 (R1)
-    print(f"\n{Color.CYAN}Step 2: R1 深度翻译...{Color.RESET}")
+
+    # 2. 测试翻译 (DeepSeek-R1-Distill-Qwen-14B)
+    print(f"\n{Color.CYAN}Step 2: Distill-14B 深度翻译...{Color.RESET}")
     translations = await run_translate(top_tweets, intermediate_dir, force_rerun=True)
-    
-    # 3. 测试科普与洞察 (R1)
-    print(f"\n{Color.CYAN}Step 3: R1 背景科普与深度启示...{Color.RESET}")
+
+    # 3. 测试科普与洞察 (sensenova-6.7-flash-lite via Token Plan)
+    print(f"\n{Color.CYAN}Step 3: sensenova-6.7-flash-lite 背景科普与深度启示...{Color.RESET}")
     insights = await run_insights(top_tweets, translations, intermediate_dir, force_rerun=True)
     
     # 4. 组装结果

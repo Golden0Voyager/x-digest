@@ -67,7 +67,7 @@ async def run_pipeline(
         print(f"\n{Color.RED}⚠️ 预过滤后无剩余推文{Color.RESET}")
         return "", ""
 
-    # Phase 0.5: 联合打分与精选（三模型并行）
+    # Phase 0.5: 联合打分与精选（V3-1 + R1 双模型并行）
     print(f"\n{Color.BOLD}━━━ Phase 0.5: 多模型联合打分 ━━━{Color.RESET}")
     from pipeline.score import run_score
     tweets = await run_score(tweets, intermediate_dir, force_rerun)
