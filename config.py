@@ -62,8 +62,10 @@ _DEFAULT_BASE_URLS = {
     "OPENAI": "https://api.openai.com/v1",
 }
 
-# 链中第一个拿到有效 key 的供应商即为主模型，其余按顺序进入降级列表。
-# 这样调链头时不需保证每个前缀都已配 key——CI 环境下尤其关键。
+# 链中第一个拿到有效 key 的供应商即降级链兜底，其余按顺序进入降级列表。
+# 注意：实际任务（打分/翻译/洞察）首选模型在 pipeline/score.py、
+# translate.py、insights.py 中 hardcode，本链仅作为兜底。这样调链头时
+# 不需保证每个前缀都已配 key——CI 环境下尤其关键。
 for _prefix in AI_PROVIDER_CHAIN:
     _key = os.getenv(f"{_prefix}_API_KEY")
     if not _key:
@@ -89,7 +91,7 @@ for _prefix in AI_PROVIDER_CHAIN:
     _add_provider_fallbacks(_name, _key, _url, _prefix)
 
 # ── 任务特定模型支持 ──────────────────────────────────
-# 允许为不同性质的任务指定不同的模型（为空时回退到主模型）
+# 允许为不同性质的任务指定不同的模型（为空时回退到兜底 V3-1）
 AI_MODEL_TRANSLATE = os.getenv("AI_MODEL_TRANSLATE", "") or AI_MODEL
 AI_MODEL_INSIGHTS = os.getenv("AI_MODEL_INSIGHTS", "") or AI_MODEL
 

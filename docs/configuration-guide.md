@@ -20,7 +20,9 @@ PROXY=http://127.0.0.1:7897
 AI_PROVIDER_CHAIN=SENSENOVA,GROQ,OPENROUTER
 ```
 
-**工作原理：** 逗号分隔的供应商前缀列表。第一个为主模型，后续为备选。主模型失败时自动降级到下一个。
+**工作原理：** 逗号分隔的供应商前缀列表。**第一个为降级链兜底（仅当任务首选模型全部失败时启用）**，后续为降级备选。每个供应商失败时自动降级到下一个。
+
+> 实际任务（打分/翻译/洞察）的首选模型在 `pipeline/score.py`、`pipeline/translate.py`、`pipeline/insights.py` 中 hardcode，详见「任务差异化模型」段。`SENSENOVA_MODEL`（V3-1）只是兜底。
 
 ### 添加供应商的三步法
 
@@ -31,11 +33,12 @@ AI_PROVIDER_CHAIN=SENSENOVA,GROQ,OPENROUTER
 ### 预置供应商示例
 
 ```bash
-# ── SenseNova / 商汤（首选 — 国内直连，DeepSeek 全系免费）──
+# ── SenseNova / 商汤（降级链兜底 — 国内直连，DeepSeek 全系免费）──
 #   文档：docs/api/sensenova-best-practices.md
+#   仅当任务首选（score/translate/insights 各自的 hardcode 模型）全失败时启用。
 #   免费模型：
-#     DeepSeek-V3-1            通用对话 32K    主模型首选
-#     DeepSeek-R1              原生推理 8K     翻译/洞察专用
+#     DeepSeek-V3-1            通用对话 32K    当前兜底
+#     DeepSeek-R1              原生推理 8K     兜底备选
 #     DeepSeek-R1-Distill-Qwen-32B  蒸馏推理 8K   永久免费
 #     DeepSeek-R1-Distill-Qwen-14B  蒸馏推理 32K  永久免费
 #   限流：1 QPS / 6 RPM / 128K TPM — 并行调用需主动控制并发度
@@ -64,7 +67,7 @@ AI_MODEL_TRANSLATE=DeepSeek-R1-Distill-Qwen-14B   # 翻译：永久免费，术�
 AI_MODEL_INSIGHTS=sensenova-6.7-flash-lite         # 洞察：走 Token Plan，科普质量极佳
 ```
 
-默认两者都使用主模型，只在需要差异化时配置。
+默认两者都使用兜底 V3-1，只在需要差异化时配置。
 
 > ⚠️ **限流提醒**：
 > - 主链 1 QPS / 6 RPM，并行使用 R1 + V3-1 调用极易触发 429
@@ -250,7 +253,7 @@ AI_MODEL_INSIGHTS=DeepSeek-R1-Distill-Qwen-14B
 | 现象 | 原因 | 解决方案 |
 |------|------|---------|
 | `⚠️ JSON 结构受损，正则抢救出 N 条` | 批次太大，AI 输出被截断 | 调小 `AI_MAX_BATCH_SIZE` |
-| `⚠️ [主模型] 失败，降级到 [xxx]` | 主模型 API 故障或限流 | 检查 API Key / 等待限流恢复 |
+| `⚠️ [主模型] 失败，降级到 [xxx]` | 兜底模型 API 故障或限流 | 检查 API Key / 等待限流恢复 |
 | `⚠️ AI_BATCH_SIZE=50 超过安全上限 30` | 配置超限 | 同步调大 `AI_MAX_BATCH_SIZE` 或调小 `AI_BATCH_SIZE` |
 | SenseNova `429 Rate Limit Exceeded` | 触发 1 QPS / 6 RPM 限流 | 调大 `AI_BATCH_COOLDOWN`、减小 `AI_BATCH_SIZE` |
 | SenseNova `400 reasoning_content is required` | R1 多轮对话特有（本项目单轮不触发） | 确认使用场景为单轮（打分/翻译/洞察）；如做多轮，参考 docs/api/sensenova-best-practices.md §3.1 |

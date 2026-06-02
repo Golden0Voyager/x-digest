@@ -58,7 +58,7 @@ async def run_pipeline(
     # 从 base_url 提取供应商域名作为简称
     provider_host = AI_BASE_URL.split("//")[-1].split("/")[0].split(".")[1] if AI_BASE_URL else "unknown"
     fallback_count = len(AI_FALLBACK_PROVIDERS)
-    print(f"  {Color.GREY}📡 当前模型: {provider_host}/{AI_MODEL}  (备选: {fallback_count} 个){Color.RESET}")
+    print(f"  {Color.GREY}📡 打分: 跨端点双引擎 | 翻译: {AI_MODEL_TRANSLATE} | 洞察: {AI_MODEL_INSIGHTS}  (兜底: {provider_host}/{AI_MODEL} + {fallback_count} 个降级){Color.RESET}")
 
     # Phase 0: 规则化预过滤（零 LLM 调用）
     tweets = curate(tweets)
