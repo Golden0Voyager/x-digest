@@ -16,7 +16,7 @@ from pipeline.curate import curate
 from pipeline.translate import run_translate
 from pipeline.insights import run_insights
 from pipeline.assemble import assemble
-from config import AI_MODEL, AI_BASE_URL, AI_FALLBACK_PROVIDERS
+from config import AI_MODEL, AI_BASE_URL, AI_FALLBACK_PROVIDERS, AI_MODEL_TRANSLATE, AI_MODEL_INSIGHTS
 
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
 
