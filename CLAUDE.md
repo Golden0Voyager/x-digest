@@ -175,3 +175,44 @@ MAX_RETRIES=3
 - 所有用户可见文本使用中文
 - 支持中文推文和中文账户
 - 摘要优先生成中文版本
+
+## 项目规范
+
+### README 双文件结构（i18n 国际标准）
+
+遵循 GitHub linguist 国际化规范（参考 React / Vue / TensorFlow / Tailwind）：
+
+| 文件 | 语言 | 入口 |
+|------|------|------|
+| `README.md` | 英文 | GitHub 默认入口 |
+| `README.zh-CN.md` | 简体中文 | 国内用户 |
+
+**强制要求**：
+
+- 两文件**结构完全对应**（章节数量、顺序、链接锚点一致）
+- 顶部互相锚链：`[English](README.md) · [简体中文](README.zh-CN.md)`
+- 所有内部 anchor 必须在 GitHub 上可点（中文 heading 自动转 anchor 时偶有 bug——若关键 section 用中文 heading 卡住，改用 `## Section Name` + 顶部 `<a id="...">` 显式锚点）
+- 不写假客户证言、不写"我"口吻、不堆砌 emoji
+- 产品文档叙事：**痛点场景 → 实测效果 → 工作流 → 快速开始 → 路线图**
+
+**新增语言**：`README.<locale>.md`，locale 取 BCP 47 格式（`ja-JP` / `ko-KR` / `de-DE`）。
+
+**禁止**：
+
+- 单文件双语堆叠（维护成本高、阅读体验差）
+- 纯中文 README（缺英文入口，GitHub i18n 算法识别不到）
+- 内部 anchor 死链（如 `docs/changelog.md` 不存在就**必须删除**而非保留——写完后 `grep -n "\.md)"` 全量验证）
+
+**改 README 前**：
+
+1. `git grep -n "\.md)" README.md README.zh-CN.md` 列出所有链接
+2. 验证每个路径存在：`uv run python -c "from pathlib import Path; [Path(p).exists() for p in [...]]"`
+3. 改完用 `git diff` 检查两文件**结构是否仍对应**（不能一个加 section 另一个漏）
+
+### Commit 规范
+
+- 提交信息中英双语，**英文块在前、中文在后**
+- 使用 conventional commits 格式（`feat:` / `fix:` / `docs:` / `refactor:` / `chore:`）
+- 单次 commit 保持**原子性**——一个独立变更一个 commit
+- 中英混合 message 含特殊字符时，写入 `/tmp/commit_msg_<n>.txt` 再用 `git commit -F` 避免 shell 转义
+- 改 `output/intermediate/*.json` / `CLAUDE.md` 注入段是 opencode 运行时副产物，**不要 commit**
