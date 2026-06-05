@@ -21,6 +21,14 @@ AI_BATCH_COOLDOWN = int(os.getenv("AI_BATCH_COOLDOWN", "15"))
 # 单批次最大条目数上限（防止输出 token 截断）
 # 默认 30 适配 Groq Kimi K2 (max_output=16K)，除非使用输出上限更高的模型否则不建议调大
 AI_MAX_BATCH_SIZE = int(os.getenv("AI_MAX_BATCH_SIZE", "30"))
+# Token Plan 端点专用批次大小
+# 适用场景：score.py 双引擎打分（含 TP）、insights.py 走 TP 的洞察任务
+# 设计依据：
+#   - sensenova-6.7-flash-lite 上下文 256K，单批塞 60 条只用 ~10K tokens（4% 利用率）
+#   - deepseek-v4-flash 上下文 32K，60 条打分输入 ~12K tokens + 输出 ~2K，安全
+#   - TP 按"次"计费（每 5h 1500 次/150 次），单次塞越多越省配额
+# 保守起步：60。观察稳定后可逐步上调到 100-150
+AI_BATCH_SIZE_TP = int(os.getenv("AI_BATCH_SIZE_TP", "60"))
 
 # ── AI 供应商降级链 ──────────────────────────────────────────
 AI_PROVIDER_CHAIN = [

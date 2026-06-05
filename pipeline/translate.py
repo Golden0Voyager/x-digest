@@ -105,10 +105,19 @@ async def run_translate(
                 max_tokens=4000,
             )
             items = extract_json(response.choices[0].message.content)
+            returned_ids = set()
             for item in items:
                 tid = str(item.get("id", ""))
                 if tid:
+                    returned_ids.add(tid)
                     translations[tid] = item.get("translation", "SKIP")
+
+            # 单批次覆盖率审计
+            missing = len(chunk) - len(returned_ids)
+            if missing > 0:
+                print(f"    {Color.YELLOW}⚠️ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)} / 缺失 {missing}（将在末尾并发补译）{Color.RESET}")
+            else:
+                print(f"    {Color.GREY}✓ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)}{Color.RESET}")
 
             # 每批次持久化全量缓存（包含历史但返回时过滤）
             raw_cache.update(translations)

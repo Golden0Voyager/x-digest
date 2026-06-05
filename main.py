@@ -27,6 +27,7 @@ from config import (
 from fetcher import fetch_all_tweets
 from pipeline import Color, log_print
 from pipeline.orchestrator import run_pipeline
+from pipeline.usage import usage_tracker
 
 # 输出目录
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
@@ -50,6 +51,9 @@ FEISHU_APP_SECRET = os.getenv("FEISHU_APP_SECRET", "")
 FEISHU_USER_ID = os.getenv("FEISHU_USER_ID", "")
 FEISHU_CHAT_ID = os.getenv("FEISHU_CHAT_ID", "") # 新增：群聊 ID
 FEISHU_WEBHOOK_URL = os.getenv("FEISHU_WEBHOOK_URL", "") # 新增：Webhook 机器人 URL
+# 调试模式：true 时在 Webhook 卡片底部追加 LLM 用量诊断信息
+# 默认 true（个人/调试用），生产推送给最终用户时建议显式设为 false
+DEBUG_WEBHOOK = os.getenv("DEBUG_WEBHOOK", "true").strip().lower() in ("true", "1", "yes", "on")
 
 
 # ===== 数据管理 (Cache & Pool) =====
@@ -250,12 +254,68 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
         print(f"{Color.RED}⚠️  飞书发送异常: {e}{Color.RESET}")
 
 
-def send_feishu_webhook_card(title: str, doc_url: str, counts_text: str, hours: int, tweet_count: int):
-    """通过 Webhook 发送精美的交互式卡片"""
+def send_feishu_webhook_card(
+    title: str,
+    doc_url: str,
+    counts_text: str,
+    hours: int,
+    tweet_count: int,
+    diagnostics: str | None = None,
+):
+    """通过 Webhook 发送精美的交互式卡片
+
+    diagnostics: 可选的诊断信息（lark_md 格式），调试阶段追加在卡片底部。
+    生产环境传 None 即可隐藏。
+    """
     if not FEISHU_WEBHOOK_URL: return
 
     # 格式化领域统计，去掉 bullet 点以便卡片展示
     clean_counts = counts_text.replace("• ", "▫️ ")
+
+    elements = [
+        {
+            "tag": "div",
+            "text": {
+                "tag": "lark_md",
+                "content": f"**📊 汇总窗口**：过去 {hours} 小时\n**📡 发现信号**：{tweet_count} 条精选情报"
+            }
+        },
+        {"tag": "hr"},
+        {
+            "tag": "div",
+            "text": {
+                "tag": "lark_md",
+                "content": f"**领域分布**：\n{clean_counts}"
+            }
+        },
+        {
+            "tag": "action",
+            "actions": [
+                {
+                    "tag": "button",
+                    "text": {"tag": "plain_text", "content": "📖 阅读完整内参"},
+                    "type": "primary",
+                    "url": doc_url
+                }
+            ]
+        },
+    ]
+
+    # 调试阶段：在卡片底部追加 LLM 用量诊断（生产环境传 diagnostics=None 即可隐藏）
+    if diagnostics:
+        elements.append({"tag": "hr"})
+        elements.append({
+            "tag": "div",
+            "text": {
+                "tag": "lark_md",
+                "content": f"**🔧 调试信息**（开发阶段·正式版将隐藏）\n{diagnostics}"
+            }
+        })
+
+    elements.append({
+        "tag": "note",
+        "elements": [{"tag": "plain_text", "content": "Powered by x-digest · SenseNova (Token Plan + Distill) Enhanced"}]
+    })
 
     card_payload = {
         "msg_type": "interactive",
@@ -265,38 +325,7 @@ def send_feishu_webhook_card(title: str, doc_url: str, counts_text: str, hours: 
                 "title": {"tag": "plain_text", "content": f"🛰️ {title}"},
                 "template": "blue"
             },
-            "elements": [
-                {
-                    "tag": "div",
-                    "text": {
-                        "tag": "lark_md",
-                        "content": f"**📊 汇总窗口**：过去 {hours} 小时\n**📡 发现信号**：{tweet_count} 条精选情报"
-                    }
-                },
-                {"tag": "hr"},
-                {
-                    "tag": "div",
-                    "text": {
-                        "tag": "lark_md",
-                        "content": f"**领域分布**：\n{clean_counts}"
-                    }
-                },
-                {
-                    "tag": "action",
-                    "actions": [
-                        {
-                            "tag": "button",
-                            "text": {"tag": "plain_text", "content": "📖 阅读完整内参"},
-                            "type": "primary",
-                            "url": doc_url
-                        }
-                    ]
-                },
-                {
-                    "tag": "note",
-                    "elements": [{"tag": "plain_text", "content": "Powered by x-digest · SenseNova (Token Plan + Distill) Enhanced"}]
-                }
-            ]
+            "elements": elements
         }
     }
 
@@ -848,7 +877,17 @@ def main():
 
     # 2. 发送 Webhook 卡片（如果配置了 URL）
     if FEISHU_WEBHOOK_URL and doc_url:
-        send_feishu_webhook_card(f"X-Digest 科技汇总日报", doc_url, counts_text, args.hours, len(selected_tweets))
+        # diagnostics 受 DEBUG_WEBHOOK 环境变量控制：
+        #   true（默认）→ 卡片底部追加 LLM 用量诊断
+        #   false      → 隐藏诊断信息，呈现给最终用户的干净版
+        send_feishu_webhook_card(
+            f"X-Digest 科技汇总日报",
+            doc_url,
+            counts_text,
+            args.hours,
+            len(selected_tweets),
+            diagnostics=usage_tracker.summary_for_webhook() if DEBUG_WEBHOOK else None,
+        )
 
     # 3. 如果配置了群 ID，发送 PDF 文件到群
     if FEISHU_CHAT_ID and output_path:
