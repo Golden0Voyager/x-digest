@@ -5,8 +5,10 @@ Step 0.5: 纯异步多模型并行打分
 从而提前过滤掉垃圾信息，大幅节省后续翻译和洞察步骤的时间与 Token 成本。
 
 双引擎组合（硬编码，2026-06 起）：
-  - sensenova-6.7-flash-lite  → Token Plan (token.sensenova.cn)
-    每 5h 1500 次，256K 上下文，与主链隔离的限速配额
+  - deepseek-v4-flash  → Token Plan (token.sensenova.cn)
+    每 5h 150 次，32K 上下文，纯文本响应极快、强工具调用
+    （从 sensenova-6.7-flash-lite 切换过来：6.7 的 256K 多模态给纯文本打分属大材小用，
+      把它留给 insights 任务；v4-flash 更适合短输入快出结果的打分场景）
   - DeepSeek-R1-Distill-Qwen-14B → 主链 (api.sensenova.cn)
     永久免费，32K 上下文，单轮评分不受 reasoning_content 往返影响
 
@@ -25,39 +27,42 @@ from pathlib import Path
 from openai import OpenAI
 
 from pipeline import Color, extract_json, load_json, save_json
+from pipeline.usage import usage_tracker
 from config import (
-    AI_BATCH_SIZE, AI_BATCH_COOLDOWN,
+    AI_BATCH_COOLDOWN, AI_BATCH_SIZE_TP,
     SENSENOVA_TP_API_KEY, SENSENOVA_TP_BASE_URL,
 )
 
 
-def _build_score_clients() -> list[tuple[OpenAI, str]]:
-    """构造双引擎 client + model 列表。
+def _build_score_clients() -> list[tuple[OpenAI, str, str]]:
+    """构造双引擎 client + model + base_url 列表。
 
-    返回 [(client, model_name), ...]，任一 client 创建失败时跳过对应引擎。
+    返回 [(client, model_name, base_url), ...]，任一 client 创建失败时跳过对应引擎。
+    base_url 用于 usage_tracker 区分端点。
     """
     sensenova_key = os.getenv("SENSENOVA_API_KEY")
-    clients: list[tuple[OpenAI, str]] = []
+    clients: list[tuple[OpenAI, str, str]] = []
 
-    # 引擎 1：Token Plan 上的 sensenova-6.7-flash-lite
+    # 引擎 1：Token Plan 上的 deepseek-v4-flash（打分专用，32K 上下文 + 强工具调用）
     if SENSENOVA_TP_API_KEY:
         tp_client = OpenAI(
             api_key=SENSENOVA_TP_API_KEY,
             base_url=SENSENOVA_TP_BASE_URL,
             timeout=180,
         )
-        clients.append((tp_client, "sensenova-6.7-flash-lite"))
+        clients.append((tp_client, "deepseek-v4-flash", SENSENOVA_TP_BASE_URL))
     else:
         print(f"  {Color.YELLOW}⚠️ SENSENOVA_TP_API_KEY 未配置，跳过 Token Plan 引擎{Color.RESET}")
 
     # 引擎 2：主链 DeepSeek-R1-Distill-Qwen-14B
+    sn_base = "https://api.sensenova.cn/compatible-mode/v2"
     if sensenova_key:
         sn_client = OpenAI(
             api_key=sensenova_key,
-            base_url="https://api.sensenova.cn/compatible-mode/v2",
+            base_url=sn_base,
             timeout=180,
         )
-        clients.append((sn_client, "DeepSeek-R1-Distill-Qwen-14B"))
+        clients.append((sn_client, "DeepSeek-R1-Distill-Qwen-14B", sn_base))
     else:
         print(f"  {Color.YELLOW}⚠️ SENSENOVA_API_KEY 未配置，跳过主链 Distill-14B 引擎{Color.RESET}")
 
@@ -78,7 +83,13 @@ Output ONLY a JSON array with the exact structure (no markdown fences, just JSON
 [{"id": "tweet_id", "quality": score}]
 """
 
-async def fetch_scores_from_model(client: OpenAI, model_name: str, chunk: list, prompt: str) -> dict:
+async def fetch_scores_from_model(
+    client: OpenAI,
+    model_name: str,
+    base_url: str,
+    chunk: list,
+    prompt: str,
+) -> dict:
     input_data = [{"id": str(t["tweet_id"]), "text": t["text"]} for t in chunk]
     try:
         response = await asyncio.to_thread(
@@ -91,18 +102,52 @@ async def fetch_scores_from_model(client: OpenAI, model_name: str, chunk: list, 
             temperature=0.1,
             max_tokens=2048
         )
+        # 提取 finish_reason（length 表示输出被截断）
+        finish_reason = None
+        if response.choices:
+            finish_reason = getattr(response.choices[0], "finish_reason", None)
+        # 用量追踪：score 不走 call_ai_with_retry，需手动记一笔
+        if response.usage:
+            u = response.usage
+            usage_tracker.track(
+                model=model_name,
+                base_url=base_url,
+                prompt_tokens=u.prompt_tokens,
+                completion_tokens=u.completion_tokens,
+                finish_reason=finish_reason,
+            )
+        else:
+            usage_tracker.track(
+                model=model_name, base_url=base_url,
+                prompt_tokens=0, completion_tokens=0, finish_reason=finish_reason,
+            )
         content = response.choices[0].message.content
         items = extract_json(content)
-        return {str(item.get("id", "")): int(item.get("quality", 0)) for item in items if item.get("id")}
+        result = {str(item.get("id", "")): int(item.get("quality", 0)) for item in items if item.get("id")}
+
+        # 单引擎覆盖率：返回条数 vs 输入条数
+        missing = len(chunk) - len(result)
+        if finish_reason == "length":
+            print(f"    {Color.RED}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing} (finish=length 截断！){Color.RESET}")
+        elif missing > 0:
+            print(f"    {Color.YELLOW}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing}{Color.RESET}")
+        else:
+            print(f"    {Color.GREY}✓ {model_name}: 输入 {len(chunk)} / 返回 {len(result)}{Color.RESET}")
+
+        return result
     except Exception as e:
+        usage_tracker.track_failure(model=model_name, base_url=base_url)
         print(f"  {Color.RED}⚠️ 模型 {model_name} 打分失败: {e}{Color.RESET}")
         return {}
 
 async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: bool = False) -> list[dict]:
     """
-    使用跨端点双引擎联合打分（sensenova-6.7-flash-lite + DeepSeek-R1-Distill-Qwen-14B），
+    使用跨端点双引擎联合打分（deepseek-v4-flash + DeepSeek-R1-Distill-Qwen-14B），
     过滤出平均分 >= 80 的推文，并取 Top 60。
     将平均分注入到推文的 'quality' 字段中。
+
+    批次大小使用 AI_BATCH_SIZE_TP（默认 60），同时受 TP 配额（150 次/5h）和
+    主链上下文（32K）双重约束。
     """
     cache_file = intermediate_dir / "scores.json"
     raw_cache = {} if force_rerun else load_json(cache_file)
@@ -122,13 +167,16 @@ async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: boo
             for t in to_process:
                 scores_cache[str(t["tweet_id"])] = 100
         else:
-            print(f"  {Color.CYAN}⚖️ 开始使用跨端点双引擎并行打分 {len(to_process)} 条推文...{Color.RESET}")
+            print(f"  {Color.CYAN}⚖️ 开始使用跨端点双引擎并行打分 {len(to_process)} 条推文 (批次 {AI_BATCH_SIZE_TP})...{Color.RESET}")
             print(f"  {Color.GREY}联合打分评委: {', '.join([m[1] for m in models])}{Color.RESET}")
-            chunks = [to_process[i:i+AI_BATCH_SIZE] for i in range(0, len(to_process), AI_BATCH_SIZE)]
+            chunks = [to_process[i:i+AI_BATCH_SIZE_TP] for i in range(0, len(to_process), AI_BATCH_SIZE_TP)]
 
             for idx, chunk in enumerate(chunks):
-                print(f"  ⚖️ 打分批次 ({idx+1}/{len(chunks)})...")
-                tasks = [fetch_scores_from_model(c, m, chunk, SCORE_PROMPT_TEMPLATE) for c, m in models]
+                print(f"  ⚖️ 打分批次 ({idx+1}/{len(chunks)}, {len(chunk)} 条)...")
+                tasks = [
+                    fetch_scores_from_model(c, m, url, chunk, SCORE_PROMPT_TEMPLATE)
+                    for c, m, url in models
+                ]
                 results = await asyncio.gather(*tasks)
 
                 # 计算平均分
@@ -141,7 +189,7 @@ async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: boo
                         avg_score = 0
                     scores_cache[tid] = avg_score
 
-                # 批次间冷却：防止主链 6 RPM / Token Plan 5h 1500 次触发限流
+                # 批次间冷却：防止主链 6 RPM / Token Plan 配额触发限流
                 if idx < len(chunks) - 1:
                     await asyncio.sleep(AI_BATCH_COOLDOWN)
 

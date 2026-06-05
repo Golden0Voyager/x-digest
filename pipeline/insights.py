@@ -18,7 +18,7 @@ from datetime import date
 from pathlib import Path
 
 from config import (
-    AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_INSIGHTS, AI_MAX_BATCH_SIZE,
+    AI_BATCH_COOLDOWN, AI_BATCH_SIZE_TP, AI_MODEL_INSIGHTS,
     SENSENOVA_TP_API_KEY, SENSENOVA_TP_BASE_URL,
 )
 from pipeline import call_ai_with_retry, extract_json, load_json, save_json, Color
@@ -56,6 +56,9 @@ async def run_insights(
     生成洞察与分类。
 
     返回 {tweet_id: {"thought": str, "category": str, "quality": int, "background": str}}
+
+    批次大小使用 AI_BATCH_SIZE_TP（默认 60），适配 Token Plan 端点的长上下文与配额。
+    max_tokens=24000：60 条 × 单条 ~400 tokens 输出 + 安全余量。
     """
     cache_file = intermediate_dir / "insights.json"
     raw_cache: dict = {} if force_rerun else load_json(cache_file)
@@ -73,12 +76,11 @@ async def run_insights(
                 insights[tid]["quality"] = t.get("quality", 80)
         return insights
 
-    print(f"  {Color.CYAN}🧠 开始分析并科普 {len(to_process)} 条精选推文...{Color.RESET}")
+    print(f"  {Color.CYAN}🧠 开始分析并科普 {len(to_process)} 条精选推文 (批次 {AI_BATCH_SIZE_TP})...{Color.RESET}")
 
     insights_prompt = INSIGHTS_PROMPT_TEMPLATE.format(current_date=date.today().isoformat())
 
-    safe_batch_size = min(AI_BATCH_SIZE, AI_MAX_BATCH_SIZE)
-    chunks = [to_process[i : i + safe_batch_size] for i in range(0, len(to_process), safe_batch_size)]
+    chunks = [to_process[i : i + AI_BATCH_SIZE_TP] for i in range(0, len(to_process), AI_BATCH_SIZE_TP)]
 
     for idx, chunk in enumerate(chunks):
         tweet_input = []
@@ -92,7 +94,7 @@ async def run_insights(
 
         input_text = json.dumps(tweet_input, ensure_ascii=False)
 
-        print(f"  🧠 分析批次 ({idx + 1}/{len(chunks)})...")
+        print(f"  🧠 分析批次 ({idx + 1}/{len(chunks)}, {len(chunk)} 条)...")
         try:
             response = await asyncio.to_thread(
                 call_ai_with_retry,
@@ -106,12 +108,16 @@ async def run_insights(
                 # 失败时自动降级到主链的 V3-1 / R1
                 base_url_override=SENSENOVA_TP_BASE_URL,
                 api_key_override=SENSENOVA_TP_API_KEY,
-                max_tokens=10000, # Token Plan 上下文 256K，输出上限更宽
+                # 批次 60 条 × 单条 background+thought ~400 tokens = 24K 输出
+                # Token Plan 上下文 256K，留足安全余量
+                max_tokens=24000,
             )
             items = extract_json(response.choices[0].message.content)
+            returned_ids = set()
             for item in items:
                 tid = str(item.get("id", ""))
                 if tid:
+                    returned_ids.add(tid)
                     original_tweet = next((t for t in chunk if str(t["tweet_id"]) == tid), {})
                     insights[tid] = {
                         "background": item.get("background", ""),
@@ -119,6 +125,15 @@ async def run_insights(
                         "category": item.get("category", "其他动态"),
                         "quality": original_tweet.get("quality", 80),
                     }
+
+            # 单批次覆盖率审计（决定 AI_BATCH_SIZE_TP 调大调小的关键指标）
+            missing = len(chunk) - len(returned_ids)
+            if missing > 0:
+                missing_ids = [str(t["tweet_id"]) for t in chunk if str(t["tweet_id"]) not in returned_ids]
+                print(f"    {Color.YELLOW}⚠️ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)} / 缺失 {missing} (缺失ID: {missing_ids[:3]}{'...' if len(missing_ids) > 3 else ''}){Color.RESET}")
+                print(f"    {Color.GREY}    → 持续出现说明输出截断，建议调小 AI_BATCH_SIZE_TP 或调高 max_tokens{Color.RESET}")
+            else:
+                print(f"    {Color.GREY}✓ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)}{Color.RESET}")
 
             raw_cache.update(insights)
             save_json(cache_file, raw_cache)

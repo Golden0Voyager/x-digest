@@ -16,6 +16,7 @@ from pipeline.curate import curate
 from pipeline.translate import run_translate
 from pipeline.insights import run_insights
 from pipeline.assemble import assemble
+from pipeline.usage import usage_tracker
 from config import AI_MODEL, AI_BASE_URL, AI_FALLBACK_PROVIDERS, AI_MODEL_TRANSLATE, AI_MODEL_INSIGHTS
 
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
@@ -90,6 +91,9 @@ async def run_pipeline(
     # Phase 3: 纯本地拼装（原推链接直接用 x.com 原始 URL，无需缩链）
     print(f"\n{Color.BOLD}━━━ Phase 3: 本地装配 ━━━{Color.RESET}")
     markdown, counts = assemble(tweets, translations, insights)
+
+    # Phase 4: 输出 LLM 用量汇总（按端点+模型聚合）
+    usage_tracker.print_summary(header="LLM 调用与 Token 用量汇总")
 
     print(f"\n{Color.GREEN}✅ 管道完成{Color.RESET}")
     return markdown, counts

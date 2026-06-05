@@ -223,16 +223,51 @@ def call_ai_with_retry(
                     temperature=temperature,
                     max_tokens=max_tokens,
                 )
-                # token 用量统计
+                # 提取 finish_reason（length 表示被 max_tokens 截断 — 关键观察信号）
+                finish_reason = None
+                if result.choices:
+                    finish_reason = getattr(result.choices[0], "finish_reason", None)
+
+                # token 用量统计（实时打印 + 全局累计）
+                from pipeline.usage import usage_tracker
                 if result.usage:
                     u = result.usage
-                    print(f"  {Color.GREY}📊 Token: {u.prompt_tokens} in / {u.completion_tokens} out / {u.total_tokens} total{Color.RESET}")
+                    # finish_reason 颜色：length=红色（截断警告）、stop=灰色（正常）
+                    if finish_reason == "length":
+                        fr_str = f" {Color.RED}finish=length ⚠️ 输出被 max_tokens 截断{Color.RESET}"
+                    elif finish_reason and finish_reason != "stop":
+                        fr_str = f" {Color.YELLOW}finish={finish_reason}{Color.RESET}"
+                    else:
+                        fr_str = f" {Color.GREY}finish={finish_reason or 'n/a'}{Color.RESET}"
+                    print(f"  {Color.GREY}📊 Token: {u.prompt_tokens} in / {u.completion_tokens} out / {u.total_tokens} total{fr_str}")
+                    usage_tracker.track(
+                        model=provider["model"],
+                        base_url=provider["base_url"],
+                        prompt_tokens=u.prompt_tokens,
+                        completion_tokens=u.completion_tokens,
+                        finish_reason=finish_reason,
+                    )
+                else:
+                    # 即使没 usage 字段也记一次调用，便于审计
+                    usage_tracker.track(
+                        model=provider["model"],
+                        base_url=provider["base_url"],
+                        prompt_tokens=0,
+                        completion_tokens=0,
+                        finish_reason=finish_reason,
+                    )
                 # 降级成功时提示当前实际服务的模型
                 if i > 0 or attempt > 1:
                     print(f"  {Color.GREEN}✓ [{provider['name']}] {provider['model']} 响应成功{Color.RESET}")
                 return result
             except Exception as e:
                 last_error = e
+                # 失败也记一笔（不计入 token 但计入失败次数）
+                from pipeline.usage import usage_tracker
+                usage_tracker.track_failure(
+                    model=provider["model"],
+                    base_url=provider["base_url"],
+                )
                 err_str = str(e).lower()
                 err_type = type(e).__name__
 
