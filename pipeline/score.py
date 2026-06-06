@@ -100,7 +100,7 @@ async def fetch_scores_from_model(
                 {"role": "user", "content": json.dumps(input_data, ensure_ascii=False)}
             ],
             temperature=0.1,
-            max_tokens=2048
+            max_tokens=8192
         )
         # 提取 finish_reason（length 表示输出被截断）
         finish_reason = None
