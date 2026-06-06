@@ -89,7 +89,7 @@ async def fetch_scores_from_model(
     base_url: str,
     chunk: list,
     prompt: str,
-) -> dict:
+) -> tuple[dict, str | None]:
     input_data = [{"id": str(t["tweet_id"]), "text": t["text"]} for t in chunk]
     try:
         response = await asyncio.to_thread(
@@ -134,11 +134,11 @@ async def fetch_scores_from_model(
         else:
             print(f"    {Color.GREY}✓ {model_name}: 输入 {len(chunk)} / 返回 {len(result)}{Color.RESET}")
 
-        return result
+        return result, finish_reason
     except Exception as e:
         usage_tracker.track_failure(model=model_name, base_url=base_url)
         print(f"  {Color.RED}⚠️ 模型 {model_name} 打分失败: {e}{Color.RESET}")
-        return {}
+        return {}, "error"
 
 async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: bool = False) -> list[dict]:
     """
@@ -169,28 +169,42 @@ async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: boo
         else:
             print(f"  {Color.CYAN}⚖️ 开始使用跨端点双引擎并行打分 {len(to_process)} 条推文 (批次 {AI_BATCH_SIZE_TP})...{Color.RESET}")
             print(f"  {Color.GREY}联合打分评委: {', '.join([m[1] for m in models])}{Color.RESET}")
-            chunks = [to_process[i:i+AI_BATCH_SIZE_TP] for i in range(0, len(to_process), AI_BATCH_SIZE_TP)]
 
-            for idx, chunk in enumerate(chunks):
-                print(f"  ⚖️ 打分批次 ({idx+1}/{len(chunks)}, {len(chunk)} 条)...")
+            current_batch_size = AI_BATCH_SIZE_TP
+            FALLBACK_BATCH_SIZE = 45
+
+            idx = 0
+            while idx < len(to_process):
+                chunk = to_process[idx : idx + current_batch_size]
+                print(f"  ⚖️ 打分批次 (剩余 {len(to_process) - idx} 条, 批 {len(chunk)} 条)...")
                 tasks = [
                     fetch_scores_from_model(c, m, url, chunk, SCORE_PROMPT_TEMPLATE)
                     for c, m, url in models
                 ]
                 results = await asyncio.gather(*tasks)
 
+                scores_results = [r[0] for r in results]
+                finish_reasons = [r[1] for r in results]
+                truncated = any(fr == "length" for fr in finish_reasons)
+
                 # 计算平均分
                 for t in chunk:
                     tid = str(t["tweet_id"])
-                    valid_scores = [r.get(tid) for r in results if tid in r and r.get(tid) is not None]
+                    valid_scores = [sr.get(tid) for sr in scores_results if tid in sr and sr.get(tid) is not None]
                     if valid_scores:
                         avg_score = int(sum(valid_scores) / len(valid_scores))
                     else:
                         avg_score = 0
                     scores_cache[tid] = avg_score
 
+                if truncated and current_batch_size > FALLBACK_BATCH_SIZE:
+                    old_size = current_batch_size
+                    current_batch_size = FALLBACK_BATCH_SIZE
+                    print(f"  {Color.YELLOW}⚠️ 检测到 length 截断，批次自动降级 {old_size} → {current_batch_size}{Color.RESET}")
+
+                idx += len(chunk)
                 # 批次间冷却：防止主链 6 RPM / Token Plan 配额触发限流
-                if idx < len(chunks) - 1:
+                if idx < len(to_process):
                     await asyncio.sleep(AI_BATCH_COOLDOWN)
 
             raw_cache.update(scores_cache)
