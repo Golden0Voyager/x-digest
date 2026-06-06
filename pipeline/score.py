@@ -91,54 +91,63 @@ async def fetch_scores_from_model(
     prompt: str,
 ) -> tuple[dict, str | None]:
     input_data = [{"id": str(t["tweet_id"]), "text": t["text"]} for t in chunk]
-    try:
-        response = await asyncio.to_thread(
-            client.chat.completions.create,
-            model=model_name,
-            messages=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": json.dumps(input_data, ensure_ascii=False)}
-            ],
-            temperature=0.1,
-            max_tokens=8192
-        )
-        # 提取 finish_reason（length 表示输出被截断）
-        finish_reason = None
-        if response.choices:
-            finish_reason = getattr(response.choices[0], "finish_reason", None)
-        # 用量追踪：score 不走 call_ai_with_retry，需手动记一笔
-        if response.usage:
-            u = response.usage
-            usage_tracker.track(
+
+    response = None
+    for attempt in range(3):
+        try:
+            response = await asyncio.to_thread(
+                client.chat.completions.create,
                 model=model_name,
-                base_url=base_url,
-                prompt_tokens=u.prompt_tokens,
-                completion_tokens=u.completion_tokens,
-                finish_reason=finish_reason,
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": json.dumps(input_data, ensure_ascii=False)}
+                ],
+                temperature=0.1,
+                max_tokens=8192
             )
-        else:
-            usage_tracker.track(
-                model=model_name, base_url=base_url,
-                prompt_tokens=0, completion_tokens=0, finish_reason=finish_reason,
-            )
-        content = response.choices[0].message.content
-        items = extract_json(content)
-        result = {str(item.get("id", "")): int(item.get("quality", 0)) for item in items if item.get("id")}
+            break
+        except Exception as e:
+            if attempt < 2:
+                await asyncio.sleep(2 ** attempt)
+                print(f"    {Color.YELLOW}⚠️ {model_name} 第 {attempt+1}/3 次失败 ({type(e).__name__})，{2**attempt}s 后重试...{Color.RESET}")
+            else:
+                usage_tracker.track_failure(model=model_name, base_url=base_url)
+                print(f"  {Color.RED}⚠️ 模型 {model_name} 3 次重试均失败: {e}{Color.RESET}")
+                return {}, "error"
 
-        # 单引擎覆盖率：返回条数 vs 输入条数
-        missing = len(chunk) - len(result)
-        if finish_reason == "length":
-            print(f"    {Color.RED}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing} (finish=length 截断！){Color.RESET}")
-        elif missing > 0:
-            print(f"    {Color.YELLOW}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing}{Color.RESET}")
-        else:
-            print(f"    {Color.GREY}✓ {model_name}: 输入 {len(chunk)} / 返回 {len(result)}{Color.RESET}")
+    # 提取 finish_reason（length 表示输出被截断）
+    finish_reason = None
+    if response.choices:
+        finish_reason = getattr(response.choices[0], "finish_reason", None)
+    # 用量追踪：score 不走 call_ai_with_retry，需手动记一笔
+    if response.usage:
+        u = response.usage
+        usage_tracker.track(
+            model=model_name,
+            base_url=base_url,
+            prompt_tokens=u.prompt_tokens,
+            completion_tokens=u.completion_tokens,
+            finish_reason=finish_reason,
+        )
+    else:
+        usage_tracker.track(
+            model=model_name, base_url=base_url,
+            prompt_tokens=0, completion_tokens=0, finish_reason=finish_reason,
+        )
+    content = response.choices[0].message.content
+    items = extract_json(content)
+    result = {str(item.get("id", "")): int(item.get("quality", 0)) for item in items if item.get("id")}
 
-        return result, finish_reason
-    except Exception as e:
-        usage_tracker.track_failure(model=model_name, base_url=base_url)
-        print(f"  {Color.RED}⚠️ 模型 {model_name} 打分失败: {e}{Color.RESET}")
-        return {}, "error"
+    # 单引擎覆盖率：返回条数 vs 输入条数
+    missing = len(chunk) - len(result)
+    if finish_reason == "length":
+        print(f"    {Color.RED}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing} (finish=length 截断！){Color.RESET}")
+    elif missing > 0:
+        print(f"    {Color.YELLOW}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing}{Color.RESET}")
+    else:
+        print(f"    {Color.GREY}✓ {model_name}: 输入 {len(chunk)} / 返回 {len(result)}{Color.RESET}")
+
+    return result, finish_reason
 
 async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: bool = False) -> list[dict]:
     """
