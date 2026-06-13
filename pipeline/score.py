@@ -232,8 +232,10 @@ async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: boo
     # 按分数降序，再按 ID 降序排序
     scored_tweets.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
 
-    # 截取 Top 60
-    top_60 = scored_tweets[:60]
+    # 动态比例：取高于 80 分推文的 30%，至少 30 条、至多 150 条
+    keep_ratio = 0.3
+    keep_count = max(60, min(180, int(len(scored_tweets) * keep_ratio)))
+    top_n = scored_tweets[:keep_count]
 
-    print(f"  {Color.GREEN}📊 打分完成，从 {len(tweets)} 条中精选出 {len(top_60)} 条（>=80分且Top60）{Color.RESET}")
-    return top_60
+    print(f"  {Color.GREEN}📊 打分完成，从 {len(tweets)} 条中精选出 {len(top_n)} 条（>=80分，取前 {keep_ratio:.0%} = {keep_count} 条）{Color.RESET}")
+    return top_n

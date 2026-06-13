@@ -15,8 +15,6 @@ DEFAULT_ACCOUNTS_FILE = Path("defaults/suggested_accounts.json")
 
 # 质量门控阈值
 _MIN_QUALITY = 80
-# 最终精选的最大条目数
-_MAX_DIGEST_ITEMS = 60
 
 # 预编译：去除推文中的所有 t.co 短链（Twitter 跟踪链接，在 Markdown 中无用）
 _TCO_RE = re.compile(r"https://t\.co/[a-zA-Z0-9]+")
