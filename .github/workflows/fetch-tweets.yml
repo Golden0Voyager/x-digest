@@ -90,32 +90,40 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: uv run python main.py --fetch-only --hours 24
 
-      - name: Commit and push tweet cache
+      - name: Commit to auto-docs
         run: |
           set -euo pipefail
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add -f output/raw_tweets_pool.json output/processed_tweets.json output/account_stats.json
+
+          mkdir -p /tmp/auto-docs-save
+          cp -r output/ /tmp/auto-docs-save/
+
+          git fetch --depth=50 origin auto-docs 2>/dev/null || true
+          if git rev-parse --verify origin/auto-docs 2>/dev/null; then
+            git checkout -B _docs origin/auto-docs
+          else
+            git checkout --orphan _docs
+            git rm -rf . 2>/dev/null || true
+          fi
+
+          mkdir -p output
+          cp -r /tmp/auto-docs-save/* output/
+
+          git add -f output/
           if git diff --cached --quiet; then
-            echo "No changes to commit"
+            echo "No data changes; nothing to commit"
           else
             git commit -m "🗃️ Auto Fetch: $(date +'%Y-%m-%d %H:%M') [skip ci]"
-            git stash push --include-untracked -m "auto-stash" || true
             for attempt in 1 2 3; do
-              git pull --rebase -X theirs origin main
-              if git push origin HEAD:main; then
+              if git push origin _docs:auto-docs; then
                 echo "Push succeeded on attempt ${attempt}"
-                git stash pop || true
                 exit 0
               fi
-
               if [ "${attempt}" -eq 3 ]; then
                 echo "Push failed after 3 attempts"
-                git stash pop || true
                 exit 1
               fi
-
-              echo "Push failed due to branch race; retrying (${attempt}/3)..."
               sleep $((attempt * 5))
             done
           fi
