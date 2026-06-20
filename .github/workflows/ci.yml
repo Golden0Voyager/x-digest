@@ -24,10 +24,10 @@ jobs:
         run: uv sync --dev
 
       - name: Run ruff check
-        run: uv run ruff check config.py fetcher.py main.py tests/
+        run: uv run ruff check *.py pipeline/
 
       - name: Run mypy
-        run: uv run mypy config.py fetcher.py main.py || true
+        run: uv run mypy *.py || true
 
       - name: Run tests with coverage
         run: uv run pytest --cov --cov-report=term-missing tests/
