@@ -14,8 +14,7 @@ from pathlib import Path
 import httpx
 from openai import OpenAI
 
-from config import AI_API_KEY, AI_BASE_URL, AI_MODEL, AI_FALLBACK_PROVIDERS
-
+from config import AI_API_KEY, AI_BASE_URL, AI_FALLBACK_PROVIDERS, AI_MODEL
 
 # ── 终端色彩 ──────────────────────────────────────────────
 

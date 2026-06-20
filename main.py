@@ -4,26 +4,21 @@ X (Twitter) 摘要生成器 - 主程序 (xAI 风格 UI + 稳定性增强版)
 功能：极致交互界面 → 动态 Token 截断 → 入库合并 → 跨领域情报汇总
 """
 
-import os
+import argparse
 import asyncio
 import json
-import re
-import time
-import argparse
-import sys
 import logging
-from datetime import datetime, timezone, timedelta
+import os
+import re
+import sys
+import time
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import httpx
-from dotenv import load_dotenv
 import questionary
-import markdown
 
-from config import (
-    HOURS_LOOKBACK, ACCOUNT_SCAN_INTERVAL,
-    AI_API_KEY, CACHE_RETENTION_HOURS
-)
+from config import ACCOUNT_SCAN_INTERVAL, AI_API_KEY, CACHE_RETENTION_HOURS, HOURS_LOOKBACK
 from fetcher import fetch_all_tweets
 from pipeline import Color, log_print
 from pipeline.orchestrator import run_pipeline
@@ -70,13 +65,13 @@ def save_json(file_path: Path, data: dict):
     file_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 def clean_cache(cache: dict, hours: int) -> dict:
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    cutoff = datetime.now(UTC) - timedelta(hours=hours)
     new_cache = {}
     for tid, ts_str in cache.items():
         try:
             if tid.startswith("SCAN_"):
                 ts = datetime.fromisoformat(ts_str)
-                if ts > (datetime.now(timezone.utc) - timedelta(hours=12)):
+                if ts > (datetime.now(UTC) - timedelta(hours=12)):
                     new_cache[tid] = ts_str
                 continue
             ts = datetime.fromisoformat(ts_str)
@@ -86,7 +81,7 @@ def clean_cache(cache: dict, hours: int) -> dict:
     return new_cache
 
 def clean_pool(pool: dict, hours: int) -> dict:
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    cutoff = datetime.now(UTC) - timedelta(hours=hours)
     new_pool = {}
     for tid, tweet in pool.items():
         try:
@@ -102,7 +97,7 @@ def clean_pool(pool: dict, hours: int) -> dict:
 def update_account_health(username: str, tweets_found: list | None):
     """更新账号扫描健康度统计"""
     stats = load_json(STATS_FILE)
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     if username not in stats:
         stats[username] = {
             "first_seen": now, "total_scans": 0, "success_scans": 0,
@@ -133,13 +128,13 @@ def generate_health_report(force=False):
     report_flag = OUTPUT_DIR / ".last_health_report"
     if not force and report_flag.exists():
         try:
-            if datetime.now(timezone.utc) - datetime.fromisoformat(report_flag.read_text().strip()) < timedelta(days=7):
+            if datetime.now(UTC) - datetime.fromisoformat(report_flag.read_text().strip()) < timedelta(days=7):
                 return
         except:
             pass
     log_print(f"\n {Color.CYAN}📋 生成账号健康审计报告...{Color.RESET}")
     ghosts, dormant, ranks = [], [], []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for u, d in stats.items():
         if d.get("error_count", 0) >= 5:
             ghosts.append(f"- @{u} (连续失败 {d['error_count']} 次)")
@@ -495,8 +490,8 @@ def create_feishu_doc(title: str, markdown_content: str) -> str | None:
 
 async def render_markdown_to_pdf(md_path: Path):
     try:
-        from playwright.async_api import async_playwright
         import markdown
+        from playwright.async_api import async_playwright
         pdf_path = md_path.with_suffix(".pdf")
         md_content = md_path.read_text(encoding="utf-8")
         html_body = markdown.markdown(md_content, extensions=["extra", "codehilite", "toc"])
@@ -582,10 +577,10 @@ def save_output(content: str, tweet_count: int, hours: int, selected_domains: li
     else:
         domain_str = "全领域全量扫描"
 
-    header = f"# 🛰️ X-Digest 科技汇总日报\n"
+    header = "# 🛰️ X-Digest 科技汇总日报\n"
     header += f"> **📅 生成时间**：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
     header += f"> **📊 汇总窗口**：过去 {hours} 小时 | {domain_str} ({account_count} 账号) | {tweet_count} 条推文\n"
-    header += f"> **📡 数据来源**：X.com (中英对照版)\n\n---\n\n"
+    header += "> **📡 数据来源**：X.com (中英对照版)\n\n---\n\n"
 
     output_path.write_text(header + content, encoding="utf-8")
     print(f"{Color.GREEN}💾 已保存精美排版报告：{output_path}{Color.RESET}")
@@ -750,7 +745,7 @@ def main():
 
     if args.target_date:
         print(f"\n {Color.CYAN}✨ Historical Mode Initiated:{Color.RESET} Extracting signals from {args.target_date}")
-        target_start = datetime.strptime(args.target_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        target_start = datetime.strptime(args.target_date, "%Y-%m-%d").replace(tzinfo=UTC)
         target_end = target_start + timedelta(days=1)
 
         selected_tweets = []
@@ -787,7 +782,7 @@ def main():
                 if scan_key in cache:
                     try:
                         last_scan = datetime.fromisoformat(cache[scan_key])
-                        if datetime.now(timezone.utc) - last_scan < timedelta(hours=ACCOUNT_SCAN_INTERVAL):
+                        if datetime.now(UTC) - last_scan < timedelta(hours=ACCOUNT_SCAN_INTERVAL):
                             continue
                     except: pass
                 active_accounts.append(acc)
@@ -803,7 +798,7 @@ def main():
             update_account_health(username, tweets_found)
             if tweets_found is None:
                 return
-            now_iso = datetime.now(timezone.utc).isoformat()
+            now_iso = datetime.now(UTC).isoformat()
             cache[f"SCAN_{username}"] = now_iso
             for t in tweets_found:
                 if t["tweet_id"] not in cache: cache[t["tweet_id"]] = now_iso
@@ -833,7 +828,7 @@ def main():
 
     # ===== 管线阶段（可被 --fetch-only 跳过） =====
     # 仅保留本次选中的账号，且在回看时间窗口内的推文
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     lookback_delta = timedelta(hours=args.hours)
     selected_tweets = []
     for tweet in pool.values():
@@ -881,7 +876,7 @@ def main():
         #   true（默认）→ 卡片底部追加 LLM 用量诊断
         #   false      → 隐藏诊断信息，呈现给最终用户的干净版
         send_feishu_webhook_card(
-            f"X-Digest 科技汇总日报",
+            "X-Digest 科技汇总日报",
             doc_url,
             counts_text,
             args.hours,

@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Optional
 from urllib.parse import urlparse
 
 
@@ -48,7 +47,7 @@ class UsageTracker:
         self._records: dict[str, UsageRecord] = defaultdict(UsageRecord)
 
     @staticmethod
-    def _extract_endpoint(base_url: Optional[str]) -> str:
+    def _extract_endpoint(base_url: str | None) -> str:
         """从 base_url 提取 host，未提供时标记为 default"""
         if not base_url:
             return "default"
@@ -61,10 +60,10 @@ class UsageTracker:
     def track(
         self,
         model: str,
-        base_url: Optional[str],
+        base_url: str | None,
         prompt_tokens: int,
         completion_tokens: int,
-        finish_reason: Optional[str] = None,
+        finish_reason: str | None = None,
     ) -> None:
         """记录一次成功调用"""
         endpoint = self._extract_endpoint(base_url)
@@ -76,7 +75,7 @@ class UsageTracker:
         if finish_reason:
             rec.finish_reasons[finish_reason] = rec.finish_reasons.get(finish_reason, 0) + 1
 
-    def track_failure(self, model: str, base_url: Optional[str]) -> None:
+    def track_failure(self, model: str, base_url: str | None) -> None:
         """记录一次失败调用（不影响 token 累计，但计入失败次数）"""
         endpoint = self._extract_endpoint(base_url)
         key = f"{endpoint}|{model}"

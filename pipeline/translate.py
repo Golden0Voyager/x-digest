@@ -9,8 +9,8 @@ import asyncio
 import json
 from pathlib import Path
 
-from config import AI_BATCH_SIZE, AI_BATCH_COOLDOWN, AI_MODEL_TRANSLATE, AI_MAX_BATCH_SIZE
-from pipeline import call_ai_with_retry, extract_json, load_json, save_json, Color
+from config import AI_BATCH_COOLDOWN, AI_BATCH_SIZE, AI_MAX_BATCH_SIZE, AI_MODEL_TRANSLATE
+from pipeline import Color, call_ai_with_retry, extract_json, load_json, save_json
 
 TRANSLATE_PROMPT = """\
 你是专业翻译官。将以下 X (Twitter) 推文翻译为中文。
@@ -68,7 +68,7 @@ async def run_translate(
     # ── 1. 加载并过滤缓存（会话隔离） ──
     cache_file = intermediate_dir / "translations.json"
     raw_cache: dict = {} if force_rerun else load_json(cache_file)
-    
+
     active_ids = {str(t["tweet_id"]) for t in tweets}
     # 仅保留本次需要的缓存，防止 30 天前的历史数据干扰条数统计
     translations = {k: v for k, v in raw_cache.items() if k in active_ids}
@@ -151,7 +151,7 @@ async def run_translate(
                         model_override=AI_MODEL_TRANSLATE,
                         max_tokens=2048,
                     )
-    
+
                     return tid, resp.choices[0].message.content.strip()
                 except Exception:
                     return tid, "SKIP" # 失败时记录为 SKIP

@@ -10,7 +10,7 @@ from pathlib import Path
 
 import httpx
 
-from pipeline import load_json, save_json, Color
+from pipeline import Color, load_json, save_json
 
 URL_MAP_FILE = Path(os.getenv("OUTPUT_DIR", "./output")) / "short_links_map.json"
 

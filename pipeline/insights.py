@@ -18,10 +18,13 @@ from datetime import date
 from pathlib import Path
 
 from config import (
-    AI_BATCH_COOLDOWN, AI_BATCH_SIZE_TP, AI_MODEL_INSIGHTS,
-    SENSENOVA_TP_API_KEY, SENSENOVA_TP_BASE_URL,
+    AI_BATCH_COOLDOWN,
+    AI_BATCH_SIZE_TP,
+    AI_MODEL_INSIGHTS,
+    SENSENOVA_TP_API_KEY,
+    SENSENOVA_TP_BASE_URL,
 )
-from pipeline import call_ai_with_retry, extract_json, load_json, save_json, Color
+from pipeline import Color, call_ai_with_retry, extract_json, load_json, save_json
 
 INSIGHTS_PROMPT_TEMPLATE = """\
 你是资深科技情报分析师。对这些精选推文进行深度分析、科普和分类。
@@ -62,7 +65,7 @@ async def run_insights(
     """
     cache_file = intermediate_dir / "insights.json"
     raw_cache: dict = {} if force_rerun else load_json(cache_file)
-    
+
     active_ids = {str(t["tweet_id"]) for t in tweets}
     insights = {k: v for k, v in raw_cache.items() if k in active_ids}
 

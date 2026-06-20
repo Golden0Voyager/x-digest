@@ -26,12 +26,14 @@ from pathlib import Path
 
 from openai import OpenAI
 
+from config import (
+    AI_BATCH_COOLDOWN,
+    AI_BATCH_SIZE_TP,
+    SENSENOVA_TP_API_KEY,
+    SENSENOVA_TP_BASE_URL,
+)
 from pipeline import Color, extract_json, load_json, save_json
 from pipeline.usage import usage_tracker
-from config import (
-    AI_BATCH_COOLDOWN, AI_BATCH_SIZE_TP,
-    SENSENOVA_TP_API_KEY, SENSENOVA_TP_BASE_URL,
-)
 
 
 def _build_score_clients() -> list[tuple[OpenAI, str, str]]:

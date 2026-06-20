@@ -31,7 +31,6 @@ import os
 import re
 import time
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from openai import OpenAI
 
@@ -372,7 +371,7 @@ async def main():
     print_section("🧪 SenseNova DeepSeek 模型翻译能力对比")
     print(f"样本数: {len(SAMPLE_TWEETS)} 条")
     print(f"测试模型: {len(MODELS_TO_TEST)} 个")
-    print(f"限流策略: 顺序调用（每调用间隔 ≥10s 防止触发 1 QPS）")
+    print("限流策略: 顺序调用（每调用间隔 ≥10s 防止触发 1 QPS）")
     print(f"预计耗时: ~{len(MODELS_TO_TEST) * 25}s")
 
     results: list[tuple[ModelResult, dict]] = []

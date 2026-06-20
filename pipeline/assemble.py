@@ -86,7 +86,7 @@ def assemble(
     # ── 归类装配 ──
     category_items: dict[str, list] = {name: [] for name, _ in DISPLAY_CATEGORIES}
     fallback_items: list[str] = []
-    
+
     skipped_no_insight = 0
 
     for t in tweets:
@@ -119,7 +119,7 @@ def assemble(
         images = t.get("images", [])
         if images:
             entry += " ".join(f"![推文配图]({url})" for url in images) + "\n"
-        
+
         entry += "\n"
 
         trans = translations.get(tid, "SKIP")
@@ -135,7 +135,7 @@ def assemble(
             thought = thought.replace("启发性思考：", "").replace("启发 & 思考：", "").replace("💡", "").strip()
             if thought:
                 entry += f"🧠 **启示**：{thought}"
-                
+
         # 归类
         cat_val = insight.get("category", "其他动态")
         matched = False
