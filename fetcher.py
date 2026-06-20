@@ -3,19 +3,19 @@
 """
 
 import asyncio
+import glob
+import hashlib
 import json
 import os
 import random
-import hashlib
-import glob
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-from playwright_stealth import Stealth
-from playwright.async_api import async_playwright
 from dotenv import load_dotenv
+from playwright.async_api import async_playwright
+from playwright_stealth import Stealth
 
-from config import ACCOUNTS, TWEETS_PER_ACCOUNT, HOURS_LOOKBACK
+from config import ACCOUNTS, HOURS_LOOKBACK, TWEETS_PER_ACCOUNT
 from pipeline import Color, log_print
 
 load_dotenv()
@@ -125,7 +125,7 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
                         raise e
                     print(f"  ⚠️ 页面访问异常 (尝试 {attempt+1}/3): {e}，准备重试...")
 
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=hours_lookback)
+        cutoff = datetime.now(UTC) - timedelta(hours=hours_lookback)
         start_time = time.monotonic()
 
         # 增加一点初始等待，让数据有时间拦截
@@ -162,7 +162,7 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
             # B. 智能识别并处理"屏蔽"或"刷新"页面
             body_text = await page.evaluate("document.body ? document.body.innerText : ''")
             if body_text and any(kw in body_text for kw in ["Retry", "Something went wrong", "出错了", "重新加载", "Try searching for something else"]):
-                print(f"  ⚠️  命中 X 错误页，尝试原地刷新...")
+                print("  ⚠️  命中 X 错误页，尝试原地刷新...")
                 await page.reload(wait_until="load", timeout=30000)
                 await asyncio.sleep(5)
                 body_text_after = await page.evaluate("document.body ? document.body.innerText : ''")
@@ -182,7 +182,7 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
                 break
 
         if not graphql_tweets:
-            print(f"  ⚠️  超时未截获数据包，可能页面已被限制")
+            print("  ⚠️  超时未截获数据包，可能页面已被限制")
             return None
         return []
 

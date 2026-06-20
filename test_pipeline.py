@@ -2,11 +2,12 @@
 import asyncio
 import os
 from pathlib import Path
+
+from pipeline import Color
+from pipeline.assemble import assemble
+from pipeline.insights import run_insights
 from pipeline.score import run_score
 from pipeline.translate import run_translate
-from pipeline.insights import run_insights
-from pipeline.assemble import assemble
-from pipeline import Color
 
 # 模拟几条硬核推文
 MOCK_TWEETS = [
@@ -29,7 +30,7 @@ MOCK_TWEETS = [
 
 async def test_full_ai_logic():
     print(f"{Color.BOLD}🧪 开始测试科普增强版 AI 管线...{Color.RESET}\n")
-    
+
     intermediate_dir = Path("./output/test_intermediate")
     intermediate_dir.mkdir(parents=True, exist_ok=True)
 
@@ -44,11 +45,11 @@ async def test_full_ai_logic():
     # 3. 测试科普与洞察 (sensenova-6.7-flash-lite via Token Plan)
     print(f"\n{Color.CYAN}Step 3: sensenova-6.7-flash-lite 背景科普与深度启示...{Color.RESET}")
     insights = await run_insights(top_tweets, translations, intermediate_dir, force_rerun=True)
-    
+
     # 4. 组装结果
     print(f"\n{Color.CYAN}Step 4: 本地排版装配...{Color.RESET}")
     markdown, counts = assemble(top_tweets, translations, insights)
-    
+
     print(f"\n{Color.GREEN}✅ 测试完成！生成的预览内容如下：{Color.RESET}\n")
     print("=" * 50)
     print(markdown)

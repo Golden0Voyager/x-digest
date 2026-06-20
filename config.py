@@ -3,6 +3,7 @@
 """
 
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -129,7 +130,7 @@ if os.getenv("GITHUB_ACTIONS") == "true":
     if not AI_MODEL:
         _missing.append("AI_MODEL (如 SENSENOVA_MODEL)")
     if _missing:
-        print(f"\n[CI-DIAG] GitHub Actions 检测到以下关键环境变量未注入：")
+        print("\n[CI-DIAG] GitHub Actions 检测到以下关键环境变量未注入：")
         for m in _missing:
             print(f"  - {m}")
         print("[CI-DIAG] 请前往仓库 Settings → Secrets → Actions 中配置，并在 workflow 的 env 中传入。\n")
