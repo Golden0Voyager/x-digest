@@ -1,6 +1,17 @@
 {
-  "karpathy": {
-    "first_seen": "2026-07-03T06:07:43.284929+00:00",
+  "ylecun": {
+    "first_seen": "2026-07-04T05:58:13.483167+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T05:58:13.483167+00:00",
+    "tweet_counts_history": [
+      15
+    ]
+  },
+  "geoffreyhinton": {
+    "first_seen": "2026-07-04T05:58:14.159650+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -10,19 +21,8 @@
       0
     ]
   },
-  "ylecun": {
-    "first_seen": "2026-07-03T06:07:43.830834+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:07:43.830834+00:00",
-    "tweet_counts_history": [
-      10
-    ]
-  },
-  "geoffreyhinton": {
-    "first_seen": "2026-07-03T06:07:44.877135+00:00",
+  "karpathy": {
+    "first_seen": "2026-07-04T05:58:16.649551+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -33,18 +33,7 @@
     ]
   },
   "ilyasut": {
-    "first_seen": "2026-07-03T06:07:58.597610+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "AndrewYNg": {
-    "first_seen": "2026-07-03T06:07:59.635784+00:00",
+    "first_seen": "2026-07-04T05:58:27.360463+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -55,7 +44,7 @@
     ]
   },
   "drfeifei": {
-    "first_seen": "2026-07-03T06:08:01.793997+00:00",
+    "first_seen": "2026-07-04T05:58:31.653668+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -65,19 +54,19 @@
       0
     ]
   },
-  "MIT_CSAIL": {
-    "first_seen": "2026-07-03T06:08:14.183194+00:00",
+  "AndrewYNg": {
+    "first_seen": "2026-07-04T05:58:35.409642+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:08:14.183194+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      4
+      0
     ]
   },
   "jeffdean": {
-    "first_seen": "2026-07-03T06:08:16.368695+00:00",
+    "first_seen": "2026-07-04T05:58:42.951830+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -88,7 +77,7 @@
     ]
   },
   "DrJimFan": {
-    "first_seen": "2026-07-03T06:08:18.789190+00:00",
+    "first_seen": "2026-07-04T05:58:47.936369+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -98,8 +87,19 @@
       0
     ]
   },
-  "OriolVinyalsML": {
-    "first_seen": "2026-07-03T06:08:30.479648+00:00",
+  "MIT_CSAIL": {
+    "first_seen": "2026-07-04T05:58:52.877437+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T05:58:52.877437+00:00",
+    "tweet_counts_history": [
+      1
+    ]
+  },
+  "NathanLambert": {
+    "first_seen": "2026-07-04T05:59:00.531362+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -110,18 +110,18 @@
     ]
   },
   "Nature": {
-    "first_seen": "2026-07-03T06:08:34.749721+00:00",
+    "first_seen": "2026-07-04T05:59:05.938663+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:08:34.749721+00:00",
+    "last_tweet_date": "2026-07-04T05:59:05.938663+00:00",
     "tweet_counts_history": [
       9
     ]
   },
-  "NathanLambert": {
-    "first_seen": "2026-07-03T06:08:35.200553+00:00",
+  "OriolVinyalsML": {
+    "first_seen": "2026-07-04T05:59:06.019868+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -131,8 +131,19 @@
       0
     ]
   },
+  "ScienceMagazine": {
+    "first_seen": "2026-07-04T05:59:18.642336+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T05:59:18.642336+00:00",
+    "tweet_counts_history": [
+      12
+    ]
+  },
   "aidangomez": {
-    "first_seen": "2026-07-03T06:08:49.360919+00:00",
+    "first_seen": "2026-07-04T05:59:22.504580+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -143,29 +154,18 @@
     ]
   },
   "StanfordHAI": {
-    "first_seen": "2026-07-03T06:08:49.445649+00:00",
+    "first_seen": "2026-07-04T05:59:22.878656+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:08:49.445649+00:00",
+    "last_tweet_date": "2026-07-04T05:59:22.878656+00:00",
     "tweet_counts_history": [
-      3
+      1
     ]
   },
-  "ScienceMagazine": {
-    "first_seen": "2026-07-03T06:08:50.908645+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:08:50.908645+00:00",
-    "tweet_counts_history": [
-      8
-    ]
-  },
-  "catthesuper": {
-    "first_seen": "2026-07-03T06:09:05.740918+00:00",
+  "arxiv": {
+    "first_seen": "2026-07-04T05:59:34.641989+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -176,7 +176,7 @@
     ]
   },
   "ch402": {
-    "first_seen": "2026-07-03T06:09:08.191177+00:00",
+    "first_seen": "2026-07-04T05:59:37.800798+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -186,8 +186,30 @@
       0
     ]
   },
-  "arxiv": {
-    "first_seen": "2026-07-03T06:09:09.522483+00:00",
+  "catthesuper": {
+    "first_seen": "2026-07-04T05:59:39.048845+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "denny_zhou": {
+    "first_seen": "2026-07-04T05:59:49.583472+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "jackclarkSF": {
+    "first_seen": "2026-07-04T05:59:54.963428+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -198,40 +220,18 @@
     ]
   },
   "fchollet": {
-    "first_seen": "2026-07-03T06:09:19.861975+00:00",
+    "first_seen": "2026-07-04T05:59:56.801193+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:09:19.861975+00:00",
+    "last_tweet_date": "2026-07-04T05:59:56.801193+00:00",
     "tweet_counts_history": [
       5
     ]
   },
-  "jackclarkSF": {
-    "first_seen": "2026-07-03T06:09:21.870293+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:09:21.870293+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "denny_zhou": {
-    "first_seen": "2026-07-03T06:09:26.235416+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "lilianweng": {
-    "first_seen": "2026-07-03T06:09:36.530404+00:00",
+  "jasonwei": {
+    "first_seen": "2026-07-04T06:00:05.881307+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -242,7 +242,7 @@
     ]
   },
   "merett": {
-    "first_seen": "2026-07-03T06:09:37.072472+00:00",
+    "first_seen": "2026-07-04T06:00:11.981548+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -252,8 +252,8 @@
       0
     ]
   },
-  "jasonwei": {
-    "first_seen": "2026-07-03T06:09:39.700949+00:00",
+  "lilianweng": {
+    "first_seen": "2026-07-04T06:00:12.966965+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -264,18 +264,7 @@
     ]
   },
   "noamshazeer": {
-    "first_seen": "2026-07-03T06:09:53.451946+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "pushmeet": {
-    "first_seen": "2026-07-03T06:09:54.097448+00:00",
+    "first_seen": "2026-07-04T06:00:22.575556+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -286,7 +275,18 @@
     ]
   },
   "quocleix": {
-    "first_seen": "2026-07-03T06:09:54.778181+00:00",
+    "first_seen": "2026-07-04T06:00:30.186013+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "pushmeet": {
+    "first_seen": "2026-07-04T06:00:30.459614+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -297,18 +297,7 @@
     ]
   },
   "rasbt": {
-    "first_seen": "2026-07-03T06:10:09.416486+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "soumithchintala": {
-    "first_seen": "2026-07-03T06:10:10.329311+00:00",
+    "first_seen": "2026-07-04T06:00:40.343857+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -319,29 +308,29 @@
     ]
   },
   "tegmark": {
-    "first_seen": "2026-07-03T06:10:13.420236+00:00",
+    "first_seen": "2026-07-04T06:00:44.102391+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:10:13.420236+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      1
+      0
     ]
   },
-  "sama": {
-    "first_seen": "2026-07-03T06:10:23.990240+00:00",
+  "soumithchintala": {
+    "first_seen": "2026-07-04T06:00:46.552479+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:10:23.990240+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      1
+      0
     ]
   },
   "woj_zaremba": {
-    "first_seen": "2026-07-03T06:10:24.227951+00:00",
+    "first_seen": "2026-07-04T06:00:57.761967+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -352,7 +341,40 @@
     ]
   },
   "gdb": {
-    "first_seen": "2026-07-03T06:10:27.619028+00:00",
+    "first_seen": "2026-07-04T06:01:03.176489+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "sama": {
+    "first_seen": "2026-07-04T06:01:04.676748+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "demishassabis": {
+    "first_seen": "2026-07-04T06:01:12.817304+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "DarioAmodei": {
+    "first_seen": "2026-07-04T06:01:21.087696+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -363,73 +385,40 @@
     ]
   },
   "elonmusk": {
-    "first_seen": "2026-07-03T06:10:37.899721+00:00",
+    "first_seen": "2026-07-04T06:01:23.940899+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:10:37.899721+00:00",
+    "last_tweet_date": "2026-07-04T06:01:23.940899+00:00",
     "tweet_counts_history": [
-      22
-    ]
-  },
-  "demishassabis": {
-    "first_seen": "2026-07-03T06:10:38.445030+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:10:38.445030+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "DarioAmodei": {
-    "first_seen": "2026-07-03T06:10:43.548610+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "nvidia": {
-    "first_seen": "2026-07-03T06:10:52.924811+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:10:52.924811+00:00",
-    "tweet_counts_history": [
-      3
+      14
     ]
   },
   "Aravind": {
-    "first_seen": "2026-07-03T06:10:53.404389+00:00",
+    "first_seen": "2026-07-04T06:01:26.424031+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:01:26.424031+00:00",
     "tweet_counts_history": [
-      0
+      5
     ]
   },
   "AMD": {
-    "first_seen": "2026-07-03T06:11:00.669577+00:00",
+    "first_seen": "2026-07-04T06:01:35.114715+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:01:35.114715+00:00",
     "tweet_counts_history": [
-      0
+      1
     ]
   },
-  "Amazon": {
-    "first_seen": "2026-07-03T06:11:08.084604+00:00",
+  "nvidia": {
+    "first_seen": "2026-07-04T06:01:41.141758+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -440,7 +429,7 @@
     ]
   },
   "ASML1": {
-    "first_seen": "2026-07-03T06:11:11.035815+00:00",
+    "first_seen": "2026-07-04T06:01:44.522775+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -451,7 +440,7 @@
     ]
   },
   "AnthropicAI": {
-    "first_seen": "2026-07-03T06:11:17.408140+00:00",
+    "first_seen": "2026-07-04T06:01:49.708673+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -461,19 +450,19 @@
       0
     ]
   },
-  "AristaNetworks": {
-    "first_seen": "2026-07-03T06:11:22.762159+00:00",
+  "Amazon": {
+    "first_seen": "2026-07-04T06:01:56.193474+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:11:22.762159+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      1
+      0
     ]
   },
   "Apple": {
-    "first_seen": "2026-07-03T06:11:27.686990+00:00",
+    "first_seen": "2026-07-04T06:02:02.565321+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -484,18 +473,18 @@
     ]
   },
   "AssaadRazzouk": {
-    "first_seen": "2026-07-03T06:11:32.746103+00:00",
+    "first_seen": "2026-07-04T06:02:06.074235+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:11:32.746103+00:00",
+    "last_tweet_date": "2026-07-04T06:02:06.074235+00:00",
     "tweet_counts_history": [
-      4
+      3
     ]
   },
-  "Google": {
-    "first_seen": "2026-07-03T06:11:40.414402+00:00",
+  "AristaNetworks": {
+    "first_seen": "2026-07-04T06:02:12.609965+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -506,7 +495,7 @@
     ]
   },
   "Broadcom": {
-    "first_seen": "2026-07-03T06:11:46.331761+00:00",
+    "first_seen": "2026-07-04T06:02:18.710043+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -517,18 +506,18 @@
     ]
   },
   "GoogleDeepMind": {
-    "first_seen": "2026-07-03T06:11:50.086321+00:00",
+    "first_seen": "2026-07-04T06:02:22.982364+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:02:22.982364+00:00",
     "tweet_counts_history": [
-      0
+      1
     ]
   },
-  "intel": {
-    "first_seen": "2026-07-03T06:11:55.777782+00:00",
+  "Google": {
+    "first_seen": "2026-07-04T06:02:28.338962+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -539,18 +528,18 @@
     ]
   },
   "HuggingFace": {
-    "first_seen": "2026-07-03T06:12:04.227737+00:00",
+    "first_seen": "2026-07-04T06:02:35.735575+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:12:04.227737+00:00",
+    "last_tweet_date": "2026-07-04T06:02:35.735575+00:00",
     "tweet_counts_history": [
-      25
+      4
     ]
   },
   "LisaSu": {
-    "first_seen": "2026-07-03T06:12:04.322040+00:00",
+    "first_seen": "2026-07-04T06:02:36.247115+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -560,19 +549,8 @@
       0
     ]
   },
-  "Microsoft": {
-    "first_seen": "2026-07-03T06:12:12.862125+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:12:12.862125+00:00",
-    "tweet_counts_history": [
-      9
-    ]
-  },
-  "MicronTech": {
-    "first_seen": "2026-07-03T06:12:18.595749+00:00",
+  "intel": {
+    "first_seen": "2026-07-04T06:02:43.307285+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -583,18 +561,7 @@
     ]
   },
   "Midjourney": {
-    "first_seen": "2026-07-03T06:12:20.053877+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:12:20.053877+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "Kimi_Moonshot": {
-    "first_seen": "2026-07-03T06:12:28.692411+00:00",
+    "first_seen": "2026-07-04T06:02:51.083267+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -604,8 +571,19 @@
       0
     ]
   },
-  "MistralAI": {
-    "first_seen": "2026-07-03T06:12:33.684296+00:00",
+  "MicronTech": {
+    "first_seen": "2026-07-04T06:02:52.544158+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "Microsoft": {
+    "first_seen": "2026-07-04T06:02:58.318825+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -616,7 +594,51 @@
     ]
   },
   "OfficialLoganK": {
-    "first_seen": "2026-07-03T06:12:34.358243+00:00",
+    "first_seen": "2026-07-04T06:03:04.451431+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "MistralAI": {
+    "first_seen": "2026-07-04T06:03:09.625153+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:03:09.625153+00:00",
+    "tweet_counts_history": [
+      2
+    ]
+  },
+  "Kimi_Moonshot": {
+    "first_seen": "2026-07-04T06:03:11.329749+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "SKhynix": {
+    "first_seen": "2026-07-04T06:03:19.603804+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:03:19.603804+00:00",
+    "tweet_counts_history": [
+      1
+    ]
+  },
+  "OpenAI": {
+    "first_seen": "2026-07-04T06:03:26.056026+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -627,29 +649,18 @@
     ]
   },
   "Qualcomm": {
-    "first_seen": "2026-07-03T06:12:45.230063+00:00",
+    "first_seen": "2026-07-04T06:03:26.209994+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:12:45.230063+00:00",
+    "last_tweet_date": "2026-07-04T06:03:26.209994+00:00",
     "tweet_counts_history": [
-      5
+      3
     ]
   },
-  "SKhynix": {
-    "first_seen": "2026-07-03T06:12:50.620482+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:12:50.620482+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "OpenAI": {
-    "first_seen": "2026-07-03T06:12:51.413977+00:00",
+  "SpaceX": {
+    "first_seen": "2026-07-04T06:03:38.845591+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -660,51 +671,18 @@
     ]
   },
   "SoftBank_Group": {
-    "first_seen": "2026-07-03T06:13:02.052143+00:00",
+    "first_seen": "2026-07-04T06:03:41.722836+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:02.052143+00:00",
+    "last_tweet_date": "2026-07-04T06:03:41.722836+00:00",
     "tweet_counts_history": [
-      2
-    ]
-  },
-  "SpaceX": {
-    "first_seen": "2026-07-03T06:13:04.113920+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:04.113920+00:00",
-    "tweet_counts_history": [
-      3
+      1
     ]
   },
   "Samsung": {
-    "first_seen": "2026-07-03T06:13:05.186164+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:05.186164+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "Supermicro": {
-    "first_seen": "2026-07-03T06:13:14.723247+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:14.723247+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "StabilityAI": {
-    "first_seen": "2026-07-03T06:13:20.727380+00:00",
+    "first_seen": "2026-07-04T06:03:42.029941+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -715,73 +693,84 @@
     ]
   },
   "Tesla": {
-    "first_seen": "2026-07-03T06:13:21.428947+00:00",
+    "first_seen": "2026-07-04T06:03:56.250075+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:21.428947+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      3
+      0
     ]
   },
-  "arm": {
-    "first_seen": "2026-07-03T06:13:30.644196+00:00",
+  "StabilityAI": {
+    "first_seen": "2026-07-04T06:03:57.548000+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "Supermicro": {
+    "first_seen": "2026-07-04T06:04:00.218675+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:30.644196+00:00",
+    "last_tweet_date": "2026-07-04T06:04:00.218675+00:00",
     "tweet_counts_history": [
-      6
+      1
     ]
   },
   "c_valenzuelab": {
-    "first_seen": "2026-07-03T06:13:36.137789+00:00",
+    "first_seen": "2026-07-04T06:04:09.697548+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:36.137789+00:00",
+    "last_tweet_date": "2026-07-04T06:04:09.697548+00:00",
     "tweet_counts_history": [
       2
     ]
   },
   "amasad": {
-    "first_seen": "2026-07-03T06:13:37.894223+00:00",
+    "first_seen": "2026-07-04T06:04:11.013687+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:37.894223+00:00",
+    "last_tweet_date": "2026-07-04T06:04:11.013687+00:00",
     "tweet_counts_history": [
-      6
+      4
     ]
   },
-  "deepseek_ai": {
-    "first_seen": "2026-07-03T06:13:48.193251+00:00",
+  "arm": {
+    "first_seen": "2026-07-04T06:04:17.871500+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:04:17.871500+00:00",
     "tweet_counts_history": [
-      0
+      4
     ]
   },
   "dylan522p": {
-    "first_seen": "2026-07-03T06:13:52.798325+00:00",
+    "first_seen": "2026-07-04T06:04:24.374263+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:13:52.798325+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      3
+      0
     ]
   },
   "cursor_ai": {
-    "first_seen": "2026-07-03T06:13:53.944274+00:00",
+    "first_seen": "2026-07-04T06:04:26.223108+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -791,30 +780,19 @@
       0
     ]
   },
-  "hwchase17": {
-    "first_seen": "2026-07-03T06:14:03.760976+00:00",
+  "deepseek_ai": {
+    "first_seen": "2026-07-04T06:04:33.864669+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:03.760976+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      23
-    ]
-  },
-  "hardmaru": {
-    "first_seen": "2026-07-03T06:14:07.135131+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:07.135131+00:00",
-    "tweet_counts_history": [
-      3
+      0
     ]
   },
   "jensenhuang": {
-    "first_seen": "2026-07-03T06:14:10.821170+00:00",
+    "first_seen": "2026-07-04T06:04:40.861708+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -824,19 +802,30 @@
       0
     ]
   },
-  "jessejenkins": {
-    "first_seen": "2026-07-03T06:14:19.775799+00:00",
+  "hardmaru": {
+    "first_seen": "2026-07-04T06:04:41.003101+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:04:41.003101+00:00",
     "tweet_counts_history": [
-      0
+      2
+    ]
+  },
+  "hwchase17": {
+    "first_seen": "2026-07-04T06:04:52.044185+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:04:52.044185+00:00",
+    "tweet_counts_history": [
+      9
     ]
   },
   "leijun": {
-    "first_seen": "2026-07-03T06:14:25.928449+00:00",
+    "first_seen": "2026-07-04T06:04:54.842711+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -847,29 +836,29 @@
     ]
   },
   "jerryjliu0": {
-    "first_seen": "2026-07-03T06:14:26.105327+00:00",
+    "first_seen": "2026-07-04T06:04:57.493832+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:26.105327+00:00",
+    "last_tweet_date": "2026-07-04T06:04:57.493832+00:00",
     "tweet_counts_history": [
-      8
+      12
     ]
   },
-  "mikeyk": {
-    "first_seen": "2026-07-03T06:14:36.565413+00:00",
+  "jessejenkins": {
+    "first_seen": "2026-07-04T06:05:09.872781+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:36.565413+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      2
+      0
     ]
   },
   "mustafasuleyman": {
-    "first_seen": "2026-07-03T06:14:40.848789+00:00",
+    "first_seen": "2026-07-04T06:05:09.941269+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -880,51 +869,40 @@
     ]
   },
   "mattshumer_": {
-    "first_seen": "2026-07-03T06:14:41.564595+00:00",
+    "first_seen": "2026-07-04T06:05:12.741004+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:41.564595+00:00",
+    "last_tweet_date": "2026-07-04T06:05:12.741004+00:00",
     "tweet_counts_history": [
-      4
-    ]
-  },
-  "satyanadella": {
-    "first_seen": "2026-07-03T06:14:53.332139+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:53.332139+00:00",
-    "tweet_counts_history": [
-      3
-    ]
-  },
-  "sundarpichai": {
-    "first_seen": "2026-07-03T06:14:55.605859+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:55.605859+00:00",
-    "tweet_counts_history": [
-      1
+      5
     ]
   },
   "rauchg": {
-    "first_seen": "2026-07-03T06:14:59.237158+00:00",
+    "first_seen": "2026-07-04T06:05:26.803900+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:14:59.237158+00:00",
+    "last_tweet_date": "2026-07-04T06:05:26.803900+00:00",
     "tweet_counts_history": [
-      6
+      7
     ]
   },
-  "v0": {
-    "first_seen": "2026-07-03T06:15:08.677850+00:00",
+  "sundarpichai": {
+    "first_seen": "2026-07-04T06:05:26.977358+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "mikeyk": {
+    "first_seen": "2026-07-04T06:05:28.142684+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -935,7 +913,7 @@
     ]
   },
   "wangxing": {
-    "first_seen": "2026-07-03T06:15:12.020284+00:00",
+    "first_seen": "2026-07-04T06:05:41.362032+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -946,7 +924,62 @@
     ]
   },
   "tim_cook": {
-    "first_seen": "2026-07-03T06:15:12.827561+00:00",
+    "first_seen": "2026-07-04T06:05:42.871217+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "satyanadella": {
+    "first_seen": "2026-07-04T06:05:46.045402+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "theinformation": {
+    "first_seen": "2026-07-04T06:05:56.412497+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:05:56.412497+00:00",
+    "tweet_counts_history": [
+      16
+    ]
+  },
+  "xAI": {
+    "first_seen": "2026-07-04T06:05:56.484367+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "v0": {
+    "first_seen": "2026-07-04T06:06:00.862775+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "benthompson": {
+    "first_seen": "2026-07-04T06:06:11.168032+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -957,7 +990,7 @@
     ]
   },
   "zhipuai": {
-    "first_seen": "2026-07-03T06:15:25.511916+00:00",
+    "first_seen": "2026-07-04T06:06:13.448834+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -965,54 +998,21 @@
     "last_tweet_date": null,
     "tweet_counts_history": [
       0
-    ]
-  },
-  "xAI": {
-    "first_seen": "2026-07-03T06:15:26.202686+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:15:26.202686+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "theinformation": {
-    "first_seen": "2026-07-03T06:15:29.671540+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:15:29.671540+00:00",
-    "tweet_counts_history": [
-      20
     ]
   },
   "WIRED": {
-    "first_seen": "2026-07-03T06:15:40.422826+00:00",
+    "first_seen": "2026-07-04T06:06:13.945120+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:15:40.422826+00:00",
+    "last_tweet_date": "2026-07-04T06:06:13.945120+00:00",
     "tweet_counts_history": [
-      20
+      12
     ]
   },
-  "techreview": {
-    "first_seen": "2026-07-03T06:15:41.480344+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:15:41.480344+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "benthompson": {
-    "first_seen": "2026-07-03T06:15:45.412213+00:00",
+  "9hills": {
+    "first_seen": "2026-07-04T06:06:28.842752+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1022,30 +1022,74 @@
       0
     ]
   },
-  "op7418": {
-    "first_seen": "2026-07-03T06:15:57.282759+00:00",
+  "dotey": {
+    "first_seen": "2026-07-04T06:06:30.295989+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:15:57.282759+00:00",
+    "last_tweet_date": "2026-07-04T06:06:30.295989+00:00",
+    "tweet_counts_history": [
+      3
+    ]
+  },
+  "techreview": {
+    "first_seen": "2026-07-04T06:06:31.630267+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:06:31.630267+00:00",
+    "tweet_counts_history": [
+      3
+    ]
+  },
+  "alliekmiller": {
+    "first_seen": "2026-07-04T06:06:44.251572+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:06:44.251572+00:00",
     "tweet_counts_history": [
       1
     ]
   },
-  "dotey": {
-    "first_seen": "2026-07-03T06:15:58.249080+00:00",
+  "LinusEkenstam": {
+    "first_seen": "2026-07-04T06:06:47.634870+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:15:58.249080+00:00",
+    "last_tweet_date": "2026-07-04T06:06:47.634870+00:00",
     "tweet_counts_history": [
-      8
+      7
     ]
   },
-  "9hills": {
-    "first_seen": "2026-07-03T06:16:00.316906+00:00",
+  "op7418": {
+    "first_seen": "2026-07-04T06:06:48.747550+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:06:48.747550+00:00",
+    "tweet_counts_history": [
+      4
+    ]
+  },
+  "karaswisher": {
+    "first_seen": "2026-07-04T06:06:58.991563+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "casey": {
+    "first_seen": "2026-07-04T06:07:01.347900+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1056,84 +1100,7 @@
     ]
   },
   "PeteHuang": {
-    "first_seen": "2026-07-03T06:16:11.930064+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "LinusEkenstam": {
-    "first_seen": "2026-07-03T06:16:12.073989+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:16:12.073989+00:00",
-    "tweet_counts_history": [
-      9
-    ]
-  },
-  "alliekmiller": {
-    "first_seen": "2026-07-03T06:16:14.338718+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:16:14.338718+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "casey": {
-    "first_seen": "2026-07-03T06:16:27.711444+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "kaifulee": {
-    "first_seen": "2026-07-03T06:16:28.849575+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "karaswisher": {
-    "first_seen": "2026-07-03T06:16:30.559556+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "markgurman": {
-    "first_seen": "2026-07-03T06:16:44.068707+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:16:44.068707+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "lexfridman": {
-    "first_seen": "2026-07-03T06:16:45.439445+00:00",
+    "first_seen": "2026-07-04T06:07:06.321098+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1144,7 +1111,7 @@
     ]
   },
   "mazhengbo": {
-    "first_seen": "2026-07-03T06:16:46.926557+00:00",
+    "first_seen": "2026-07-04T06:07:13.800979+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1154,19 +1121,19 @@
       0
     ]
   },
-  "swyx": {
-    "first_seen": "2026-07-03T06:16:59.969099+00:00",
+  "lexfridman": {
+    "first_seen": "2026-07-04T06:07:20.367367+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:16:59.969099+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      30
+      0
     ]
   },
-  "rowancheung": {
-    "first_seen": "2026-07-03T06:17:03.602135+00:00",
+  "kaifulee": {
+    "first_seen": "2026-07-04T06:07:21.144724+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1177,7 +1144,7 @@
     ]
   },
   "technology": {
-    "first_seen": "2026-07-03T06:17:05.125330+00:00",
+    "first_seen": "2026-07-04T06:07:28.746004+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1187,8 +1154,8 @@
       0
     ]
   },
-  "Bloomberg": {
-    "first_seen": "2026-07-03T06:17:18.300857+00:00",
+  "markgurman": {
+    "first_seen": "2026-07-04T06:07:36.911851+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1198,19 +1165,19 @@
       0
     ]
   },
-  "vikingmute": {
-    "first_seen": "2026-07-03T06:17:18.883290+00:00",
+  "rowancheung": {
+    "first_seen": "2026-07-04T06:07:39.681590+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:17:18.883290+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      4
+      0
     ]
   },
   "markets": {
-    "first_seen": "2026-07-03T06:17:22.436404+00:00",
+    "first_seen": "2026-07-04T06:07:42.338981+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1220,118 +1187,118 @@
       0
     ]
   },
-  "WSJ": {
-    "first_seen": "2026-07-03T06:17:34.105968+00:00",
+  "swyx": {
+    "first_seen": "2026-07-04T06:07:52.011313+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:17:34.105968+00:00",
+    "last_tweet_date": "2026-07-04T06:07:52.011313+00:00",
     "tweet_counts_history": [
-      20
+      30
     ]
   },
-  "Reuters": {
-    "first_seen": "2026-07-03T06:17:34.617911+00:00",
+  "vikingmute": {
+    "first_seen": "2026-07-04T06:07:57.503234+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:17:34.617911+00:00",
-    "tweet_counts_history": [
-      20
-    ]
-  },
-  "FT": {
-    "first_seen": "2026-07-03T06:17:37.749363+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:17:37.749363+00:00",
-    "tweet_counts_history": [
-      20
-    ]
-  },
-  "RayDalio": {
-    "first_seen": "2026-07-03T06:17:49.666127+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:17:49.666127+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "GoldmanSachs": {
-    "first_seen": "2026-07-03T06:17:49.888943+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:17:49.888943+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "BespokeInvest": {
-    "first_seen": "2026-07-03T06:17:52.837442+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:17:52.837442+00:00",
-    "tweet_counts_history": [
-      14
-    ]
-  },
-  "BradSetser": {
-    "first_seen": "2026-07-03T06:18:03.544735+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "CNNI": {
-    "first_seen": "2026-07-03T06:18:07.402974+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:07.402974+00:00",
-    "tweet_counts_history": [
-      8
-    ]
-  },
-  "CathieDWood": {
-    "first_seen": "2026-07-03T06:18:07.536534+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:07.536534+00:00",
-    "tweet_counts_history": [
-      6
-    ]
-  },
-  "CharlieBilello": {
-    "first_seen": "2026-07-03T06:18:21.529182+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:21.529182+00:00",
+    "last_tweet_date": "2026-07-04T06:07:57.503234+00:00",
     "tweet_counts_history": [
       3
     ]
   },
-  "DailyShot": {
-    "first_seen": "2026-07-03T06:18:23.013233+00:00",
+  "FT": {
+    "first_seen": "2026-07-04T06:07:58.599502+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:07:58.599502+00:00",
+    "tweet_counts_history": [
+      20
+    ]
+  },
+  "Bloomberg": {
+    "first_seen": "2026-07-04T06:08:07.640010+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "Reuters": {
+    "first_seen": "2026-07-04T06:08:13.170315+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:08:13.170315+00:00",
+    "tweet_counts_history": [
+      20
+    ]
+  },
+  "BespokeInvest": {
+    "first_seen": "2026-07-04T06:08:13.668282+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:08:13.668282+00:00",
+    "tweet_counts_history": [
+      7
+    ]
+  },
+  "WSJ": {
+    "first_seen": "2026-07-04T06:08:22.569856+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:08:22.569856+00:00",
+    "tweet_counts_history": [
+      20
+    ]
+  },
+  "CathieDWood": {
+    "first_seen": "2026-07-04T06:08:30.546990+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "GoldmanSachs": {
+    "first_seen": "2026-07-04T06:08:32.028149+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:08:32.028149+00:00",
+    "tweet_counts_history": [
+      1
+    ]
+  },
+  "RayDalio": {
+    "first_seen": "2026-07-04T06:08:41.154510+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:08:41.154510+00:00",
+    "tweet_counts_history": [
+      2
+    ]
+  },
+  "BradSetser": {
+    "first_seen": "2026-07-04T06:08:46.636494+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1342,73 +1309,51 @@
     ]
   },
   "Forbes": {
-    "first_seen": "2026-07-03T06:18:26.220760+00:00",
+    "first_seen": "2026-07-04T06:08:47.253235+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:26.220760+00:00",
+    "last_tweet_date": "2026-07-04T06:08:47.253235+00:00",
     "tweet_counts_history": [
-      21
+      20
     ]
   },
-  "Gavekal": {
-    "first_seen": "2026-07-03T06:18:35.002368+00:00",
+  "CNNI": {
+    "first_seen": "2026-07-04T06:08:55.800772+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:35.002368+00:00",
+    "last_tweet_date": "2026-07-04T06:08:55.800772+00:00",
     "tweet_counts_history": [
-      2
-    ]
-  },
-  "Hedgeye": {
-    "first_seen": "2026-07-03T06:18:40.447170+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:40.447170+00:00",
-    "tweet_counts_history": [
-      23
+      7
     ]
   },
   "IMFNews": {
-    "first_seen": "2026-07-03T06:18:41.729437+00:00",
+    "first_seen": "2026-07-04T06:09:02.659737+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:41.729437+00:00",
+    "last_tweet_date": "2026-07-04T06:09:02.659737+00:00",
     "tweet_counts_history": [
-      4
+      3
     ]
   },
-  "KobeissiLetter": {
-    "first_seen": "2026-07-03T06:18:52.315105+00:00",
+  "CharlieBilello": {
+    "first_seen": "2026-07-04T06:09:03.094090+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:52.315105+00:00",
+    "last_tweet_date": "2026-07-04T06:09:03.094090+00:00",
     "tweet_counts_history": [
-      11
+      3
     ]
   },
-  "LynAldenContact": {
-    "first_seen": "2026-07-03T06:18:57.931909+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:18:57.931909+00:00",
-    "tweet_counts_history": [
-      15
-    ]
-  },
-  "MacroAlf": {
-    "first_seen": "2026-07-03T06:18:59.372716+00:00",
+  "DailyShot": {
+    "first_seen": "2026-07-04T06:09:12.226576+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1418,129 +1363,140 @@
       0
     ]
   },
-  "MacroCharts": {
-    "first_seen": "2026-07-03T06:19:07.068129+00:00",
+  "Gavekal": {
+    "first_seen": "2026-07-04T06:09:17.709530+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "MacroAlf": {
+    "first_seen": "2026-07-04T06:09:20.986451+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "Hedgeye": {
+    "first_seen": "2026-07-04T06:09:28.242474+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:07.068129+00:00",
+    "last_tweet_date": "2026-07-04T06:09:28.242474+00:00",
+    "tweet_counts_history": [
+      5
+    ]
+  },
+  "KobeissiLetter": {
+    "first_seen": "2026-07-04T06:09:34.243779+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:09:34.243779+00:00",
+    "tweet_counts_history": [
+      7
+    ]
+  },
+  "MorganStanley": {
+    "first_seen": "2026-07-04T06:09:34.811074+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "LynAldenContact": {
+    "first_seen": "2026-07-04T06:09:44.149981+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:09:44.149981+00:00",
+    "tweet_counts_history": [
+      10
+    ]
+  },
+  "MacroCharts": {
+    "first_seen": "2026-07-04T06:09:48.994280+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "RuiMa": {
+    "first_seen": "2026-07-04T06:09:51.926188+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:09:51.926188+00:00",
     "tweet_counts_history": [
       1
     ]
   },
   "MarketWatch": {
-    "first_seen": "2026-07-03T06:19:14.199709+00:00",
+    "first_seen": "2026-07-04T06:10:01.174474+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:14.199709+00:00",
+    "last_tweet_date": "2026-07-04T06:10:01.174474+00:00",
     "tweet_counts_history": [
-      23
-    ]
-  },
-  "MorganStanley": {
-    "first_seen": "2026-07-03T06:19:16.133753+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:16.133753+00:00",
-    "tweet_counts_history": [
-      2
+      11
     ]
   },
   "NewYorker": {
-    "first_seen": "2026-07-03T06:19:23.016876+00:00",
+    "first_seen": "2026-07-04T06:10:04.272643+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:23.016876+00:00",
+    "last_tweet_date": "2026-07-04T06:10:04.272643+00:00",
+    "tweet_counts_history": [
+      20
+    ]
+  },
+  "TheEconomist": {
+    "first_seen": "2026-07-04T06:10:06.300461+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:10:06.300461+00:00",
     "tweet_counts_history": [
       20
     ]
   },
   "RealVision": {
-    "first_seen": "2026-07-03T06:19:27.772813+00:00",
+    "first_seen": "2026-07-04T06:10:14.610952+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:27.772813+00:00",
+    "last_tweet_date": "2026-07-04T06:10:14.610952+00:00",
     "tweet_counts_history": [
-      18
-    ]
-  },
-  "RuiMa": {
-    "first_seen": "2026-07-03T06:19:29.982815+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:29.982815+00:00",
-    "tweet_counts_history": [
-      6
-    ]
-  },
-  "SawyerMerritt": {
-    "first_seen": "2026-07-03T06:19:37.180087+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:37.180087+00:00",
-    "tweet_counts_history": [
-      22
-    ]
-  },
-  "TashaArk": {
-    "first_seen": "2026-07-03T06:19:43.739706+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "TheEconomist": {
-    "first_seen": "2026-07-03T06:19:47.281210+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:47.281210+00:00",
-    "tweet_counts_history": [
-      21
-    ]
-  },
-  "YahooFinance": {
-    "first_seen": "2026-07-03T06:19:51.380786+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:19:51.380786+00:00",
-    "tweet_counts_history": [
-      17
-    ]
-  },
-  "azadessa": {
-    "first_seen": "2026-07-03T06:20:01.297494+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
+      20
     ]
   },
   "balajis": {
-    "first_seen": "2026-07-03T06:20:02.554692+00:00",
+    "first_seen": "2026-07-04T06:10:19.916713+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1550,30 +1506,19 @@
       0
     ]
   },
-  "leixing77": {
-    "first_seen": "2026-07-03T06:20:06.483566+00:00",
+  "SawyerMerritt": {
+    "first_seen": "2026-07-04T06:10:21.529035+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:20:06.483566+00:00",
+    "last_tweet_date": "2026-07-04T06:10:21.529035+00:00",
     "tweet_counts_history": [
       15
     ]
   },
-  "michaeljburry": {
-    "first_seen": "2026-07-03T06:20:15.734588+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:20:15.734588+00:00",
-    "tweet_counts_history": [
-      3
-    ]
-  },
-  "nytimesworld": {
-    "first_seen": "2026-07-03T06:20:20.285404+00:00",
+  "TashaArk": {
+    "first_seen": "2026-07-04T06:10:30.762374+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1584,18 +1529,7 @@
     ]
   },
   "michaelxpettis": {
-    "first_seen": "2026-07-03T06:20:21.125956+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:20:21.125956+00:00",
-    "tweet_counts_history": [
-      11
-    ]
-  },
-  "F1": {
-    "first_seen": "2026-07-03T06:20:33.738387+00:00",
+    "first_seen": "2026-07-04T06:10:32.739664+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1605,8 +1539,19 @@
       0
     ]
   },
-  "Max33Verstappen": {
-    "first_seen": "2026-07-03T06:20:34.010805+00:00",
+  "YahooFinance": {
+    "first_seen": "2026-07-04T06:10:36.730637+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:10:36.730637+00:00",
+    "tweet_counts_history": [
+      1
+    ]
+  },
+  "azadessa": {
+    "first_seen": "2026-07-04T06:10:45.796207+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1617,40 +1562,40 @@
     ]
   },
   "fia": {
-    "first_seen": "2026-07-03T06:20:39.401958+00:00",
+    "first_seen": "2026-07-04T06:10:46.832603+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "leixing77": {
+    "first_seen": "2026-07-04T06:10:53.255808+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:20:39.401958+00:00",
+    "last_tweet_date": "2026-07-04T06:10:53.255808+00:00",
     "tweet_counts_history": [
-      2
+      13
     ]
   },
-  "redbullracing": {
-    "first_seen": "2026-07-03T06:20:47.541951+00:00",
+  "michaeljburry": {
+    "first_seen": "2026-07-04T06:11:01.255096+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:11:01.255096+00:00",
     "tweet_counts_history": [
-      0
-    ]
-  },
-  "LewisHamilton": {
-    "first_seen": "2026-07-03T06:20:48.764088+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
+      7
     ]
   },
   "williamsf1": {
-    "first_seen": "2026-07-03T06:20:56.084324+00:00",
+    "first_seen": "2026-07-04T06:11:03.347167+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1660,8 +1605,8 @@
       0
     ]
   },
-  "AlexJacquesF1": {
-    "first_seen": "2026-07-03T06:21:02.779044+00:00",
+  "nytimesworld": {
+    "first_seen": "2026-07-04T06:11:06.290836+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1671,8 +1616,8 @@
       0
     ]
   },
-  "ScuderiaFerrari": {
-    "first_seen": "2026-07-03T06:21:04.091697+00:00",
+  "F1": {
+    "first_seen": "2026-07-04T06:11:15.007841+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1683,7 +1628,7 @@
     ]
   },
   "AlbertFabrega": {
-    "first_seen": "2026-07-03T06:21:14.681549+00:00",
+    "first_seen": "2026-07-04T06:11:18.058945+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1693,8 +1638,8 @@
       0
     ]
   },
-  "AlpineF1Team": {
-    "first_seen": "2026-07-03T06:21:18.907334+00:00",
+  "Max33Verstappen": {
+    "first_seen": "2026-07-04T06:11:21.082042+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1704,8 +1649,8 @@
       0
     ]
   },
-  "Briatore": {
-    "first_seen": "2026-07-03T06:21:20.889582+00:00",
+  "LewisHamilton": {
+    "first_seen": "2026-07-04T06:11:31.857363+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1716,7 +1661,7 @@
     ]
   },
   "AstonMartinF1": {
-    "first_seen": "2026-07-03T06:21:29.882072+00:00",
+    "first_seen": "2026-07-04T06:11:34.424191+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1726,8 +1671,8 @@
       0
     ]
   },
-  "CadillacVSeries": {
-    "first_seen": "2026-07-03T06:21:33.250947+00:00",
+  "redbullracing": {
+    "first_seen": "2026-07-04T06:11:38.180965+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1737,8 +1682,8 @@
       0
     ]
   },
-  "Charles_Leclerc": {
-    "first_seen": "2026-07-03T06:21:38.229700+00:00",
+  "ScuderiaFerrari": {
+    "first_seen": "2026-07-04T06:11:48.989293+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1749,7 +1694,7 @@
     ]
   },
   "Carlossainz55": {
-    "first_seen": "2026-07-03T06:21:43.945516+00:00",
+    "first_seen": "2026-07-04T06:11:49.644932+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1759,8 +1704,8 @@
       0
     ]
   },
-  "ChrisMedlandF1": {
-    "first_seen": "2026-07-03T06:21:52.397493+00:00",
+  "AlexJacquesF1": {
+    "first_seen": "2026-07-04T06:11:54.918920+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1770,8 +1715,8 @@
       0
     ]
   },
-  "GeorgeRussell63": {
-    "first_seen": "2026-07-03T06:21:54.857282+00:00",
+  "AlpineF1Team": {
+    "first_seen": "2026-07-04T06:12:05.893864+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1782,7 +1727,7 @@
     ]
   },
   "F_Vasseur": {
-    "first_seen": "2026-07-03T06:21:59.446020+00:00",
+    "first_seen": "2026-07-04T06:12:06.079908+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1792,8 +1737,8 @@
       0
     ]
   },
-  "HulkHulkenberg": {
-    "first_seen": "2026-07-03T06:22:07.951835+00:00",
+  "Briatore": {
+    "first_seen": "2026-07-04T06:12:09.963581+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1803,8 +1748,19 @@
       0
     ]
   },
-  "LandoNorris": {
-    "first_seen": "2026-07-03T06:22:10.942960+00:00",
+  "Charles_Leclerc": {
+    "first_seen": "2026-07-04T06:12:23.143440+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "CadillacVSeries": {
+    "first_seen": "2026-07-04T06:12:23.313228+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1815,7 +1771,7 @@
     ]
   },
   "JamesVowles": {
-    "first_seen": "2026-07-03T06:22:13.412521+00:00",
+    "first_seen": "2026-07-04T06:12:23.912988+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1825,8 +1781,8 @@
       0
     ]
   },
-  "LiamLawson30": {
-    "first_seen": "2026-07-03T06:22:23.663566+00:00",
+  "ChrisMedlandF1": {
+    "first_seen": "2026-07-04T06:12:39.190081+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1836,8 +1792,8 @@
       0
     ]
   },
-  "MercedesAMGF1": {
-    "first_seen": "2026-07-03T06:22:28.993888+00:00",
+  "GeorgeRussell63": {
+    "first_seen": "2026-07-04T06:12:41.131544+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1848,7 +1804,7 @@
     ]
   },
   "McLarenF1": {
-    "first_seen": "2026-07-03T06:22:32.188151+00:00",
+    "first_seen": "2026-07-04T06:12:41.760470+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1858,8 +1814,8 @@
       0
     ]
   },
-  "Motorsport": {
-    "first_seen": "2026-07-03T06:22:41.500060+00:00",
+  "HulkHulkenberg": {
+    "first_seen": "2026-07-04T06:12:54.006901+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1869,8 +1825,8 @@
       0
     ]
   },
-  "OllieBearman": {
-    "first_seen": "2026-07-03T06:22:44.062264+00:00",
+  "LandoNorris": {
+    "first_seen": "2026-07-04T06:12:56.649356+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1881,18 +1837,7 @@
     ]
   },
   "OconEsteban": {
-    "first_seen": "2026-07-03T06:22:49.439494+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:22:49.439494+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "OscarPiastri": {
-    "first_seen": "2026-07-03T06:22:55.049968+00:00",
+    "first_seen": "2026-07-04T06:12:58.799740+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1902,8 +1847,19 @@
       0
     ]
   },
-  "SChecoPerez": {
-    "first_seen": "2026-07-03T06:22:57.809290+00:00",
+  "LiamLawson30": {
+    "first_seen": "2026-07-04T06:13:10.385376+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "MercedesAMGF1": {
+    "first_seen": "2026-07-04T06:13:11.895634+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1914,7 +1870,7 @@
     ]
   },
   "PierreGASLY": {
-    "first_seen": "2026-07-03T06:23:04.564164+00:00",
+    "first_seen": "2026-07-04T06:13:16.498549+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1924,19 +1880,19 @@
       0
     ]
   },
-  "ScarbsTech": {
-    "first_seen": "2026-07-03T06:23:10.331878+00:00",
+  "Motorsport": {
+    "first_seen": "2026-07-04T06:13:25.818495+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:23:10.331878+00:00",
+    "last_tweet_date": "2026-07-04T06:13:25.818495+00:00",
     "tweet_counts_history": [
-      25
+      20
     ]
   },
-  "TedKravitz": {
-    "first_seen": "2026-07-03T06:23:16.140634+00:00",
+  "OllieBearman": {
+    "first_seen": "2026-07-04T06:13:30.523154+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1947,29 +1903,18 @@
     ]
   },
   "SkySportsF1": {
-    "first_seen": "2026-07-03T06:23:18.760767+00:00",
+    "first_seen": "2026-07-04T06:13:33.116605+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:23:18.760767+00:00",
+    "last_tweet_date": "2026-07-04T06:13:33.116605+00:00",
     "tweet_counts_history": [
-      13
+      19
     ]
   },
-  "ValtteriBottas": {
-    "first_seen": "2026-07-03T06:23:26.970446+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:23:26.970446+00:00",
-    "tweet_counts_history": [
-      9
-    ]
-  },
-  "alex_albon": {
-    "first_seen": "2026-07-03T06:23:32.505784+00:00",
+  "OscarPiastri": {
+    "first_seen": "2026-07-04T06:13:43.270861+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1977,10 +1922,21 @@
     "last_tweet_date": null,
     "tweet_counts_history": [
       0
+    ]
+  },
+  "SChecoPerez": {
+    "first_seen": "2026-07-04T06:13:46.155091+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:13:46.155091+00:00",
+    "tweet_counts_history": [
+      1
     ]
   },
   "ZhouGuanyu24": {
-    "first_seen": "2026-07-03T06:23:34.063702+00:00",
+    "first_seen": "2026-07-04T06:13:46.415254+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -1990,8 +1946,19 @@
       0
     ]
   },
-  "alo_oficial": {
-    "first_seen": "2026-07-03T06:23:42.099357+00:00",
+  "ScarbsTech": {
+    "first_seen": "2026-07-04T06:13:57.423405+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:13:57.423405+00:00",
+    "tweet_counts_history": [
+      18
+    ]
+  },
+  "TedKravitz": {
+    "first_seen": "2026-07-04T06:14:01.490355+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2002,29 +1969,29 @@
     ]
   },
   "antone11i": {
-    "first_seen": "2026-07-03T06:23:49.922665+00:00",
+    "first_seen": "2026-07-04T06:14:04.605810+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:14:04.605810+00:00",
     "tweet_counts_history": [
-      0
+      2
     ]
   },
-  "jakcrawfordrac1": {
-    "first_seen": "2026-07-03T06:23:50.397891+00:00",
+  "ValtteriBottas": {
+    "first_seen": "2026-07-04T06:14:12.571030+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 1,
+    "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": null,
+    "last_tweet_date": "2026-07-04T06:14:12.571030+00:00",
     "tweet_counts_history": [
-      0
+      7
     ]
   },
-  "lawrobarretto": {
-    "first_seen": "2026-07-03T06:23:59.746653+00:00",
+  "alex_albon": {
+    "first_seen": "2026-07-04T06:14:18.293041+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2035,7 +2002,51 @@
     ]
   },
   "leonardoforna": {
-    "first_seen": "2026-07-03T06:24:06.729629+00:00",
+    "first_seen": "2026-07-04T06:14:19.756422+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "alo_oficial": {
+    "first_seen": "2026-07-04T06:14:29.627810+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "jakcrawfordrac1": {
+    "first_seen": "2026-07-04T06:14:31.371696+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "wbuxton": {
+    "first_seen": "2026-07-04T06:14:36.228340+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "lawrobarretto": {
+    "first_seen": "2026-07-04T06:14:43.351062+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2046,51 +2057,7 @@
     ]
   },
   "stakef1team": {
-    "first_seen": "2026-07-03T06:24:08.632170+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "visacashapprb": {
-    "first_seen": "2026-07-03T06:24:13.947949+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:24:13.947949+00:00",
-    "tweet_counts_history": [
-      6
-    ]
-  },
-  "wbuxton": {
-    "first_seen": "2026-07-03T06:24:21.248721+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "yukitsunoda07": {
-    "first_seen": "2026-07-03T06:24:22.959409+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "MuseumModernArt": {
-    "first_seen": "2026-07-03T06:24:31.378652+00:00",
+    "first_seen": "2026-07-04T06:14:45.800350+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2101,7 +2068,7 @@
     ]
   },
   "Tate": {
-    "first_seen": "2026-07-03T06:24:36.322786+00:00",
+    "first_seen": "2026-07-04T06:14:51.752612+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2111,19 +2078,19 @@
       0
     ]
   },
-  "Guggenheim": {
-    "first_seen": "2026-07-03T06:24:39.401364+00:00",
+  "visacashapprb": {
+    "first_seen": "2026-07-04T06:14:59.361004+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:24:39.401364+00:00",
+    "last_tweet_date": "2026-07-04T06:14:59.361004+00:00",
     "tweet_counts_history": [
-      1
+      14
     ]
   },
-  "metmuseum": {
-    "first_seen": "2026-07-03T06:24:47.213057+00:00",
+  "yukitsunoda07": {
+    "first_seen": "2026-07-04T06:15:01.821213+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2134,18 +2101,18 @@
     ]
   },
   "refikanadol": {
-    "first_seen": "2026-07-03T06:24:52.366499+00:00",
+    "first_seen": "2026-07-04T06:15:04.586796+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:24:52.366499+00:00",
+    "last_tweet_date": "2026-07-04T06:15:04.586796+00:00",
     "tweet_counts_history": [
       4
     ]
   },
-  "ARTnews": {
-    "first_seen": "2026-07-03T06:25:00.728304+00:00",
+  "MuseumModernArt": {
+    "first_seen": "2026-07-04T06:15:11.904779+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2155,19 +2122,74 @@
       0
     ]
   },
-  "ArtBasel": {
-    "first_seen": "2026-07-03T06:25:08.059585+00:00",
+  "Guggenheim": {
+    "first_seen": "2026-07-04T06:15:20.533903+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:08.059585+00:00",
+    "last_tweet_date": "2026-07-04T06:15:20.533903+00:00",
     "tweet_counts_history": [
-      7
+      1
+    ]
+  },
+  "ArtBasel": {
+    "first_seen": "2026-07-04T06:15:22.516193+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:15:22.516193+00:00",
+    "tweet_counts_history": [
+      2
+    ]
+  },
+  "metmuseum": {
+    "first_seen": "2026-07-04T06:15:30.154775+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "ArtReview_": {
+    "first_seen": "2026-07-04T06:15:36.174753+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:15:36.174753+00:00",
+    "tweet_counts_history": [
+      4
+    ]
+  },
+  "ARTnews": {
+    "first_seen": "2026-07-04T06:15:45.106765+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "Artnet": {
+    "first_seen": "2026-07-04T06:15:52.202914+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:15:52.202914+00:00",
+    "tweet_counts_history": [
+      3
     ]
   },
   "hansulrichobrist": {
-    "first_seen": "2026-07-03T06:25:10.719810+00:00",
+    "first_seen": "2026-07-04T06:15:52.975190+00:00",
     "total_scans": 2,
     "success_scans": 0,
     "empty_scans": 0,
@@ -2176,29 +2198,29 @@
     "tweet_counts_history": []
   },
   "ArtRabbit": {
-    "first_seen": "2026-07-03T06:25:15.201511+00:00",
+    "first_seen": "2026-07-04T06:15:59.514629+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:15.201511+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      2
+      0
     ]
   },
-  "ArtReview_": {
-    "first_seen": "2026-07-03T06:25:22.294205+00:00",
+  "CubittGallery": {
+    "first_seen": "2026-07-04T06:16:07.673512+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:22.294205+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      4
+      0
     ]
   },
   "ArtMonthly": {
-    "first_seen": "2026-07-03T06:25:25.056665+00:00",
+    "first_seen": "2026-07-04T06:16:11.294360+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2209,73 +2231,7 @@
     ]
   },
   "Artforum": {
-    "first_seen": "2026-07-03T06:25:31.204879+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:31.204879+00:00",
-    "tweet_counts_history": [
-      5
-    ]
-  },
-  "Artnet": {
-    "first_seen": "2026-07-03T06:25:38.362692+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:38.362692+00:00",
-    "tweet_counts_history": [
-      3
-    ]
-  },
-  "ArtTactic": {
-    "first_seen": "2026-07-03T06:25:42.767575+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:42.767575+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "ChristiesInc": {
-    "first_seen": "2026-07-03T06:25:44.326895+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:44.326895+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "CubittGallery": {
-    "first_seen": "2026-07-03T06:25:54.180473+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "Gagosian": {
-    "first_seen": "2026-07-03T06:25:58.712108+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:25:58.712108+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "ChisenhaleGal": {
-    "first_seen": "2026-07-03T06:25:58.767942+00:00",
+    "first_seen": "2026-07-04T06:16:12.808243+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2286,7 +2242,7 @@
     ]
   },
   "HauserWirth": {
-    "first_seen": "2026-07-03T06:26:08.761619+00:00",
+    "first_seen": "2026-07-04T06:16:23.576438+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2296,19 +2252,19 @@
       0
     ]
   },
-  "ICALondon": {
-    "first_seen": "2026-07-03T06:26:14.613706+00:00",
+  "ArtTactic": {
+    "first_seen": "2026-07-04T06:16:24.609881+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:26:14.613706+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      3
+      0
     ]
   },
-  "GContinua": {
-    "first_seen": "2026-07-03T06:26:16.068707+00:00",
+  "ChristiesInc": {
+    "first_seen": "2026-07-04T06:16:30.077933+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2319,7 +2275,7 @@
     ]
   },
   "LaBiennale": {
-    "first_seen": "2026-07-03T06:26:22.537139+00:00",
+    "first_seen": "2026-07-04T06:16:41.458555+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2329,8 +2285,74 @@
       0
     ]
   },
+  "ChisenhaleGal": {
+    "first_seen": "2026-07-04T06:16:42.771821+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "Gagosian": {
+    "first_seen": "2026-07-04T06:16:45.964912+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:16:45.964912+00:00",
+    "tweet_counts_history": [
+      2
+    ]
+  },
+  "MoMAPS1": {
+    "first_seen": "2026-07-04T06:16:57.730148+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:16:57.730148+00:00",
+    "tweet_counts_history": [
+      1
+    ]
+  },
+  "GContinua": {
+    "first_seen": "2026-07-04T06:16:58.009581+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "ICALondon": {
+    "first_seen": "2026-07-04T06:17:00.801566+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 0,
+    "error_count": 0,
+    "last_tweet_date": "2026-07-04T06:17:00.801566+00:00",
+    "tweet_counts_history": [
+      2
+    ]
+  },
   "Hoor": {
-    "first_seen": "2026-07-03T06:26:31.746448+00:00",
+    "first_seen": "2026-07-04T06:17:13.789985+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "SerpentineUK": {
+    "first_seen": "2026-07-04T06:17:15.424199+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2341,7 +2363,7 @@
     ]
   },
   "MarianGoodman": {
-    "first_seen": "2026-07-03T06:26:33.593094+00:00",
+    "first_seen": "2026-07-04T06:17:19.213409+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2349,65 +2371,10 @@
     "last_tweet_date": null,
     "tweet_counts_history": [
       0
-    ]
-  },
-  "MoMAPS1": {
-    "first_seen": "2026-07-03T06:26:35.424593+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:26:35.424593+00:00",
-    "tweet_counts_history": [
-      1
     ]
   },
   "Lisson_Gallery": {
-    "first_seen": "2026-07-03T06:26:47.189232+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "SFMOMA": {
-    "first_seen": "2026-07-03T06:26:49.560690+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:26:49.560690+00:00",
-    "tweet_counts_history": [
-      1
-    ]
-  },
-  "SerpentineUK": {
-    "first_seen": "2026-07-03T06:26:49.636441+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "WhiteCube": {
-    "first_seen": "2026-07-03T06:27:05.351394+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 1,
-    "error_count": 0,
-    "last_tweet_date": null,
-    "tweet_counts_history": [
-      0
-    ]
-  },
-  "RichardOrlinski": {
-    "first_seen": "2026-07-03T06:27:05.713675+00:00",
+    "first_seen": "2026-07-04T06:17:28.676500+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2418,7 +2385,51 @@
     ]
   },
   "alvanoto": {
-    "first_seen": "2026-07-03T06:27:07.243642+00:00",
+    "first_seen": "2026-07-04T06:17:31.313285+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "SFMOMA": {
+    "first_seen": "2026-07-04T06:17:36.310706+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "RichardOrlinski": {
+    "first_seen": "2026-07-04T06:17:45.299621+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "davidzwirner": {
+    "first_seen": "2026-07-04T06:17:47.693955+00:00",
+    "total_scans": 1,
+    "success_scans": 1,
+    "empty_scans": 1,
+    "error_count": 0,
+    "last_tweet_date": null,
+    "tweet_counts_history": [
+      0
+    ]
+  },
+  "WhiteCube": {
+    "first_seen": "2026-07-04T06:17:50.465895+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2429,18 +2440,18 @@
     ]
   },
   "Sothebys": {
-    "first_seen": "2026-07-03T06:27:23.197229+00:00",
+    "first_seen": "2026-07-04T06:17:59.801936+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:27:23.197229+00:00",
+    "last_tweet_date": "2026-07-04T06:17:59.801936+00:00",
     "tweet_counts_history": [
-      3
+      1
     ]
   },
-  "davidzwirner": {
-    "first_seen": "2026-07-03T06:27:23.544755+00:00",
+  "hyperallergic": {
+    "first_seen": "2026-07-04T06:18:03.478775+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2451,7 +2462,7 @@
     ]
   },
   "curiousoctopus": {
-    "first_seen": "2026-07-03T06:27:24.243186+00:00",
+    "first_seen": "2026-07-04T06:18:06.450996+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2462,18 +2473,7 @@
     ]
   },
   "artsy": {
-    "first_seen": "2026-07-03T06:27:37.864589+00:00",
-    "total_scans": 1,
-    "success_scans": 1,
-    "empty_scans": 0,
-    "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:27:37.864589+00:00",
-    "tweet_counts_history": [
-      2
-    ]
-  },
-  "hyperallergic": {
-    "first_seen": "2026-07-03T06:27:40.650313+00:00",
+    "first_seen": "2026-07-04T06:18:17.749985+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2484,7 +2484,7 @@
     ]
   },
   "pacegallery": {
-    "first_seen": "2026-07-03T06:27:55.101886+00:00",
+    "first_seen": "2026-07-04T06:18:19.292725+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2495,18 +2495,18 @@
     ]
   },
   "designmilk": {
-    "first_seen": "2026-07-03T06:27:55.564837+00:00",
+    "first_seen": "2026-07-04T06:18:32.748337+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 0,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:27:55.564837+00:00",
+    "last_tweet_date": "2026-07-04T06:18:32.748337+00:00",
     "tweet_counts_history": [
       3
     ]
   },
   "galerieperrotin": {
-    "first_seen": "2026-07-03T06:27:58.824078+00:00",
+    "first_seen": "2026-07-04T06:18:39.136934+00:00",
     "total_scans": 2,
     "success_scans": 0,
     "empty_scans": 0,
@@ -2515,7 +2515,7 @@
     "tweet_counts_history": []
   },
   "jerrysaltz": {
-    "first_seen": "2026-07-03T06:28:11.049561+00:00",
+    "first_seen": "2026-07-04T06:18:48.304826+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2526,7 +2526,7 @@
     ]
   },
   "klausbiesenbach": {
-    "first_seen": "2026-07-03T06:28:12.469532+00:00",
+    "first_seen": "2026-07-04T06:18:53.561197+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2537,7 +2537,7 @@
     ]
   },
   "thewhitepube": {
-    "first_seen": "2026-07-03T06:28:25.115791+00:00",
+    "first_seen": "2026-07-04T06:19:01.975075+00:00",
     "total_scans": 1,
     "success_scans": 1,
     "empty_scans": 1,
@@ -2548,14 +2548,14 @@
     ]
   },
   "whitneymuseum": {
-    "first_seen": "2026-07-03T06:28:26.565944+00:00",
+    "first_seen": "2026-07-04T06:19:09.282802+00:00",
     "total_scans": 1,
     "success_scans": 1,
-    "empty_scans": 0,
+    "empty_scans": 1,
     "error_count": 0,
-    "last_tweet_date": "2026-07-03T06:28:26.565944+00:00",
+    "last_tweet_date": null,
     "tweet_counts_history": [
-      1
+      0
     ]
   }
 }
