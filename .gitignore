@@ -15,6 +15,13 @@ output/*.log
 # 输出报告
 output/
 
+# Cache
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
 # IDE
 .vscode/
 .idea/
