@@ -336,13 +336,25 @@ def validate_cookies():
                 page = await ctx.new_page()
                 try:
                     await page.goto("https://x.com/home", wait_until="domcontentloaded", timeout=15000)
-                    await asyncio.sleep(2)
-                    body = await page.evaluate("document.body ? document.body.innerText : ''")
-                    if any(kw in body for kw in ["Home", "For you", "Following", "推荐", "首页"]):
+                    keywords = ["Home", "For you", "Following", "推荐", "首页"]
+                    # X 是 SPA，domcontentloaded 后首屏文本约需 5s 才渲染；固定短等待会读到空 innerText 而误判失效
+                    body = ""
+                    valid = False
+                    for _ in range(20):
+                        await asyncio.sleep(1)
+                        body = await page.evaluate("document.body ? document.body.innerText : ''")
+                        if any(kw in body for kw in keywords):
+                            valid = True
+                            break
+                    if valid:
                         log_print(f"  ✓ Cookie #{i+1} ({cookie_files[i]}) 有效")
                         results.append((cookie_files[i], True))
                     else:
-                        log_print(f"  ⚠️  Cookie #{i+1} ({cookie_files[i]}) 可能已失效", "warning")
+                        log_print(
+                            f"  ⚠️  Cookie #{i+1} ({cookie_files[i]}) 可能已失效 "
+                            f"(title={await page.title()!r}, innerText 长度={len(body)})",
+                            "warning",
+                        )
                         results.append((cookie_files[i], False))
                 except Exception as e:
                     log_print(f"  ❌ Cookie #{i+1} ({cookie_files[i]}) 验证失败: {e}", "warning")
