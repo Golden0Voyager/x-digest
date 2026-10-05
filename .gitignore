@@ -8,6 +8,7 @@ __pycache__/
 
 # 登录态与缓存
 x_cookies_*.json
+x_cookies_*.json.bak-*
 browser_cookies*.json
 output/*.json
 output/*.log
