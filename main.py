@@ -851,6 +851,9 @@ def main():
             "本次窗口内未发现新推文，系统已待机。"
         )
         send_feishu_message(status_msg)
+        if os.getenv("GITHUB_ACTIONS") == "true":
+            print(f" {Color.RED}❌ 定时运行零推文：上游抓取未产出数据，按失败处理{Color.RESET}")
+            sys.exit(1)
         return
 
     summary, counts_text = asyncio.run(run_pipeline(selected_tweets))
