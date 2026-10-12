@@ -231,6 +231,9 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
         all_tweets = []
         failed_accounts = []  # 记录 (username, 首轮所用 context_idx)
         lock = asyncio.Lock()
+        # 单账号失败要 60s 截获窗口 + 前置等待，233 个全败再全部重试会烧满 2 小时且零产出
+        stats = {"ok": 0, "consecutive_zero_success": 0, "aborted": False}
+        abort_threshold = 40
 
         # ===== 改动 2：Per-Context 队列 — 每个 context 独立串行队列，队列间并行 =====
         async def process_queue(context_idx: int, queue: list[str], is_retry=False):
@@ -239,6 +242,9 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
             consecutive_failures = 0
 
             for username in queue:
+                if stats["aborted"]:
+                    break
+
                 # 每次请求前保持合理间隔
                 wait_time = random.uniform(5.0, 10.0) if not is_retry else random.uniform(10.0, 20.0)
                 await asyncio.sleep(wait_time)
@@ -263,9 +269,17 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
 
                 if tweets is not None:
                     consecutive_failures = 0
-                    async with lock: all_tweets.extend(tweets)
+                    async with lock:
+                        all_tweets.extend(tweets)
+                        stats["ok"] += 1
+                        stats["consecutive_zero_success"] = 0
                 else:
                     consecutive_failures += 1
+                    async with lock:
+                        if stats["ok"] == 0:
+                            stats["consecutive_zero_success"] += 1
+                            if stats["consecutive_zero_success"] >= abort_threshold:
+                                stats["aborted"] = True
                     if not is_retry:
                         print(f"  ⚠️  @{username} 抓取失败，已加入稍后重试列表")
                         async with lock: failed_accounts.append((username, context_idx))
@@ -282,6 +296,13 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
 
         # 所有队列并行启动
         await asyncio.gather(*[process_queue(i, q) for i, q in enumerate(queues)])
+
+        if stats["aborted"]:
+            raise RuntimeError(
+                f"连续 {stats['consecutive_zero_success']} 个账号零成功（成功 {stats['ok']} 次），已中止且不重试。"
+                "会话预热通过却拿不到 GraphQL 数据，特征符合出口 IP 被 X 限制，而非 Cookie 失效——"
+                "换 Cookie 不会解决，请检查代理/出口 IP。"
+            )
 
         # ===== 改动 3：跨 Cookie 重试 — 失败账号切换到另一个 context =====
         if failed_accounts:
@@ -314,6 +335,26 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
     return all_tweets
 
 
+VALIDATION_KEYWORDS = ["Home", "For you", "Following", "推荐", "首页"]
+VALIDATION_FAILURE_LABELS = {
+    "blocked_ip": "疑似出口 IP 被 Cloudflare 拦截，换 Cookie 无效",
+    "not_rendered": "20s 内首页未渲染出文本，无法判定登录态",
+    "logged_out": "页面已渲染但未登录，Cookie 可能已失效",
+    "error": "校验过程抛异常",
+}
+
+
+def classify_validation_page(title: str, body: str) -> str:
+    """归类 x.com/home 的渲染结果，避免把 IP 拦截误报成 Cookie 失效。"""
+    if any(k in title for k in ("Just a moment", "Attention Required")) or "Cloudflare" in body:
+        return "blocked_ip"
+    if not body.strip():
+        return "not_rendered"
+    if any(kw in body for kw in VALIDATION_KEYWORDS):
+        return "valid"
+    return "logged_out"
+
+
 def validate_cookies():
     """验证所有 Cookie 文件是否有效。若全部失效则抛出 RuntimeError。"""
     cookie_files = sorted(glob.glob(COOKIE_FILE_PATTERN))
@@ -336,29 +377,29 @@ def validate_cookies():
                 page = await ctx.new_page()
                 try:
                     await page.goto("https://x.com/home", wait_until="domcontentloaded", timeout=15000)
-                    keywords = ["Home", "For you", "Following", "推荐", "首页"]
                     # X 是 SPA，domcontentloaded 后首屏文本约需 5s 才渲染；固定短等待会读到空 innerText 而误判失效
                     body = ""
-                    valid = False
+                    title = ""
+                    status = "not_rendered"
                     for _ in range(20):
                         await asyncio.sleep(1)
                         body = await page.evaluate("document.body ? document.body.innerText : ''")
-                        if any(kw in body for kw in keywords):
-                            valid = True
+                        title = await page.title()
+                        status = classify_validation_page(title, body)
+                        if status in ("valid", "blocked_ip"):
                             break
-                    if valid:
+                    if status == "valid":
                         log_print(f"  ✓ Cookie #{i+1} ({cookie_files[i]}) 有效")
-                        results.append((cookie_files[i], True))
                     else:
                         log_print(
-                            f"  ⚠️  Cookie #{i+1} ({cookie_files[i]}) 可能已失效 "
-                            f"(title={await page.title()!r}, innerText 长度={len(body)})",
+                            f"  ⚠️  Cookie #{i+1} ({cookie_files[i]}) {VALIDATION_FAILURE_LABELS[status]} "
+                            f"(title={title!r}, innerText 长度={len(body)})",
                             "warning",
                         )
-                        results.append((cookie_files[i], False))
+                    results.append((cookie_files[i], status))
                 except Exception as e:
                     log_print(f"  ❌ Cookie #{i+1} ({cookie_files[i]}) 验证失败: {e}", "warning")
-                    results.append((cookie_files[i], False))
+                    results.append((cookie_files[i], "error"))
                 finally:
                     await page.close()
                     await ctx.close()
@@ -366,7 +407,20 @@ def validate_cookies():
             return results
 
     results = asyncio.run(_check())
-    valid_count = sum(1 for _, ok in results if ok)
+    valid_count = sum(1 for _, status in results if status == "valid")
     if valid_count == 0:
-        raise RuntimeError(f"所有 {len(results)} 组 Cookie 均已失效，请重新导出")
+        reasons = sorted({status for _, status in results})
+        if reasons == ["blocked_ip"]:
+            raise RuntimeError(
+                f"所有 {len(results)} 组 Cookie 都拿到 Cloudflare 拦截页（title='Just a moment...'）。"
+                "这是出口 IP 被 X 限制，不是 Cookie 失效——换 Cookie 不会解决，需要住宅/ISP 代理"
+            )
+        if reasons == ["not_rendered"]:
+            raise RuntimeError(
+                f"所有 {len(results)} 组 Cookie 的首页 20s 内都没渲染出文本，"
+                "无法判定登录态（可能是网络或渲染问题，不一定是 Cookie 失效）"
+            )
+        raise RuntimeError(
+            f"所有 {len(results)} 组 Cookie 校验未通过，状态={reasons}；只有 logged_out 才需要重新导出 Cookie"
+        )
     print(f"✅ Cookie 验证完成：{valid_count}/{len(results)} 组有效")
