@@ -61,35 +61,45 @@ async def _scrape_user_page(page, username: str, hours_lookback: int = HOURS_LOO
 
     # 1. 监听 GraphQL 响应 (最稳的数据来源)
     async def handle_response(response):
-        if "UserTweets" in response.url or "UserByScreenName" in response.url:
-            try:
-                data = await response.json()
-                def extract_tweets(obj):
-                    if isinstance(obj, dict):
-                        if obj.get("rest_id") and obj.get("legacy"):
-                            legacy = obj["legacy"]
-                            # 提取图片 URL
-                            media_entities = legacy.get("extended_entities", {}).get("media", []) or legacy.get("entities", {}).get("media", [])
-                            images = [m["media_url_https"] for m in media_entities if m.get("type") == "photo" and m.get("media_url_https")]
-                            tweet = {
-                                "tweet_id": obj["rest_id"],
-                                "text": legacy.get("full_text", ""),
-                                "datetime_raw": legacy.get("created_at", ""),
-                                "is_retweet": "retweeted_status_result" in obj.get("core", {}) or "retweeted_status_id_str" in legacy,
-                                "images": images,
-                            }
-                            try:
-                                dt = datetime.strptime(tweet["datetime_raw"], "%a %b %d %H:%M:%S %z %Y")
-                                tweet["datetime"] = dt.isoformat()
-                            except (ValueError, TypeError):
-                                tweet["datetime"] = tweet["datetime_raw"]
-                            graphql_tweets.append(tweet)
-                        for v in obj.values(): extract_tweets(v)
-                    elif isinstance(obj, list):
-                        for item in obj: extract_tweets(item)
-                extract_tweets(data)
-            except Exception as e:
-                log_print(f"  {Color.GREY}⚠️ GraphQL 响应解析异常: {type(e).__name__}: {str(e)[:100]}{Color.RESET}", "warning")
+        # X 会改 GraphQL 操作名（UserTweets 已变成 UserOriginalsTimeline），所以按端点而不是操作名过滤；
+        # 响应里到底有没有推文，交给下面 extract_tweets 的 rest_id + legacy 形状判断
+        if response.status != 200 or "/i/api/" not in response.url:
+            return
+        if "graphql" not in response.url and "timeline.json" not in response.url:
+            return
+        # 放宽端点过滤后会命中非 JSON 响应，先看 content-type，否则每个都刷一条解析异常
+        if "json" not in response.headers.get("content-type", ""):
+            return
+        try:
+            data = await response.json()
+
+            def extract_tweets(obj):
+                if isinstance(obj, dict):
+                    if obj.get("rest_id") and obj.get("legacy"):
+                        legacy = obj["legacy"]
+                        # 提取图片 URL
+                        media_entities = legacy.get("extended_entities", {}).get("media", []) or legacy.get("entities", {}).get("media", [])
+                        images = [m["media_url_https"] for m in media_entities if m.get("type") == "photo" and m.get("media_url_https")]
+                        tweet = {
+                            "tweet_id": obj["rest_id"],
+                            "text": legacy.get("full_text", ""),
+                            "datetime_raw": legacy.get("created_at", ""),
+                            "is_retweet": "retweeted_status_result" in obj.get("core", {}) or "retweeted_status_id_str" in legacy,
+                            "images": images,
+                        }
+                        try:
+                            dt = datetime.strptime(tweet["datetime_raw"], "%a %b %d %H:%M:%S %z %Y")
+                            tweet["datetime"] = dt.isoformat()
+                        except (ValueError, TypeError):
+                            tweet["datetime"] = tweet["datetime_raw"]
+                        graphql_tweets.append(tweet)
+                    for v in obj.values(): extract_tweets(v)
+                elif isinstance(obj, list):
+                    for item in obj: extract_tweets(item)
+
+            extract_tweets(data)
+        except Exception as e:
+            log_print(f"  {Color.GREY}⚠️ GraphQL 响应解析异常: {type(e).__name__}: {str(e)[:100]}{Color.RESET}", "warning")
 
     page.on("response", handle_response)
 
@@ -408,19 +418,18 @@ def validate_cookies():
 
     results = asyncio.run(_check())
     valid_count = sum(1 for _, status in results if status == "valid")
-    if valid_count == 0:
-        reasons = sorted({status for _, status in results})
-        if reasons == ["blocked_ip"]:
-            raise RuntimeError(
-                f"所有 {len(results)} 组 Cookie 都拿到 Cloudflare 拦截页（title='Just a moment...'）。"
-                "这是出口 IP 被 X 限制，不是 Cookie 失效——换 Cookie 不会解决，需要住宅/ISP 代理"
-            )
-        if reasons == ["not_rendered"]:
-            raise RuntimeError(
-                f"所有 {len(results)} 组 Cookie 的首页 20s 内都没渲染出文本，"
-                "无法判定登录态（可能是网络或渲染问题，不一定是 Cookie 失效）"
-            )
-        raise RuntimeError(
-            f"所有 {len(results)} 组 Cookie 校验未通过，状态={reasons}；只有 logged_out 才需要重新导出 Cookie"
-        )
-    print(f"✅ Cookie 验证完成：{valid_count}/{len(results)} 组有效")
+    if valid_count:
+        print(f"✅ Cookie 验证完成：{valid_count}/{len(results)} 组有效")
+        return
+
+    reasons = sorted({status for _, status in results})
+    if reasons == ["logged_out"]:
+        raise RuntimeError(f"所有 {len(results)} 组 Cookie 都停在登录墙（页面已渲染但未登录），请重新导出")
+    if reasons == ["error"]:
+        raise RuntimeError(f"所有 {len(results)} 组 Cookie 校验都抛异常，环境或网络可能不可用")
+    log_print(
+        f"⚠️  无法判定 Cookie 登录态（状态={reasons}）。blocked_ip 表示拿到 Cloudflare 拦截页、"
+        "not_rendered 表示首屏未渲染，都不是 Cookie 失效的证据；不以未知原因阻断流水线，"
+        "交给抓取阶段判定（零成功会由 fetch 的快速中止兜住）。",
+        "warning",
+    )
