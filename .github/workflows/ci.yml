@@ -31,8 +31,23 @@ jobs:
       - name: Run security scan (bandit)
         run: uv tool run bandit -r . || true
 
-      - name: Run dependency audit
-        run: uv audit || true
+      - name: Audit dependencies
+        # The old step ran `uv audit` for real (uv >= 0.11) but `|| true` turned
+        # every advisory into a green build. This gate reads the frozen lock, so
+        # CI cannot disagree with uv.lock.
+        run: |
+          uv export --frozen --no-emit-project --format requirements-txt --no-hashes > "$RUNNER_TEMP/requirements.txt"
+          uvx pip-audit@2.10.1 --disable-pip --no-deps -r "$RUNNER_TEMP/requirements.txt" --progress-spinner off \
+            --ignore-vuln PYSEC-2026-4114
+        # PYSEC-2026-4114 (oauthlib 3.3.1, timing attack on the PKCE code_verifier
+        # comparison) is fixed only in oauthlib 4.0.0, and oauthlib cannot reach
+        # 4.0.0 here: tweepy requires `oauthlib>=3.2.0,<4`, so the resolver refuses
+        # (`uv lock --upgrade-package oauthlib==4.0.0` -> unsatisfiable). Impact is
+        # limited to running an OAuth provider: the affected code paths are
+        # oauthlib's RevocationEndpoint and PKCE verification, and this project
+        # only uses oauthlib transitively for outbound API signing — it never
+        # imports tweepy at all. Revisit when tweepy allows oauthlib 4.x, or drop
+        # tweepy.
 
 
       - name: Run tests with coverage
