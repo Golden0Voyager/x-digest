@@ -40,3 +40,6 @@ output/*.json
 # Skill-generated analysis artifacts
 .understand-anything/
 .codegraph/
+
+# Local git worktrees
+.worktrees/
