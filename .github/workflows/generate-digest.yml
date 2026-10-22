@@ -50,11 +50,12 @@ jobs:
           import urllib.error
           import urllib.request
 
-          checks = [
-              ("TP", "https://token.sensenova.cn/v1", os.getenv("SENSENOVA_TP_API_KEY") or os.getenv("SENSENOVA_API_KEY")),
-              ("main", "https://api.sensenova.cn/compatible-mode/v2", os.getenv("SENSENOVA_API_KEY")),
-          ]
-          for name, base, key in checks:
+          tp_base = "https://token.sensenova.cn/v1"
+          tp_key = os.getenv("SENSENOVA_TP_API_KEY") or os.getenv("SENSENOVA_API_KEY")
+          main_base = "https://api.sensenova.cn/compatible-mode/v2"
+          main_key = os.getenv("SENSENOVA_API_KEY")
+
+          for name, base, key in (("TP", tp_base, tp_key), ("main", main_base, main_key)):
               if not key:
                   print(f"{name}: no key")
                   continue
@@ -71,6 +72,28 @@ jobs:
                   print("  body:", e.read().decode("utf-8", "replace")[:300])
               except Exception as e:
                   print(f"{name}: {type(e).__name__}: {str(e)[:200]}")
+
+          for model in ("deepseek-v4-flash", "deepseek-v4.1-flash", "sensenova-6.8-flash-lite"):
+              payload = json.dumps({
+                  "model": model,
+                  "messages": [{"role": "user", "content": "Reply with OK"}],
+                  "max_tokens": 8,
+              }).encode()
+              req = urllib.request.Request(
+                  f"{tp_base}/chat/completions",
+                  data=payload,
+                  headers={"Authorization": f"Bearer {tp_key}", "Content-Type": "application/json"},
+                  method="POST",
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as resp:
+                      data = json.load(resp)
+                  content = data["choices"][0]["message"].get("content", "")
+                  print(f"chat {model}: HTTP {resp.status} content={content[:40]!r}")
+              except urllib.error.HTTPError as e:
+                  print(f"chat {model}: HTTP {e.code} {e.read().decode('utf-8', 'replace')[:150]}")
+              except Exception as e:
+                  print(f"chat {model}: {type(e).__name__}: {str(e)[:150]}")
           PY
 
       - name: Restore fetched tweets
