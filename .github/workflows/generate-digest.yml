@@ -39,6 +39,40 @@ jobs:
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
+      - name: Probe available models
+        env:
+          SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
+          SENSENOVA_TP_API_KEY: ${{ secrets.SENSENOVA_TP_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          checks = [
+              ("TP", "https://token.sensenova.cn/v1", os.getenv("SENSENOVA_TP_API_KEY") or os.getenv("SENSENOVA_API_KEY")),
+              ("main", "https://api.sensenova.cn/compatible-mode/v2", os.getenv("SENSENOVA_API_KEY")),
+          ]
+          for name, base, key in checks:
+              if not key:
+                  print(f"{name}: no key")
+                  continue
+              req = urllib.request.Request(
+                  f"{base}/models", headers={"Authorization": f"Bearer {key}"}
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as resp:
+                      data = json.load(resp)
+                  print(f"{name}: HTTP {resp.status}")
+                  print("  models:", [m.get("id") for m in data.get("data", [])])
+              except urllib.error.HTTPError as e:
+                  print(f"{name}: HTTP {e.code}")
+                  print("  body:", e.read().decode("utf-8", "replace")[:300])
+              except Exception as e:
+                  print(f"{name}: {type(e).__name__}: {str(e)[:200]}")
+          PY
+
       - name: Restore fetched tweets
         run: |
           set -euo pipefail
