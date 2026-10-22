@@ -32,6 +32,11 @@ docs/.pdca-snapshots/
 docs/.pdca-status.json
 output/*.json
 
+# CI 代理运行时文件
+.mihomo/
+mihomo
+mihomo.gz
+
 # --- AI & Metadata ---
 .pdca-status.json
 .gemini/

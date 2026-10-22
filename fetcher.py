@@ -21,7 +21,9 @@ from pipeline import Color, log_print
 load_dotenv()
 
 if os.getenv("GITHUB_ACTIONS") == "true":
-    PROXY = None
+    # CI 的机房 IP 会被 x.com 的 Cloudflare 挑战页拦下，workflow 会先起一个本地 Clash 内核，
+    # 这里统一走它；没有配置时退回直连（保持旧行为）
+    PROXY = os.getenv("CI_PROXY") or None
 else:
     PROXY = os.getenv("PROXY", "http://127.0.0.1:7897")
 
@@ -375,7 +377,9 @@ def validate_cookies():
 
     async def _check():
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
+            browser = await p.chromium.launch(
+                headless=True, proxy={"server": PROXY} if PROXY else None
+            )
             results = []
             for i, cookies in enumerate(cookie_data_list):
                 ctx = await browser.new_context(

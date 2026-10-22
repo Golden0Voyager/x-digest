@@ -47,6 +47,72 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: uv run playwright install chromium
 
+      - name: Start CI proxy
+        env:
+          CLASH_SUBSCRIPTION_URL: ${{ secrets.CLASH_SUBSCRIPTION_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLASH_SUBSCRIPTION_URL:-}" ]; then
+            echo "❌ 未配置 CLASH_SUBSCRIPTION_URL secret，无法启动代理"
+            exit 1
+          fi
+
+          # 固定版本，避免上游 latest 变动导致 CI 行为漂移
+          MIHOMO_VERSION="v1.19.33"
+          curl -fsSL -o mihomo.gz \
+            "https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/mihomo-linux-amd64-${MIHOMO_VERSION}.gz"
+          gunzip -f mihomo.gz
+          chmod +x mihomo
+
+          mkdir -p .mihomo
+          curl -fsSL -A "clash.meta" --retry 3 --max-time 60 \
+            "$CLASH_SUBSCRIPTION_URL" -o .mihomo/sub.yaml
+          if ! grep -qE '^proxies:' .mihomo/sub.yaml; then
+            echo "❌ 订阅内容不是 Clash YAML（缺少 proxies:），请在机场复制 Clash 订阅链接"
+            exit 1
+          fi
+
+          uv run python - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          Path(".mihomo/config.yaml").write_text(textwrap.dedent("""\
+              mixed-port: 7890
+              allow-lan: false
+              mode: rule
+              log-level: warning
+              proxy-providers:
+                sub:
+                  type: file
+                  path: ./sub.yaml
+              proxy-groups:
+                - name: PROXY
+                  type: url-test
+                  url: https://www.gstatic.com/generate_204
+                  interval: 300
+                  tolerance: 50
+                  use:
+                    - sub
+              rules:
+                - MATCH,PROXY
+              """))
+          PY
+
+          nohup ./mihomo -d .mihomo > .mihomo/mihomo.log 2>&1 &
+          for _ in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -x http://127.0.0.1:7890 \
+              --max-time 8 https://www.gstatic.com/generate_204 || true)
+            if [ "$code" = "204" ]; then
+              echo "✓ CI 代理已就绪"
+              echo "CI_PROXY=http://127.0.0.1:7890" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "❌ 代理启动超时"
+          tail -50 .mihomo/mihomo.log
+          exit 1
+
       - name: Prepare Twitter cookies
         run: |
           if [ -n "${{ secrets.X_COOKIES_1 }}" ]; then
