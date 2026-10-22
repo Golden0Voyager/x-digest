@@ -78,7 +78,8 @@ jobs:
           AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
           AI_MODEL: DeepSeek-V3-1
           AI_MODEL_TRANSLATE: deepseek-v4-flash
-          AI_MODEL_INSIGHTS: sensenova-6.8-flash-lite
+          AI_MODEL_INSIGHTS: deepseek-v4-flash
+          AI_BATCH_SIZE_TP: 30
 
           # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
           SENSENOVA_BASE_URL: https://api.sensenova.cn/compatible-mode/v2
