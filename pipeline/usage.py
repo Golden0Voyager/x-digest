@@ -156,7 +156,7 @@ class UsageTracker:
             lines.append("")
             lines.append(
                 f"[Token Plan 配额提示] 本次共调用 token.sensenova.cn {tp_calls} 次 "
-                f"(按次计费，每 5h 重置：sensenova-6.7-flash-lite=1500/5h, "
+                f"(按次计费，每 5h 重置：sensenova-6.8-flash-lite=1500/5h, "
                 f"deepseek-v4-flash=150/5h)"
             )
 
@@ -209,7 +209,7 @@ class UsageTracker:
         格式示例：
             ▫️ 调用：5 次 (TP:4 / 主链:1) · Token：125.8K (in 74.5K / out 51.3K)
             ▫️ finish: stop=4, length=1
-            <font color='red'>⚠️ 截断: sensenova-6.7-flash-lite (×1) → 建议调小 AI_BATCH_SIZE_TP</font>
+            <font color='red'>⚠️ 截断: sensenova-6.8-flash-lite (×1) → 建议调小 AI_BATCH_SIZE_TP</font>
         """
         if not self._records:
             return "▫️ （本次未发生 LLM 调用）"
@@ -268,9 +268,9 @@ class UsageTracker:
 
         # Token Plan 配额健康度提示
         if tp_calls > 0:
-            tp_pct = (tp_calls / 1500) * 100  # 以 6.7-flash-lite 配额为基准
+            tp_pct = (tp_calls / 1500) * 100  # 以 6.8-flash-lite 配额为基准
             lines.append(
-                f"▫️ TP 配额消耗：{tp_calls}/1500 (~{tp_pct:.1f}%, 按 6.7-flash-lite 上限算)"
+                f"▫️ TP 配额消耗：{tp_calls}/1500 (~{tp_pct:.1f}%, 按 6.8-flash-lite 上限算)"
             )
 
         return "\n".join(lines)

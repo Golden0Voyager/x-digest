@@ -2,7 +2,7 @@
 Step 3: 专注洞察与分类 (科普增强版)
 
 在联合打分和翻译完成后运行。
-利用 sensenova-6.7-flash-lite（SenseNova Token Plan）的多模态 + 长上下文能力，
+利用 sensenova-6.8-flash-lite（SenseNova Token Plan）的多模态 + 长上下文能力，
 为非专业人士补全背景常识。
 
 参考：

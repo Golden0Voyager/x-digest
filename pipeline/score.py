@@ -1,27 +1,23 @@
 """
 Step 0.5: 纯异步多模型并行打分
 
-在翻译之前运行，用 **跨端点双引擎** 对原文同时打分，取平均分。
+在翻译之前运行，用 **Token Plan 双模型** 对原文同时打分，取平均分。
 从而提前过滤掉垃圾信息，大幅节省后续翻译和洞察步骤的时间与 Token 成本。
 
-双引擎组合（硬编码，2026-06 起）：
+双模型组合（2026-10 起）：
   - deepseek-v4-flash  → Token Plan (token.sensenova.cn)
     每 5h 150 次，32K 上下文，纯文本响应极快、强工具调用
-    （从 sensenova-6.7-flash-lite 切换过来：6.7 的 256K 多模态给纯文本打分属大材小用，
-      把它留给 insights 任务；v4-flash 更适合短输入快出结果的打分场景）
-  - DeepSeek-R1-Distill-Qwen-14B → 主链 (api.sensenova.cn)
-    永久免费，32K 上下文，单轮评分不受 reasoning_content 往返影响
+  - sensenova-6.8-flash-lite → Token Plan
+    256K 上下文，用于给打分结果提供不同模型族的第二意见
 
-跨端点的好处：两个请求走不同 baseurl，不会在主链 1 QPS / 6 RPM 限制上
-互相排队；Token Plan 配额独立，不消耗主链每日 5000 万 token 额度。
+原来的主链 DeepSeek-R1-Distill-Qwen-14B 已下线（404 model route not found），
+主链端点也返回 503，因此两个引擎都走 Token Plan；配额按模型独立计算。
 
 参考：
-  - docs/api/sensenova-best-practices.md
   - docs/api/sensenova-token-plan-usage.md
 """
 import asyncio
 import json
-import os
 from pathlib import Path
 
 from openai import OpenAI
@@ -37,15 +33,13 @@ from pipeline.usage import usage_tracker
 
 
 def _build_score_clients() -> list[tuple[OpenAI, str, str]]:
-    """构造双引擎 client + model + base_url 列表。
+    """构造双模型 client + model + base_url 列表。
 
-    返回 [(client, model_name, base_url), ...]，任一 client 创建失败时跳过对应引擎。
+    两个模型都走 Token Plan；返回 [(client, model_name, base_url), ...]。
     base_url 用于 usage_tracker 区分端点。
     """
-    sensenova_key = os.getenv("SENSENOVA_API_KEY")
     clients: list[tuple[OpenAI, str, str]] = []
 
-    # 引擎 1：Token Plan 上的 deepseek-v4-flash（打分专用，32K 上下文 + 强工具调用）
     if SENSENOVA_TP_API_KEY:
         tp_client = OpenAI(
             api_key=SENSENOVA_TP_API_KEY,
@@ -53,20 +47,9 @@ def _build_score_clients() -> list[tuple[OpenAI, str, str]]:
             timeout=180,
         )
         clients.append((tp_client, "deepseek-v4-flash", SENSENOVA_TP_BASE_URL))
+        clients.append((tp_client, "sensenova-6.8-flash-lite", SENSENOVA_TP_BASE_URL))
     else:
-        print(f"  {Color.YELLOW}⚠️ SENSENOVA_TP_API_KEY 未配置，跳过 Token Plan 引擎{Color.RESET}")
-
-    # 引擎 2：主链 DeepSeek-R1-Distill-Qwen-14B
-    sn_base = "https://api.sensenova.cn/compatible-mode/v2"
-    if sensenova_key:
-        sn_client = OpenAI(
-            api_key=sensenova_key,
-            base_url=sn_base,
-            timeout=180,
-        )
-        clients.append((sn_client, "DeepSeek-R1-Distill-Qwen-14B", sn_base))
-    else:
-        print(f"  {Color.YELLOW}⚠️ SENSENOVA_API_KEY 未配置，跳过主链 Distill-14B 引擎{Color.RESET}")
+        print(f"  {Color.YELLOW}⚠️ SENSENOVA_TP_API_KEY 未配置，跳过打分引擎{Color.RESET}")
 
     return clients
 
@@ -153,8 +136,8 @@ async def fetch_scores_from_model(
 
 async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: bool = False) -> list[dict]:
     """
-    使用跨端点双引擎联合打分（deepseek-v4-flash + DeepSeek-R1-Distill-Qwen-14B），
-    过滤出平均分 >= 80 的推文，并取 Top 60。
+    使用 Token Plan 双模型联合打分（deepseek-v4-flash + sensenova-6.8-flash-lite），
+    过滤出平均分 >= 80 的推文，并取 Top N。
     将平均分注入到推文的 'quality' 字段中。
 
     批次大小使用 AI_BATCH_SIZE_TP（默认 60），同时受 TP 配额（150 次/5h）和
@@ -178,7 +161,7 @@ async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: boo
             for t in to_process:
                 scores_cache[str(t["tweet_id"])] = 100
         else:
-            print(f"  {Color.CYAN}⚖️ 开始使用跨端点双引擎并行打分 {len(to_process)} 条推文 (批次 {AI_BATCH_SIZE_TP})...{Color.RESET}")
+            print(f"  {Color.CYAN}⚖️ 开始使用 Token Plan 双模型并行打分 {len(to_process)} 条推文 (批次 {AI_BATCH_SIZE_TP})...{Color.RESET}")
             print(f"  {Color.GREY}联合打分评委: {', '.join([m[1] for m in models])}{Color.RESET}")
 
             current_batch_size = AI_BATCH_SIZE_TP

@@ -9,7 +9,14 @@ import asyncio
 import json
 from pathlib import Path
 
-from config import AI_BATCH_COOLDOWN, AI_BATCH_SIZE, AI_MAX_BATCH_SIZE, AI_MODEL_TRANSLATE
+from config import (
+    AI_BATCH_COOLDOWN,
+    AI_BATCH_SIZE,
+    AI_MAX_BATCH_SIZE,
+    AI_MODEL_TRANSLATE,
+    SENSENOVA_TP_API_KEY,
+    SENSENOVA_TP_BASE_URL,
+)
 from pipeline import Color, call_ai_with_retry, extract_json, load_json, save_json
 
 TRANSLATE_PROMPT = """\
@@ -103,6 +110,9 @@ async def run_translate(
                 temperature=0.2,
                 model_override=AI_MODEL_TRANSLATE,
                 max_tokens=4000,
+                # 主链旧翻译模型已下线且端点 503，翻译统一走 Token Plan
+                base_url_override=SENSENOVA_TP_BASE_URL,
+                api_key_override=SENSENOVA_TP_API_KEY,
             )
             items = extract_json(response.choices[0].message.content)
             returned_ids = set()
@@ -150,6 +160,8 @@ async def run_translate(
                         temperature=0.2,
                         model_override=AI_MODEL_TRANSLATE,
                         max_tokens=2048,
+                        base_url_override=SENSENOVA_TP_BASE_URL,
+                        api_key_override=SENSENOVA_TP_API_KEY,
                     )
 
                     return tid, resp.choices[0].message.content.strip()
