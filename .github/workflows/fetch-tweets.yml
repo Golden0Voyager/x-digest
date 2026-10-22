@@ -50,6 +50,7 @@ jobs:
       - name: Start CI proxy
         env:
           CLASH_SUBSCRIPTION_URL: ${{ secrets.CLASH_SUBSCRIPTION_URL }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           if [ -z "${CLASH_SUBSCRIPTION_URL:-}" ]; then
@@ -57,10 +58,12 @@ jobs:
             exit 1
           fi
 
-          # 固定版本，避免上游 latest 变动导致 CI 行为漂移
+          # 固定版本，避免上游 latest 变动导致 CI 行为漂移。
+          # runner 对匿名 Release 下载会返回 403，用仓库 token 走 API 下载。
           MIHOMO_VERSION="v1.19.33"
-          curl -fsSL -o mihomo.gz \
-            "https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/mihomo-linux-amd64-${MIHOMO_VERSION}.gz"
+          gh release download "$MIHOMO_VERSION" --repo MetaCubeX/mihomo \
+            --pattern "mihomo-linux-amd64-${MIHOMO_VERSION}.gz" \
+            --output mihomo.gz --clobber
           gunzip -f mihomo.gz
           chmod +x mihomo
 
