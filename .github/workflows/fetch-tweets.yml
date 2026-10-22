@@ -68,10 +68,24 @@ jobs:
           chmod +x mihomo
 
           mkdir -p .mihomo
-          curl -fsSL -A "clash.meta" --retry 3 --max-time 60 \
-            "$CLASH_SUBSCRIPTION_URL" -o .mihomo/sub.yaml
-          if ! grep -qE '^proxies:' .mihomo/sub.yaml; then
-            echo "❌ 订阅内容不是 Clash YAML（缺少 proxies:），请在机场复制 Clash 订阅链接"
+          sub_ok=""
+          for ua in \
+            "clash.meta" \
+            "ClashX/1.118.0" \
+            "clash-verge/v2.0.0" \
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+          do
+            code=$(curl -sSL -A "$ua" --max-time 60 \
+              -o .mihomo/sub.yaml -w '%{http_code}' \
+              "$CLASH_SUBSCRIPTION_URL" || true)
+            echo "订阅下载 UA=${ua%%/*} → HTTP ${code}"
+            if [ "$code" = "200" ] && grep -qE '^proxies:' .mihomo/sub.yaml; then
+              sub_ok="yes"
+              break
+            fi
+          done
+          if [ -z "$sub_ok" ]; then
+            echo "❌ 订阅下载失败：机场域名可能屏蔽了 GitHub 机房 IP，或只接受特定客户端 UA"
             exit 1
           fi
 
