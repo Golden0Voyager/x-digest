@@ -39,6 +39,20 @@ jobs:
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
+      - name: Restore fetched tweets
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin auto-docs
+          mkdir -p output
+          if git show origin/auto-docs:output/raw_tweets_pool.json > output/raw_tweets_pool.json 2>/dev/null; then
+            echo "✓ 已从 auto-docs 恢复抓取缓存"
+          else
+            echo "⚠️ auto-docs 上没有 raw_tweets_pool.json"
+            rm -f output/raw_tweets_pool.json
+          fi
+          git show origin/auto-docs:output/processed_tweets.json > output/processed_tweets.json 2>/dev/null \
+            || rm -f output/processed_tweets.json
+
       - name: Run digest pipeline
         env:
           # AI 管线配置
