@@ -49,12 +49,46 @@ jobs:
 
       - name: Start CI proxy
         env:
+          CLASH_PROXIES_B64: ${{ secrets.CLASH_PROXIES_B64 }}
           CLASH_SUBSCRIPTION_URL: ${{ secrets.CLASH_SUBSCRIPTION_URL }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if [ -z "${CLASH_SUBSCRIPTION_URL:-}" ]; then
-            echo "❌ 未配置 CLASH_SUBSCRIPTION_URL secret，无法启动代理"
+          mkdir -p .mihomo
+
+          # 优先用节点配置：机场订阅域名会 403 掉 GitHub 机房 IP，所以把节点
+          # 预先导出到 Secret 最可靠；订阅链接路径保留给域名未被拦截的情况。
+          sub_ok=""
+          if [ -n "${CLASH_PROXIES_B64:-}" ]; then
+            echo "$CLASH_PROXIES_B64" | base64 -d > .mihomo/sub.yaml
+            if grep -qE '^proxies:' .mihomo/sub.yaml; then
+              echo "✓ 使用 Secret 中的节点配置"
+              sub_ok="inline"
+            else
+              echo "⚠️ CLASH_PROXIES_B64 解码后不是 Clash YAML，忽略"
+            fi
+          fi
+
+          if [ -z "$sub_ok" ] && [ -n "${CLASH_SUBSCRIPTION_URL:-}" ]; then
+            for ua in \
+              "clash.meta" \
+              "ClashX/1.118.0" \
+              "clash-verge/v2.0.0" \
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+            do
+              code=$(curl -sSL -A "$ua" --max-time 60 \
+                -o .mihomo/sub.yaml -w '%{http_code}' \
+                "$CLASH_SUBSCRIPTION_URL" || true)
+              echo "订阅下载 UA=${ua%%/*} → HTTP ${code}"
+              if [ "$code" = "200" ] && grep -qE '^proxies:' .mihomo/sub.yaml; then
+                sub_ok="subscription"
+                break
+              fi
+            done
+          fi
+
+          if [ -z "$sub_ok" ]; then
+            echo "❌ 没有可用的 Clash 配置：请配置 CLASH_PROXIES_B64（或可访问的 CLASH_SUBSCRIPTION_URL）"
             exit 1
           fi
 
@@ -66,28 +100,6 @@ jobs:
             --output mihomo.gz --clobber
           gunzip -f mihomo.gz
           chmod +x mihomo
-
-          mkdir -p .mihomo
-          sub_ok=""
-          for ua in \
-            "clash.meta" \
-            "ClashX/1.118.0" \
-            "clash-verge/v2.0.0" \
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
-          do
-            code=$(curl -sSL -A "$ua" --max-time 60 \
-              -o .mihomo/sub.yaml -w '%{http_code}' \
-              "$CLASH_SUBSCRIPTION_URL" || true)
-            echo "订阅下载 UA=${ua%%/*} → HTTP ${code}"
-            if [ "$code" = "200" ] && grep -qE '^proxies:' .mihomo/sub.yaml; then
-              sub_ok="yes"
-              break
-            fi
-          done
-          if [ -z "$sub_ok" ]; then
-            echo "❌ 订阅下载失败：机场域名可能屏蔽了 GitHub 机房 IP，或只接受特定客户端 UA"
-            exit 1
-          fi
 
           uv run python - <<'PY'
           from pathlib import Path
