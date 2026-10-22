@@ -50,4 +50,4 @@ show_missing = true
 skips = ["B101", "B311", "B404", "B603"]
 
 [tool.uv]
-required-version = "0.13.4"
+required-version = ">=0.13.5"
