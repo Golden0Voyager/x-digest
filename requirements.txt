@@ -1,6 +1,7 @@
 httpx
 markdown
 openai
+typesafe-sdk==0.7.5
 playwright
 playwright-stealth
 python-dotenv
