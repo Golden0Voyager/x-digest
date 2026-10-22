@@ -44,14 +44,33 @@ jobs:
           set -euo pipefail
           git fetch --depth=1 origin auto-docs
           mkdir -p output
-          if git show origin/auto-docs:output/raw_tweets_pool.json > output/raw_tweets_pool.json 2>/dev/null; then
-            echo "✓ 已从 auto-docs 恢复抓取缓存"
-          else
-            echo "⚠️ auto-docs 上没有 raw_tweets_pool.json"
-            rm -f output/raw_tweets_pool.json
-          fi
-          git show origin/auto-docs:output/processed_tweets.json > output/processed_tweets.json 2>/dev/null \
-            || rm -f output/processed_tweets.json
+          # auto-docs 同时存在 output/ 和旧版嵌套的 output/output/，取最新的那份
+          git show origin/auto-docs:output/raw_tweets_pool.json > /tmp/pool_top.json 2>/dev/null || true
+          git show origin/auto-docs:output/output/raw_tweets_pool.json > /tmp/pool_nested.json 2>/dev/null || true
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          best = None
+          for path in (Path("/tmp/pool_top.json"), Path("/tmp/pool_nested.json")):
+              if not path.exists():
+                  continue
+              try:
+                  data = json.loads(path.read_text())
+              except (ValueError, OSError):
+                  continue
+              if not isinstance(data, dict) or not data:
+                  continue
+              latest = max((t.get("created_at", "") for t in data.values() if isinstance(t, dict)), default="")
+              if best is None or latest > best[0]:
+                  best = (latest, data)
+
+          if best is None:
+              print("⚠️ auto-docs 上没有可用的推文池")
+          else:
+              Path("output/raw_tweets_pool.json").write_text(json.dumps(best[1], ensure_ascii=False))
+              print(f"✓ 恢复推文池 {len(best[1])} 条（最新 {best[0]}）")
+          PY
 
       - name: Run digest pipeline
         env:
@@ -92,7 +111,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
 
           mkdir -p /tmp/auto-docs-save
-          cp -r output/ /tmp/auto-docs-save/
+          cp -r output/. /tmp/auto-docs-save/
 
           git fetch --depth=50 origin auto-docs 2>/dev/null || true
           if git rev-parse --verify origin/auto-docs 2>/dev/null; then
@@ -103,7 +122,7 @@ jobs:
           fi
 
           mkdir -p output
-          cp -r /tmp/auto-docs-save/* output/
+          cp -r /tmp/auto-docs-save/. output/
 
           git add -f output/
           if git diff --cached --quiet; then

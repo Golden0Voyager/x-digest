@@ -194,7 +194,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
 
           mkdir -p /tmp/auto-docs-save
-          cp -r output/ /tmp/auto-docs-save/
+          cp -r output/. /tmp/auto-docs-save/
 
           git fetch --depth=50 origin auto-docs 2>/dev/null || true
           if git rev-parse --verify origin/auto-docs 2>/dev/null; then
@@ -205,7 +205,7 @@ jobs:
           fi
 
           mkdir -p output
-          cp -r /tmp/auto-docs-save/* output/
+          cp -r /tmp/auto-docs-save/. output/
 
           git add -f output/
           if git diff --cached --quiet; then
