@@ -30,8 +30,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
-        # 不钉 version：让 CI 始终装最新 uv；太旧的版本由 pyproject.toml 的 required-version 下限挡住
-
       - name: Create virtual environment
         run: uv venv
 
