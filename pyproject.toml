@@ -15,6 +15,7 @@ dependencies = [
     "tenacity>=9.1.4",
     "tweepy>=4.16.0",
     "twikit>=2.3.3",
+    "typesafe-sdk==0.7.5",
 ]
 
 [dependency-groups]
