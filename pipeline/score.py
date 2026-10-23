@@ -13,7 +13,9 @@ Jev 只做判断，不生成文本；翻译和洞察仍由后面的 LLM 步骤�
 """
 
 import asyncio
+import json
 import os
+from collections import Counter
 from pathlib import Path
 
 from typesafe_sdk import AsyncTypeSafeClient, Noul, NoulCriteria, Score
@@ -27,6 +29,17 @@ JEV_CONCURRENCY = int(os.getenv("JEV_CONCURRENCY", "10"))
 JEV_MIN_SIGNAL = float(os.getenv("JEV_MIN_SIGNAL", "0.5"))
 JEV_QUALITY_THRESHOLD = int(os.getenv("JEV_QUALITY_THRESHOLD", "60"))
 JEV_MAX_RETRIES = 3
+JEV_DOMAIN_FLOOR = int(os.getenv("JEV_DOMAIN_FLOOR", "5"))
+JEV_DOMAIN_CAP = int(os.getenv("JEV_DOMAIN_CAP", "40"))
+
+DOMAIN_LABELS = {
+    "AI_Scientists_&_Academia": "AI",
+    "Tech_Industry_&_CEOs": "科技公司",
+    "Tech_Media_&_Deep_Analysis": "科技媒体",
+    "Macro_Finance_&_A-Shares": "宏观金融",
+    "F1_Racing_&_Paddock": "F1",
+    "Contemporary_Art_&_Institutions": "艺术",
+}
 
 QUALITY_WEIGHTS = {
     "signal": 0.5,
@@ -80,6 +93,84 @@ QUESTIONS = {
     "depth": DEPTH_QUESTION,
     "novelty": NOVELTY_QUESTION,
 }
+
+
+def _load_domain_map() -> tuple[dict[str, str], list[str]]:
+    """从 custom_accounts.json 读取作者 → 领域映射。"""
+    path = Path(__file__).resolve().parent.parent / "custom_accounts.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}, []
+
+    domain_of: dict[str, str] = {}
+    groups: list[str] = []
+    for group, users in data.items():
+        groups.append(group)
+        for user in users:
+            domain_of[str(user).lower()] = group
+    return domain_of, groups
+
+
+def _select_with_domains(
+    candidates: list[dict],
+    keep_count: int,
+    domain_of: dict[str, str],
+    domain_groups: list[str],
+) -> tuple[list[dict], Counter]:
+    """先按领域下限保底，再按分数填充并遵守单领域上限。"""
+    if keep_count <= 0:
+        return [], Counter()
+
+    selected: list[dict] = []
+    selected_ids: set[str] = set()
+    counts: Counter = Counter()
+
+    if domain_groups and keep_count >= JEV_DOMAIN_FLOOR * len(domain_groups):
+        for group in domain_groups:
+            taken = 0
+            for t in candidates:
+                if taken >= JEV_DOMAIN_FLOOR:
+                    break
+                tid = str(t["tweet_id"])
+                if tid in selected_ids or t.get("_domain") != group:
+                    continue
+                selected.append(t)
+                selected_ids.add(tid)
+                counts[group] += 1
+                taken += 1
+    elif domain_groups:
+        print(
+            f"  {Color.YELLOW}⚠️ 目标只有 {keep_count} 条，不足以执行领域下限 "
+            f"{JEV_DOMAIN_FLOOR}×{len(domain_groups)}，本次跳过下限{Color.RESET}"
+        )
+
+    for t in candidates:
+        if len(selected) >= keep_count:
+            break
+        tid = str(t["tweet_id"])
+        if tid in selected_ids:
+            continue
+        domain = t.get("_domain", "unknown")
+        if counts[domain] >= JEV_DOMAIN_CAP:
+            continue
+        selected.append(t)
+        selected_ids.add(tid)
+        counts[domain] += 1
+
+    # 候选不足或配额限制导致没选满时，再按分数补一次
+    for t in candidates:
+        if len(selected) >= keep_count:
+            break
+        tid = str(t["tweet_id"])
+        if tid in selected_ids:
+            continue
+        selected.append(t)
+        selected_ids.add(tid)
+        counts[t.get("_domain", "unknown")] += 1
+
+    selected.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
+    return selected, counts
 
 
 def _state_for(tweet: dict) -> dict:
@@ -249,11 +340,13 @@ async def run_score(
             if vals:
                 print(f"     {dim} avg={sum(vals) / len(vals):.3f}")
 
+    domain_of, domain_groups = _load_domain_map()
     scored = []
     for t in tweets:
         tid = str(t["tweet_id"])
         quality = int(cache.get(tid, {}).get("quality", 0))
         t["quality"] = quality
+        t["_domain"] = domain_of.get(str(t.get("username", "")).lower(), "unknown")
         if quality >= JEV_QUALITY_THRESHOLD:
             scored.append(t)
 
@@ -276,7 +369,21 @@ async def run_score(
     keep_count = min(
         len(scored), max(60, min(180, int(len(scored) * keep_ratio)))
     )
-    top_n = scored[:keep_count]
+    top_n, domain_counts = _select_with_domains(
+        scored, keep_count, domain_of, domain_groups
+    )
+
+    if domain_groups:
+        dist = " | ".join(
+            f"{DOMAIN_LABELS.get(g, g)}={domain_counts.get(g, 0)}"
+            for g in domain_groups
+        )
+        if domain_counts.get("unknown"):
+            dist += f" | 未分组={domain_counts['unknown']}"
+        print(
+            f"  {Color.GREY}🗂️ 领域分布: {dist} "
+            f"(floor={JEV_DOMAIN_FLOOR}, cap={JEV_DOMAIN_CAP}){Color.RESET}"
+        )
 
     print(
         f"  {Color.GREEN}📊 Jev 打分完成，从 {len(tweets)} 条中精选出 {len(top_n)} 条"
