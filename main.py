@@ -208,7 +208,9 @@ def send_feishu_message(text: str, msg_type: str = "text", content: dict | None 
     # 优先使用传入的 receive_id，否则回退到配置文件
     target_id = receive_id or FEISHU_USER_ID
     if not all([FEISHU_APP_ID, FEISHU_APP_SECRET, target_id]):
-        print(f"{Color.GREY}⚠️  飞书配置不完整，跳过推送{Color.RESET}")
+        # Webhook 卡片能独立投递时静默；缺 APP 凭据或 Webhook 时才需要警告
+        if not (FEISHU_WEBHOOK_URL and FEISHU_APP_ID and FEISHU_APP_SECRET):
+            print(f"{Color.GREY}⚠️  飞书配置不完整，跳过推送{Color.RESET}")
         return
 
     receive_id_type = "chat_id" if target_id.startswith("oc_") else "open_id"
