@@ -147,6 +147,9 @@ jobs:
             fi
           done
 
+          # 旧路径 bug 留下的嵌套目录，直接清掉
+          rm -rf output/output
+
           git add -f -A output/
           if git diff --cached --quiet; then
             echo "No data changes; nothing to commit"
