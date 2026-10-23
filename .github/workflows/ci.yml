@@ -16,8 +16,8 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
-        with:
-          version: "0.13.4"
+
+        # 不钉 version：让 CI 始终装最新 uv；太旧的版本由 pyproject.toml 的 required-version 下限挡住
 
       - name: Set up Python
         run: uv python install 3.12
