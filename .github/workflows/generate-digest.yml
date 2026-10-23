@@ -138,7 +138,16 @@ jobs:
           mkdir -p output
           cp -r /tmp/auto-docs-save/. output/
 
-          git add -f output/
+          # git checkout 会把 mtime 重置为当前时间，必须按文件名里的日期判断
+          cutoff=$(date -u -d '30 days ago' +%Y-%m-%d)
+          for f in output/20??-??-??-*.md output/20??-??-??-*.pdf; do
+            [ -e "$f" ] || continue
+            if [[ "$(basename "$f" | cut -c1-10)" < "$cutoff" ]]; then
+              rm -f "$f"
+            fi
+          done
+
+          git add -f -A output/
           if git diff --cached --quiet; then
             echo "No data changes; nothing to commit"
           else
