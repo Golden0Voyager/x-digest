@@ -12,6 +12,8 @@ concurrency:
 
 jobs:
   generate-digest:
+    # 抓取被取消/失败时不生成摘要，避免空数据误报
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
