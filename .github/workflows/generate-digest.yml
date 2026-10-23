@@ -72,6 +72,15 @@ jobs:
               print(f"✓ 恢复推文池 {len(best[1])} 条（最新 {best[0]}）")
           PY
 
+          mkdir -p output/intermediate
+          for f in jev_scores.json translations.json insights.json; do
+            if git show "origin/auto-docs:output/intermediate/$f" > "output/intermediate/$f" 2>/dev/null; then
+              echo "✓ 恢复 output/intermediate/$f"
+            else
+              rm -f "output/intermediate/$f"
+            fi
+          done
+
       - name: Run digest pipeline
         env:
           # AI 管线配置

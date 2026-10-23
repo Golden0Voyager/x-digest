@@ -168,7 +168,7 @@ async def run_translate(
                 except Exception:
                     return tid, "SKIP" # 失败时记录为 SKIP
 
-        results = await asyncio.gather(*[_translate_one(t) for t in missing[:AI_MAX_BATCH_SIZE]])
+        results = await asyncio.gather(*[_translate_one(t) for t in missing])
         for tid, trans in results:
             translations[tid] = trans
             raw_cache[tid] = trans

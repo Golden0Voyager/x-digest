@@ -20,15 +20,18 @@ from typesafe_sdk import AsyncTypeSafeClient, Noul, NoulCriteria, Score
 
 from pipeline import Color, load_json, save_json
 
+# ScoreAnswer.score 是档位序号均值（0..levels-1），不是 0-1；
+# 合成前必须归一化，否则大量分数会超过 100 被截断。
+JEV_SCORER_VERSION = 2
 JEV_CONCURRENCY = int(os.getenv("JEV_CONCURRENCY", "10"))
 JEV_MIN_SIGNAL = float(os.getenv("JEV_MIN_SIGNAL", "0.5"))
-JEV_QUALITY_THRESHOLD = int(os.getenv("JEV_QUALITY_THRESHOLD", "80"))
+JEV_QUALITY_THRESHOLD = int(os.getenv("JEV_QUALITY_THRESHOLD", "60"))
 JEV_MAX_RETRIES = 3
 
 QUALITY_WEIGHTS = {
-    "depth": 0.5,
-    "signal": 0.3,
-    "novelty": 0.2,
+    "signal": 0.5,
+    "novelty": 0.3,
+    "depth": 0.2,
 }
 
 SIGNAL_QUESTION = Noul(
@@ -56,19 +59,21 @@ NOVELTY_QUESTION = Noul(
     ),
 )
 
+DEPTH_CRITERIA = [
+    "Pure noise or chatter with no information value",
+    "Routine update or generic commentary with little reference value",
+    "Some information value, such as a normal update or ordinary opinion",
+    "Important industry information, data, or deep analysis",
+    "Major breakthrough, exclusive data, or major event",
+]
 DEPTH_QUESTION = Score(
     instructions=(
         "How deep and important is the information in this tweet? "
         "Use the five ordered levels below."
     ),
-    criteria=[
-        "Pure noise or chatter with no information value",
-        "Routine update or generic commentary with little reference value",
-        "Some information value, such as a normal update or ordinary opinion",
-        "Important industry information, data, or deep analysis",
-        "Major breakthrough, exclusive data, or major event",
-    ],
+    criteria=DEPTH_CRITERIA,
 )
+DEPTH_MAX = len(DEPTH_CRITERIA) - 1
 
 QUESTIONS = {
     "signal": SIGNAL_QUESTION,
@@ -90,15 +95,35 @@ def _state_for(tweet: dict) -> dict:
 
 
 def _compose_quality(signal: float, depth: float, novelty: float) -> int:
+    depth_norm = depth / DEPTH_MAX if DEPTH_MAX else 0.0
     quality = 100 * (
-        QUALITY_WEIGHTS["depth"] * depth
-        + QUALITY_WEIGHTS["signal"] * signal
+        QUALITY_WEIGHTS["signal"] * signal
         + QUALITY_WEIGHTS["novelty"] * novelty
+        + QUALITY_WEIGHTS["depth"] * depth_norm
     )
     # 硬门槛：signal 低的推文无论深度如何都不进入日报
     if signal < JEV_MIN_SIGNAL:
         quality = min(quality, JEV_QUALITY_THRESHOLD - 1)
     return max(0, min(100, int(round(quality))))
+
+
+def _upgrade_verdict(verdict) -> dict | None:
+    """用旧的原始判断重算新版本的 quality，避免升级公式后重复调用 Jev。"""
+    if not isinstance(verdict, dict):
+        return None
+    if verdict.get("scorer_version") == JEV_SCORER_VERSION:
+        return verdict
+    if all(k in verdict for k in ("signal", "depth", "novelty")):
+        depth = float(verdict["depth"])
+        return {
+            **verdict,
+            "scorer_version": JEV_SCORER_VERSION,
+            "quality": _compose_quality(
+                float(verdict["signal"]), depth, float(verdict["novelty"])
+            ),
+            "depth_normalized": round(depth / DEPTH_MAX, 4) if DEPTH_MAX else 0.0,
+        }
+    return None
 
 
 async def _judge_tweet(client, semaphore, tweet: dict) -> tuple[str, dict]:
@@ -116,9 +141,13 @@ async def _judge_tweet(client, semaphore, tweet: dict) -> tuple[str, dict]:
                 novelty = float(response.nouls["novelty"].noul)
                 confidence = response.scores["depth"].confidence
                 return tid, {
+                    "scorer_version": JEV_SCORER_VERSION,
                     "quality": _compose_quality(signal, depth, novelty),
                     "signal": round(signal, 4),
                     "depth": round(depth, 4),
+                    "depth_normalized": round(depth / DEPTH_MAX, 4)
+                    if DEPTH_MAX
+                    else 0.0,
                     "novelty": round(novelty, 4),
                     "depth_confidence": round(float(confidence), 4)
                     if confidence is not None
@@ -153,11 +182,18 @@ async def run_score(
     raw_cache = {} if force_rerun else load_json(cache_file)
 
     active_ids = {str(t["tweet_id"]) for t in tweets}
-    cache = {
-        k: v
-        for k, v in raw_cache.items()
-        if k in active_ids and isinstance(v, dict) and "quality" in v
-    }
+    cache = {}
+    upgraded_count = 0
+    for tweet_id, verdict in raw_cache.items():
+        if tweet_id not in active_ids:
+            continue
+        upgraded = _upgrade_verdict(verdict)
+        if upgraded is not None:
+            cache[tweet_id] = upgraded
+            if verdict.get("scorer_version") != JEV_SCORER_VERSION:
+                upgraded_count += 1
+    if upgraded_count:
+        print(f"  {Color.GREY}♻️ 旧版 Jev 判断已按新公式重算 {upgraded_count} 条{Color.RESET}")
     to_process = [t for t in tweets if str(t["tweet_id"]) not in cache]
 
     if not to_process:
@@ -186,6 +222,28 @@ async def run_score(
                 raise RuntimeError(
                     f"Jev 打分失败率过高（{len(errors)}/{len(to_process)}），已中止"
                 )
+
+    verdicts = [cache[str(t["tweet_id"])] for t in tweets if str(t["tweet_id"]) in cache]
+    if verdicts:
+        qs = sorted(v["quality"] for v in verdicts)
+        count = len(qs)
+
+        def _pct(p):
+            return qs[min(count - 1, int(count * p))]
+
+        print(
+            f"  {Color.GREY}📈 Jev 质量分布: n={count} mean={sum(qs) / count:.1f} "
+            f"p10={_pct(0.1)} p50={_pct(0.5)} p90={_pct(0.9)} "
+            f"min={qs[0]} max={qs[-1]}{Color.RESET}"
+        )
+        print(
+            f"     >= {JEV_QUALITY_THRESHOLD}: {sum(q >= JEV_QUALITY_THRESHOLD for q in qs)} | "
+            f">=80: {sum(q >= 80 for q in qs)} | >=90: {sum(q >= 90 for q in qs)}"
+        )
+        for dim in ("signal", "depth_normalized", "novelty"):
+            vals = [v[dim] for v in verdicts if v.get(dim) is not None]
+            if vals:
+                print(f"     {dim} avg={sum(vals) / len(vals):.3f}")
 
     scored = []
     for t in tweets:
