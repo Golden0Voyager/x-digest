@@ -211,7 +211,6 @@ async def run_score(
                 errors.append((tid, verdict["error"]))
             else:
                 cache[tid] = verdict
-        save_json(cache_file, cache)
 
         if errors:
             print(
@@ -222,6 +221,11 @@ async def run_score(
                 raise RuntimeError(
                     f"Jev 打分失败率过高（{len(errors)}/{len(to_process)}），已中止"
                 )
+
+    # 保留不活跃推文的历史判断，避免缓存被当天的窗口裁掉
+    if to_process or upgraded_count:
+        raw_cache.update(cache)
+        save_json(cache_file, raw_cache)
 
     verdicts = [cache[str(t["tweet_id"])] for t in tweets if str(t["tweet_id"]) in cache]
     if verdicts:
@@ -256,7 +260,7 @@ async def run_score(
     scored.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
     high_quality_count = len(scored)
 
-    # Jev 的 80 分线可能偏严；至少保证 60 条进入后续管线，避免空报告
+    # Jev 分数线可能偏严；至少保证 60 条进入后续管线，避免空报告
     if high_quality_count < 60 and tweets:
         existing = {str(t["tweet_id"]) for t in scored}
         rest = [t for t in tweets if str(t["tweet_id"]) not in existing]
@@ -269,12 +273,14 @@ async def run_score(
         )
 
     keep_ratio = 0.3
-    keep_count = max(60, min(180, int(len(scored) * keep_ratio)))
+    keep_count = min(
+        len(scored), max(60, min(180, int(len(scored) * keep_ratio)))
+    )
     top_n = scored[:keep_count]
 
     print(
         f"  {Color.GREEN}📊 Jev 打分完成，从 {len(tweets)} 条中精选出 {len(top_n)} 条"
         f"（>= {JEV_QUALITY_THRESHOLD} 分 {high_quality_count} 条，"
-        f"取前 {keep_ratio:.0%} = {keep_count} 条）{Color.RESET}"
+        f"保留 {keep_count} 条）{Color.RESET}"
     )
     return top_n
