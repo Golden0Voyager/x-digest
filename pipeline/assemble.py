@@ -96,7 +96,7 @@ def assemble(
             skipped_no_insight += 1
             continue
 
-        quality = insight.get("quality", 0)
+        quality = t.get("quality", insight.get("quality", 0))
         thought = insight.get("thought", "")
         if thought.upper() == "SKIP":
             # 即使没有深度启示，也要归类展示推文内容

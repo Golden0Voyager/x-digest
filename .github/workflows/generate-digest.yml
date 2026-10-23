@@ -29,7 +29,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v5
 
         # 不钉 version：让 CI 始终装最新 uv；太旧的版本由 pyproject.toml 的 required-version 下限挡住
 
@@ -39,13 +39,56 @@ jobs:
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
+      - name: Restore fetched tweets
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin auto-docs
+          mkdir -p output
+          # auto-docs 同时存在 output/ 和旧版嵌套的 output/output/，取最新的那份
+          git show origin/auto-docs:output/raw_tweets_pool.json > /tmp/pool_top.json 2>/dev/null || true
+          git show origin/auto-docs:output/output/raw_tweets_pool.json > /tmp/pool_nested.json 2>/dev/null || true
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          best = None
+          for path in (Path("/tmp/pool_top.json"), Path("/tmp/pool_nested.json")):
+              if not path.exists():
+                  continue
+              try:
+                  data = json.loads(path.read_text())
+              except (ValueError, OSError):
+                  continue
+              if not isinstance(data, dict) or not data:
+                  continue
+              latest = max((t.get("created_at", "") for t in data.values() if isinstance(t, dict)), default="")
+              if best is None or latest > best[0]:
+                  best = (latest, data)
+
+          if best is None:
+              print("⚠️ auto-docs 上没有可用的推文池")
+          else:
+              Path("output/raw_tweets_pool.json").write_text(json.dumps(best[1], ensure_ascii=False))
+              print(f"✓ 恢复推文池 {len(best[1])} 条（最新 {best[0]}）")
+          PY
+
+          mkdir -p output/intermediate
+          for f in jev_scores.json translations.json insights.json; do
+            if git show "origin/auto-docs:output/intermediate/$f" > "output/intermediate/$f" 2>/dev/null; then
+              echo "✓ 恢复 output/intermediate/$f"
+            else
+              rm -f "output/intermediate/$f"
+            fi
+          done
+
       - name: Run digest pipeline
         env:
           # AI 管线配置
           AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
           AI_MODEL: DeepSeek-V3-1
-          AI_MODEL_TRANSLATE: DeepSeek-R1-Distill-Qwen-14B
-          AI_MODEL_INSIGHTS: sensenova-6.7-flash-lite
+          AI_MODEL_TRANSLATE: deepseek-v4-flash
+          AI_MODEL_INSIGHTS: deepseek-v4-flash
+          AI_BATCH_SIZE_TP: 30
 
           # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
           SENSENOVA_BASE_URL: https://api.sensenova.cn/compatible-mode/v2
@@ -63,6 +106,8 @@ jobs:
           SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
           # Token Plan 凭据留空时自动复用 SENSENOVA_API_KEY
           SENSENOVA_TP_API_KEY: ${{ secrets.SENSENOVA_TP_API_KEY }}
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+          TYPESAFE_DEFAULT_MODEL: jev-latest
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -78,7 +123,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
 
           mkdir -p /tmp/auto-docs-save
-          cp -r output/ /tmp/auto-docs-save/
+          cp -r output/. /tmp/auto-docs-save/
 
           git fetch --depth=50 origin auto-docs 2>/dev/null || true
           if git rev-parse --verify origin/auto-docs 2>/dev/null; then
@@ -89,7 +134,7 @@ jobs:
           fi
 
           mkdir -p output
-          cp -r /tmp/auto-docs-save/* output/
+          cp -r /tmp/auto-docs-save/. output/
 
           git add -f output/
           if git diff --cached --quiet; then

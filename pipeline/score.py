@@ -1,243 +1,393 @@
 """
-Step 0.5: 纯异步多模型并行打分
+Step 0.5: Jev 类型化打分
 
-在翻译之前运行，用 **跨端点双引擎** 对原文同时打分，取平均分。
-从而提前过滤掉垃圾信息，大幅节省后续翻译和洞察步骤的时间与 Token 成本。
+用 TypeSafe Jev 对每条推文做三个独立判断：
+  - signal  (Noul): 是否包含值得收录的实质信息
+  - depth   (Score): 信息深度/重要性（5 个有序等级）
+  - novelty (Noul): 是否提供新信息，而不是重复已知消息
 
-双引擎组合（硬编码，2026-06 起）：
-  - deepseek-v4-flash  → Token Plan (token.sensenova.cn)
-    每 5h 150 次，32K 上下文，纯文本响应极快、强工具调用
-    （从 sensenova-6.7-flash-lite 切换过来：6.7 的 256K 多模态给纯文本打分属大材小用，
-      把它留给 insights 任务；v4-flash 更适合短输入快出结果的打分场景）
-  - DeepSeek-R1-Distill-Qwen-14B → 主链 (api.sensenova.cn)
-    永久免费，32K 上下文，单轮评分不受 reasoning_content 往返影响
+代码把三个概率合成 0-100 的 quality，过滤后按质量取 Top N。
+判断结果缓存到 output/intermediate/jev_scores.json，便于审计和调权重。
 
-跨端点的好处：两个请求走不同 baseurl，不会在主链 1 QPS / 6 RPM 限制上
-互相排队；Token Plan 配额独立，不消耗主链每日 5000 万 token 额度。
-
-参考：
-  - docs/api/sensenova-best-practices.md
-  - docs/api/sensenova-token-plan-usage.md
+Jev 只做判断，不生成文本；翻译和洞察仍由后面的 LLM 步骤完成。
 """
+
 import asyncio
 import json
 import os
+from collections import Counter
 from pathlib import Path
 
-from openai import OpenAI
+from typesafe_sdk import AsyncTypeSafeClient, Noul, NoulCriteria, Score
 
-from config import (
-    AI_BATCH_COOLDOWN,
-    AI_BATCH_SIZE_TP,
-    SENSENOVA_TP_API_KEY,
-    SENSENOVA_TP_BASE_URL,
+from pipeline import Color, load_json, save_json
+
+# ScoreAnswer.score 是档位序号均值（0..levels-1），不是 0-1；
+# 合成前必须归一化，否则大量分数会超过 100 被截断。
+JEV_SCORER_VERSION = 2
+JEV_CONCURRENCY = int(os.getenv("JEV_CONCURRENCY", "10"))
+JEV_MIN_SIGNAL = float(os.getenv("JEV_MIN_SIGNAL", "0.5"))
+JEV_QUALITY_THRESHOLD = int(os.getenv("JEV_QUALITY_THRESHOLD", "60"))
+JEV_MAX_RETRIES = 3
+JEV_DOMAIN_FLOOR = int(os.getenv("JEV_DOMAIN_FLOOR", "5"))
+JEV_DOMAIN_CAP = int(os.getenv("JEV_DOMAIN_CAP", "40"))
+
+DOMAIN_LABELS = {
+    "AI_Scientists_&_Academia": "AI",
+    "Tech_Industry_&_CEOs": "科技公司",
+    "Tech_Media_&_Deep_Analysis": "科技媒体",
+    "Macro_Finance_&_A-Shares": "宏观金融",
+    "F1_Racing_&_Paddock": "F1",
+    "Contemporary_Art_&_Institutions": "艺术",
+}
+
+QUALITY_WEIGHTS = {
+    "signal": 0.5,
+    "novelty": 0.3,
+    "depth": 0.2,
+}
+
+SIGNAL_QUESTION = Noul(
+    instructions=(
+        "Does this tweet contain substantive information worth including in a "
+        "technology intelligence digest? Substantive information means facts, "
+        "data, research results, product launches, verifiable opinions, or deep "
+        "analysis. Exclude pure emotion, small talk, ads, giveaways, link-only "
+        "posts, and retweets with no added information."
+    ),
+    criteria=NoulCriteria(
+        true="The tweet itself states concrete facts, data, an opinion, or a development that gives the reader new information.",
+        false="The tweet is only emotion, small talk, an ad, a slogan, a link, or an information-free retweet.",
+    ),
 )
-from pipeline import Color, extract_json, load_json, save_json
-from pipeline.usage import usage_tracker
+
+NOVELTY_QUESTION = Noul(
+    instructions=(
+        "Does this tweet add new information or a new angle rather than merely "
+        "repeating a story that is already known?"
+    ),
+    criteria=NoulCriteria(
+        true="It contains a new development, data point, opinion, or detail not already covered.",
+        false="It only repeats a known item, is a routine retweet, or adds no new information.",
+    ),
+)
+
+DEPTH_CRITERIA = [
+    "Pure noise or chatter with no information value",
+    "Routine update or generic commentary with little reference value",
+    "Some information value, such as a normal update or ordinary opinion",
+    "Important industry information, data, or deep analysis",
+    "Major breakthrough, exclusive data, or major event",
+]
+DEPTH_QUESTION = Score(
+    instructions=(
+        "How deep and important is the information in this tweet? "
+        "Use the five ordered levels below."
+    ),
+    criteria=DEPTH_CRITERIA,
+)
+DEPTH_MAX = len(DEPTH_CRITERIA) - 1
+
+QUESTIONS = {
+    "signal": SIGNAL_QUESTION,
+    "depth": DEPTH_QUESTION,
+    "novelty": NOVELTY_QUESTION,
+}
 
 
-def _build_score_clients() -> list[tuple[OpenAI, str, str]]:
-    """构造双引擎 client + model + base_url 列表。
+def _load_domain_map() -> tuple[dict[str, str], list[str]]:
+    """从 custom_accounts.json 读取作者 → 领域映射。"""
+    path = Path(__file__).resolve().parent.parent / "custom_accounts.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}, []
 
-    返回 [(client, model_name, base_url), ...]，任一 client 创建失败时跳过对应引擎。
-    base_url 用于 usage_tracker 区分端点。
-    """
-    sensenova_key = os.getenv("SENSENOVA_API_KEY")
-    clients: list[tuple[OpenAI, str, str]] = []
+    domain_of: dict[str, str] = {}
+    groups: list[str] = []
+    for group, users in data.items():
+        groups.append(group)
+        for user in users:
+            domain_of[str(user).lower()] = group
+    return domain_of, groups
 
-    # 引擎 1：Token Plan 上的 deepseek-v4-flash（打分专用，32K 上下文 + 强工具调用）
-    if SENSENOVA_TP_API_KEY:
-        tp_client = OpenAI(
-            api_key=SENSENOVA_TP_API_KEY,
-            base_url=SENSENOVA_TP_BASE_URL,
-            timeout=180,
+
+def _select_with_domains(
+    candidates: list[dict],
+    keep_count: int,
+    domain_of: dict[str, str],
+    domain_groups: list[str],
+) -> tuple[list[dict], Counter]:
+    """先按领域下限保底，再按分数填充并遵守单领域上限。"""
+    if keep_count <= 0:
+        return [], Counter()
+
+    selected: list[dict] = []
+    selected_ids: set[str] = set()
+    counts: Counter = Counter()
+
+    if domain_groups and keep_count >= JEV_DOMAIN_FLOOR * len(domain_groups):
+        for group in domain_groups:
+            taken = 0
+            for t in candidates:
+                if taken >= JEV_DOMAIN_FLOOR:
+                    break
+                tid = str(t["tweet_id"])
+                if tid in selected_ids or t.get("_domain") != group:
+                    continue
+                selected.append(t)
+                selected_ids.add(tid)
+                counts[group] += 1
+                taken += 1
+    elif domain_groups:
+        print(
+            f"  {Color.YELLOW}⚠️ 目标只有 {keep_count} 条，不足以执行领域下限 "
+            f"{JEV_DOMAIN_FLOOR}×{len(domain_groups)}，本次跳过下限{Color.RESET}"
         )
-        clients.append((tp_client, "deepseek-v4-flash", SENSENOVA_TP_BASE_URL))
-    else:
-        print(f"  {Color.YELLOW}⚠️ SENSENOVA_TP_API_KEY 未配置，跳过 Token Plan 引擎{Color.RESET}")
 
-    # 引擎 2：主链 DeepSeek-R1-Distill-Qwen-14B
-    sn_base = "https://api.sensenova.cn/compatible-mode/v2"
-    if sensenova_key:
-        sn_client = OpenAI(
-            api_key=sensenova_key,
-            base_url=sn_base,
-            timeout=180,
-        )
-        clients.append((sn_client, "DeepSeek-R1-Distill-Qwen-14B", sn_base))
-    else:
-        print(f"  {Color.YELLOW}⚠️ SENSENOVA_API_KEY 未配置，跳过主链 Distill-14B 引擎{Color.RESET}")
-
-    return clients
-
-SCORE_PROMPT_TEMPLATE = """\
-You are a senior tech intelligence analyst. Evaluate the information value of each tweet on a strict 0-100 scale.
-
-Scoring Criteria:
-95-100 = Groundbreaking headlines / exclusive data / major tech breakthroughs
-85-94 = Substantial industry insights, deep trend analysis, or hard-core tech details
-70-84 = Medium quality information or commentary with some reference value
-40-69 = Fragmented information, basic updates, normal retweets, general talk
-0-39 = Zero information value (pure emojis, links only, ads, meaningless chat)
-
-Input will be a JSON array of tweets.
-Output ONLY a JSON array with the exact structure (no markdown fences, just JSON):
-[{"id": "tweet_id", "quality": score}]
-"""
-
-async def fetch_scores_from_model(
-    client: OpenAI,
-    model_name: str,
-    base_url: str,
-    chunk: list,
-    prompt: str,
-) -> tuple[dict, str | None]:
-    input_data = [{"id": str(t["tweet_id"]), "text": t["text"]} for t in chunk]
-
-    response = None
-    for attempt in range(3):
-        try:
-            response = await asyncio.to_thread(
-                client.chat.completions.create,
-                model=model_name,
-                messages=[
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": json.dumps(input_data, ensure_ascii=False)}
-                ],
-                temperature=0.1,
-                max_tokens=8192
-            )
+    for t in candidates:
+        if len(selected) >= keep_count:
             break
-        except Exception as e:
-            if attempt < 2:
-                await asyncio.sleep(2 ** attempt)
-                print(f"    {Color.YELLOW}⚠️ {model_name} 第 {attempt+1}/3 次失败 ({type(e).__name__})，{2**attempt}s 后重试...{Color.RESET}")
-            else:
-                usage_tracker.track_failure(model=model_name, base_url=base_url)
-                print(f"  {Color.RED}⚠️ 模型 {model_name} 3 次重试均失败: {e}{Color.RESET}")
-                return {}, "error"
+        tid = str(t["tweet_id"])
+        if tid in selected_ids:
+            continue
+        domain = t.get("_domain", "unknown")
+        if counts[domain] >= JEV_DOMAIN_CAP:
+            continue
+        selected.append(t)
+        selected_ids.add(tid)
+        counts[domain] += 1
 
-    # 提取 finish_reason（length 表示输出被截断）
-    finish_reason = None
-    if response.choices:
-        finish_reason = getattr(response.choices[0], "finish_reason", None)
-    # 用量追踪：score 不走 call_ai_with_retry，需手动记一笔
-    if response.usage:
-        u = response.usage
-        usage_tracker.track(
-            model=model_name,
-            base_url=base_url,
-            prompt_tokens=u.prompt_tokens,
-            completion_tokens=u.completion_tokens,
-            finish_reason=finish_reason,
+    # 候选不足或配额限制导致没选满时，再按分数补一次
+    for t in candidates:
+        if len(selected) >= keep_count:
+            break
+        tid = str(t["tweet_id"])
+        if tid in selected_ids:
+            continue
+        selected.append(t)
+        selected_ids.add(tid)
+        counts[t.get("_domain", "unknown")] += 1
+
+    selected.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
+    return selected, counts
+
+
+def _state_for(tweet: dict) -> dict:
+    return {
+        "tweet": {
+            "author": tweet.get("username", ""),
+            "text": tweet.get("text", ""),
+            "created_at": tweet.get("created_at", ""),
+            "is_retweet": bool(tweet.get("is_retweet")),
+        },
+        "audience": "Chinese-language technology intelligence digest readers",
+    }
+
+
+def _compose_quality(signal: float, depth: float, novelty: float) -> int:
+    depth_norm = depth / DEPTH_MAX if DEPTH_MAX else 0.0
+    quality = 100 * (
+        QUALITY_WEIGHTS["signal"] * signal
+        + QUALITY_WEIGHTS["novelty"] * novelty
+        + QUALITY_WEIGHTS["depth"] * depth_norm
+    )
+    # 硬门槛：signal 低的推文无论深度如何都不进入日报
+    if signal < JEV_MIN_SIGNAL:
+        quality = min(quality, JEV_QUALITY_THRESHOLD - 1)
+    return max(0, min(100, int(round(quality))))
+
+
+def _upgrade_verdict(verdict) -> dict | None:
+    """用旧的原始判断重算新版本的 quality，避免升级公式后重复调用 Jev。"""
+    if not isinstance(verdict, dict):
+        return None
+    if verdict.get("scorer_version") == JEV_SCORER_VERSION:
+        return verdict
+    if all(k in verdict for k in ("signal", "depth", "novelty")):
+        depth = float(verdict["depth"])
+        return {
+            **verdict,
+            "scorer_version": JEV_SCORER_VERSION,
+            "quality": _compose_quality(
+                float(verdict["signal"]), depth, float(verdict["novelty"])
+            ),
+            "depth_normalized": round(depth / DEPTH_MAX, 4) if DEPTH_MAX else 0.0,
+        }
+    return None
+
+
+async def _judge_tweet(client, semaphore, tweet: dict) -> tuple[str, dict]:
+    tid = str(tweet["tweet_id"])
+    async with semaphore:
+        last_error = None
+        for attempt in range(1, JEV_MAX_RETRIES + 1):
+            try:
+                response = await client.system_one(
+                    state=_state_for(tweet),
+                    questions=QUESTIONS,
+                )
+                signal = float(response.nouls["signal"].noul)
+                depth = float(response.scores["depth"].score)
+                novelty = float(response.nouls["novelty"].noul)
+                confidence = response.scores["depth"].confidence
+                return tid, {
+                    "scorer_version": JEV_SCORER_VERSION,
+                    "quality": _compose_quality(signal, depth, novelty),
+                    "signal": round(signal, 4),
+                    "depth": round(depth, 4),
+                    "depth_normalized": round(depth / DEPTH_MAX, 4)
+                    if DEPTH_MAX
+                    else 0.0,
+                    "novelty": round(novelty, 4),
+                    "depth_confidence": round(float(confidence), 4)
+                    if confidence is not None
+                    else None,
+                }
+            except Exception as e:
+                last_error = e
+                if attempt < JEV_MAX_RETRIES:
+                    await asyncio.sleep(2 ** (attempt - 1))
+        return tid, {"error": f"{type(last_error).__name__}: {last_error}"}
+
+
+async def _judge_all(tweets: list[dict]) -> list[tuple[str, dict]]:
+    if not os.getenv("TYPESAFE_API_KEY"):
+        raise RuntimeError("未配置 TYPESAFE_API_KEY，Jev 打分无法运行")
+
+    model = os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-latest"
+    semaphore = asyncio.Semaphore(JEV_CONCURRENCY)
+    async with AsyncTypeSafeClient(model=model) as client:
+        return await asyncio.gather(
+            *[_judge_tweet(client, semaphore, t) for t in tweets]
         )
-    else:
-        usage_tracker.track(
-            model=model_name, base_url=base_url,
-            prompt_tokens=0, completion_tokens=0, finish_reason=finish_reason,
-        )
-    content = response.choices[0].message.content
-    items = extract_json(content)
-    result = {str(item.get("id", "")): int(item.get("quality", 0)) for item in items if item.get("id")}
 
-    # 单引擎覆盖率：返回条数 vs 输入条数
-    missing = len(chunk) - len(result)
-    if finish_reason == "length":
-        print(f"    {Color.RED}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing} (finish=length 截断！){Color.RESET}")
-    elif missing > 0:
-        print(f"    {Color.YELLOW}⚠️ {model_name}: 输入 {len(chunk)} / 返回 {len(result)} / 缺失 {missing}{Color.RESET}")
-    else:
-        print(f"    {Color.GREY}✓ {model_name}: 输入 {len(chunk)} / 返回 {len(result)}{Color.RESET}")
 
-    return result, finish_reason
-
-async def run_score(tweets: list[dict], intermediate_dir: Path, force_rerun: bool = False) -> list[dict]:
-    """
-    使用跨端点双引擎联合打分（deepseek-v4-flash + DeepSeek-R1-Distill-Qwen-14B），
-    过滤出平均分 >= 80 的推文，并取 Top 60。
-    将平均分注入到推文的 'quality' 字段中。
-
-    批次大小使用 AI_BATCH_SIZE_TP（默认 60），同时受 TP 配额（150 次/5h）和
-    主链上下文（32K）双重约束。
-    """
-    cache_file = intermediate_dir / "scores.json"
+async def run_score(
+    tweets: list[dict],
+    intermediate_dir: Path,
+    force_rerun: bool = False,
+) -> list[dict]:
+    """用 Jev 打分、过滤并排序，返回进入后续管线的推文。"""
+    cache_file = intermediate_dir / "jev_scores.json"
     raw_cache = {} if force_rerun else load_json(cache_file)
 
     active_ids = {str(t["tweet_id"]) for t in tweets}
-    scores_cache = {k: v for k, v in raw_cache.items() if k in active_ids}
-
-    to_process = [t for t in tweets if str(t["tweet_id"]) not in scores_cache]
+    cache = {}
+    upgraded_count = 0
+    for tweet_id, verdict in raw_cache.items():
+        if tweet_id not in active_ids:
+            continue
+        upgraded = _upgrade_verdict(verdict)
+        if upgraded is not None:
+            cache[tweet_id] = upgraded
+            if verdict.get("scorer_version") != JEV_SCORER_VERSION:
+                upgraded_count += 1
+    if upgraded_count:
+        print(f"  {Color.GREY}♻️ 旧版 Jev 判断已按新公式重算 {upgraded_count} 条{Color.RESET}")
+    to_process = [t for t in tweets if str(t["tweet_id"]) not in cache]
 
     if not to_process:
-        print(f"  {Color.GREEN}✓ 打分缓存完全命中{Color.RESET}")
+        print(f"  {Color.GREEN}✓ Jev 打分缓存完全命中{Color.RESET}")
     else:
-        models = _build_score_clients()
+        print(
+            f"  {Color.CYAN}🧠 Jev 打分 {len(to_process)} 条推文"
+            f"（并发 {JEV_CONCURRENCY}，模型 {os.getenv('TYPESAFE_DEFAULT_MODEL') or 'jev-latest'}）...{Color.RESET}"
+        )
+        results = await _judge_all(to_process)
 
-        if not models:
-            print(f"  {Color.YELLOW}⚠️ 未配置任何打分引擎 API Key，回退全部给 100 分{Color.RESET}")
-            for t in to_process:
-                scores_cache[str(t["tweet_id"])] = 100
-        else:
-            print(f"  {Color.CYAN}⚖️ 开始使用跨端点双引擎并行打分 {len(to_process)} 条推文 (批次 {AI_BATCH_SIZE_TP})...{Color.RESET}")
-            print(f"  {Color.GREY}联合打分评委: {', '.join([m[1] for m in models])}{Color.RESET}")
+        errors = []
+        for tid, verdict in results:
+            if "error" in verdict:
+                errors.append((tid, verdict["error"]))
+            else:
+                cache[tid] = verdict
 
-            current_batch_size = AI_BATCH_SIZE_TP
-            FALLBACK_BATCH_SIZE = 45
+        if errors:
+            print(
+                f"  {Color.YELLOW}⚠️ Jev 失败 {len(errors)}/{len(to_process)} 条，"
+                f"示例: {errors[:2]}{Color.RESET}"
+            )
+            if len(errors) > max(10, int(len(to_process) * 0.2)):
+                raise RuntimeError(
+                    f"Jev 打分失败率过高（{len(errors)}/{len(to_process)}），已中止"
+                )
 
-            idx = 0
-            while idx < len(to_process):
-                chunk = to_process[idx : idx + current_batch_size]
-                print(f"  ⚖️ 打分批次 (剩余 {len(to_process) - idx} 条, 批 {len(chunk)} 条)...")
-                tasks = [
-                    fetch_scores_from_model(c, m, url, chunk, SCORE_PROMPT_TEMPLATE)
-                    for c, m, url in models
-                ]
-                results = await asyncio.gather(*tasks)
+    # 保留不活跃推文的历史判断，避免缓存被当天的窗口裁掉
+    if to_process or upgraded_count:
+        raw_cache.update(cache)
+        save_json(cache_file, raw_cache)
 
-                scores_results = [r[0] for r in results]
-                finish_reasons = [r[1] for r in results]
-                truncated = any(fr == "length" for fr in finish_reasons)
+    verdicts = [cache[str(t["tweet_id"])] for t in tweets if str(t["tweet_id"]) in cache]
+    if verdicts:
+        qs = sorted(v["quality"] for v in verdicts)
+        count = len(qs)
 
-                # 计算平均分
-                for t in chunk:
-                    tid = str(t["tweet_id"])
-                    valid_scores = [sr.get(tid) for sr in scores_results if tid in sr and sr.get(tid) is not None]
-                    if valid_scores:
-                        avg_score = int(sum(valid_scores) / len(valid_scores))
-                    else:
-                        avg_score = 0
-                    scores_cache[tid] = avg_score
+        def _pct(p):
+            return qs[min(count - 1, int(count * p))]
 
-                if truncated and current_batch_size > FALLBACK_BATCH_SIZE:
-                    old_size = current_batch_size
-                    current_batch_size = FALLBACK_BATCH_SIZE
-                    print(f"  {Color.YELLOW}⚠️ 检测到 length 截断，批次自动降级 {old_size} → {current_batch_size}{Color.RESET}")
+        print(
+            f"  {Color.GREY}📈 Jev 质量分布: n={count} mean={sum(qs) / count:.1f} "
+            f"p10={_pct(0.1)} p50={_pct(0.5)} p90={_pct(0.9)} "
+            f"min={qs[0]} max={qs[-1]}{Color.RESET}"
+        )
+        print(
+            f"     >= {JEV_QUALITY_THRESHOLD}: {sum(q >= JEV_QUALITY_THRESHOLD for q in qs)} | "
+            f">=80: {sum(q >= 80 for q in qs)} | >=90: {sum(q >= 90 for q in qs)}"
+        )
+        for dim in ("signal", "depth_normalized", "novelty"):
+            vals = [v[dim] for v in verdicts if v.get(dim) is not None]
+            if vals:
+                print(f"     {dim} avg={sum(vals) / len(vals):.3f}")
 
-                idx += len(chunk)
-                # 批次间冷却：防止主链 6 RPM / Token Plan 配额触发限流
-                if idx < len(to_process):
-                    await asyncio.sleep(AI_BATCH_COOLDOWN)
-
-            raw_cache.update(scores_cache)
-            save_json(cache_file, raw_cache)
-
-    # 过滤、注入打分并排序
-    scored_tweets = []
+    domain_of, domain_groups = _load_domain_map()
+    scored = []
     for t in tweets:
         tid = str(t["tweet_id"])
-        score = scores_cache.get(tid, 0)
-        # 注入质量分数
-        t["quality"] = score
-        if score >= 80:
-            scored_tweets.append(t)
+        quality = int(cache.get(tid, {}).get("quality", 0))
+        t["quality"] = quality
+        t["_domain"] = domain_of.get(str(t.get("username", "")).lower(), "unknown")
+        if quality >= JEV_QUALITY_THRESHOLD:
+            scored.append(t)
 
-    # 按分数降序，再按 ID 降序排序
-    scored_tweets.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
+    scored.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
+    high_quality_count = len(scored)
 
-    # 动态比例：取高于 80 分推文的 30%，至少 30 条、至多 150 条
+    # Jev 分数线可能偏严；至少保证 60 条进入后续管线，避免空报告
+    if high_quality_count < 60 and tweets:
+        existing = {str(t["tweet_id"]) for t in scored}
+        rest = [t for t in tweets if str(t["tweet_id"]) not in existing]
+        rest.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
+        scored.extend(rest[: 60 - high_quality_count])
+        scored.sort(key=lambda t: (t["quality"], str(t["tweet_id"])), reverse=True)
+        print(
+            f"  {Color.YELLOW}⚠️ >= {JEV_QUALITY_THRESHOLD} 分只有 {high_quality_count} 条，"
+            f"已按 Jev 排序补足到 {len(scored)} 条{Color.RESET}"
+        )
+
     keep_ratio = 0.3
-    keep_count = max(60, min(180, int(len(scored_tweets) * keep_ratio)))
-    top_n = scored_tweets[:keep_count]
+    keep_count = min(
+        len(scored), max(60, min(180, int(len(scored) * keep_ratio)))
+    )
+    top_n, domain_counts = _select_with_domains(
+        scored, keep_count, domain_of, domain_groups
+    )
 
-    print(f"  {Color.GREEN}📊 打分完成，从 {len(tweets)} 条中精选出 {len(top_n)} 条（>=80分，取前 {keep_ratio:.0%} = {keep_count} 条）{Color.RESET}")
+    if domain_groups:
+        dist = " | ".join(
+            f"{DOMAIN_LABELS.get(g, g)}={domain_counts.get(g, 0)}"
+            for g in domain_groups
+        )
+        if domain_counts.get("unknown"):
+            dist += f" | 未分组={domain_counts['unknown']}"
+        print(
+            f"  {Color.GREY}🗂️ 领域分布: {dist} "
+            f"(floor={JEV_DOMAIN_FLOOR}, cap={JEV_DOMAIN_CAP}){Color.RESET}"
+        )
+
+    print(
+        f"  {Color.GREEN}📊 Jev 打分完成，从 {len(tweets)} 条中精选出 {len(top_n)} 条"
+        f"（>= {JEV_QUALITY_THRESHOLD} 分 {high_quality_count} 条，"
+        f"保留 {keep_count} 条）{Color.RESET}"
+    )
     return top_n

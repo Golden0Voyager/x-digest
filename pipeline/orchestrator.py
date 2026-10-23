@@ -26,7 +26,7 @@ _MAX_CACHE_ENTRIES = 2000
 
 def _prune_intermediate(intermediate_dir: Path, active_ids: set[str]):
     """清理中间缓存中不在本次推文列表里的旧条目，防止文件无限增长"""
-    for filename in ("translations.json", "insights.json"):
+    for filename in ("jev_scores.json", "translations.json", "insights.json"):
         path = intermediate_dir / filename
         data = load_json(path)
         if len(data) <= _MAX_CACHE_ENTRIES:
@@ -58,7 +58,7 @@ async def run_pipeline(
     # 从 base_url 提取供应商域名作为简称
     provider_host = AI_BASE_URL.split("//")[-1].split("/")[0].split(".")[1] if AI_BASE_URL else "unknown"
     fallback_count = len(AI_FALLBACK_PROVIDERS)
-    print(f"  {Color.GREY}📡 打分: 跨端点双引擎 | 翻译: {AI_MODEL_TRANSLATE} | 洞察: {AI_MODEL_INSIGHTS}  (兜底: {provider_host}/{AI_MODEL} + {fallback_count} 个降级){Color.RESET}")
+    print(f"  {Color.GREY}📡 打分: Jev | 翻译: {AI_MODEL_TRANSLATE} | 洞察: {AI_MODEL_INSIGHTS}  (兜底: {provider_host}/{AI_MODEL} + {fallback_count} 个降级){Color.RESET}")
 
     # Phase 0: 规则化预过滤（零 LLM 调用）
     tweets = curate(tweets)
@@ -67,13 +67,13 @@ async def run_pipeline(
         print(f"\n{Color.RED}⚠️ 预过滤后无剩余推文{Color.RESET}")
         return "", ""
 
-    # Phase 0.5: 联合打分与精选（V3-1 + R1 双模型并行）
-    print(f"\n{Color.BOLD}━━━ Phase 0.5: 多模型联合打分 ━━━{Color.RESET}")
+    # Phase 0.5: Jev 类型化打分与精选
+    print(f"\n{Color.BOLD}━━━ Phase 0.5: Jev 打分 ━━━{Color.RESET}")
     from pipeline.score import run_score
     tweets = await run_score(tweets, intermediate_dir, force_rerun)
 
     if not tweets:
-        print(f"\n{Color.RED}⚠️ 联合打分后无剩余推文（全低于 80 分）{Color.RESET}")
+        print(f"\n{Color.RED}⚠️ Jev 打分后无剩余推文{Color.RESET}")
         return "", ""
 
     # 更新 active_ids（预过滤和打分可能大幅删减了推文）

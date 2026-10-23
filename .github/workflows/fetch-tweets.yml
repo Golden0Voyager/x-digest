@@ -28,7 +28,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v5
 
         # 不钉 version：让 CI 始终装最新 uv；太旧的版本由 pyproject.toml 的 required-version 下限挡住
 
@@ -48,6 +48,101 @@ jobs:
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: uv run playwright install chromium
+
+      - name: Start CI proxy
+        env:
+          CLASH_PROXIES_B64: ${{ secrets.CLASH_PROXIES_B64 }}
+          CLASH_SUBSCRIPTION_URL: ${{ secrets.CLASH_SUBSCRIPTION_URL }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .mihomo
+
+          # 优先用节点配置：机场订阅域名会 403 掉 GitHub 机房 IP，所以把节点
+          # 预先导出到 Secret 最可靠；订阅链接路径保留给域名未被拦截的情况。
+          sub_ok=""
+          if [ -n "${CLASH_PROXIES_B64:-}" ]; then
+            echo "$CLASH_PROXIES_B64" | base64 -d > .mihomo/sub.yaml
+            if grep -qE '^proxies:' .mihomo/sub.yaml; then
+              echo "✓ 使用 Secret 中的节点配置"
+              sub_ok="inline"
+            else
+              echo "⚠️ CLASH_PROXIES_B64 解码后不是 Clash YAML，忽略"
+            fi
+          fi
+
+          if [ -z "$sub_ok" ] && [ -n "${CLASH_SUBSCRIPTION_URL:-}" ]; then
+            for ua in \
+              "clash.meta" \
+              "ClashX/1.118.0" \
+              "clash-verge/v2.0.0" \
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+            do
+              code=$(curl -sSL -A "$ua" --max-time 60 \
+                -o .mihomo/sub.yaml -w '%{http_code}' \
+                "$CLASH_SUBSCRIPTION_URL" || true)
+              echo "订阅下载 UA=${ua%%/*} → HTTP ${code}"
+              if [ "$code" = "200" ] && grep -qE '^proxies:' .mihomo/sub.yaml; then
+                sub_ok="subscription"
+                break
+              fi
+            done
+          fi
+
+          if [ -z "$sub_ok" ]; then
+            echo "❌ 没有可用的 Clash 配置：请配置 CLASH_PROXIES_B64（或可访问的 CLASH_SUBSCRIPTION_URL）"
+            exit 1
+          fi
+
+          # 固定版本，避免上游 latest 变动导致 CI 行为漂移。
+          # runner 对匿名 Release 下载会返回 403，用仓库 token 走 API 下载。
+          MIHOMO_VERSION="v1.19.33"
+          gh release download "$MIHOMO_VERSION" --repo MetaCubeX/mihomo \
+            --pattern "mihomo-linux-amd64-${MIHOMO_VERSION}.gz" \
+            --output mihomo.gz --clobber
+          gunzip -f mihomo.gz
+          chmod +x mihomo
+
+          uv run python - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          Path(".mihomo/config.yaml").write_text(textwrap.dedent("""\
+              mixed-port: 7890
+              allow-lan: false
+              mode: rule
+              log-level: warning
+              proxy-providers:
+                sub:
+                  type: file
+                  path: ./sub.yaml
+              proxy-groups:
+                - name: PROXY
+                  type: url-test
+                  url: https://www.gstatic.com/generate_204
+                  interval: 300
+                  tolerance: 50
+                  use:
+                    - sub
+              rules:
+                - MATCH,PROXY
+              """))
+          PY
+
+          nohup ./mihomo -d .mihomo > .mihomo/mihomo.log 2>&1 &
+          for _ in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -x http://127.0.0.1:7890 \
+              --max-time 8 https://www.gstatic.com/generate_204 || true)
+            if [ "$code" = "204" ]; then
+              echo "✓ CI 代理已就绪"
+              echo "CI_PROXY=http://127.0.0.1:7890" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "❌ 代理启动超时"
+          tail -50 .mihomo/mihomo.log
+          exit 1
 
       - name: Prepare Twitter cookies
         run: |
@@ -99,7 +194,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
 
           mkdir -p /tmp/auto-docs-save
-          cp -r output/ /tmp/auto-docs-save/
+          cp -r output/. /tmp/auto-docs-save/
 
           git fetch --depth=50 origin auto-docs 2>/dev/null || true
           if git rev-parse --verify origin/auto-docs 2>/dev/null; then
@@ -110,7 +205,7 @@ jobs:
           fi
 
           mkdir -p output
-          cp -r /tmp/auto-docs-save/* output/
+          cp -r /tmp/auto-docs-save/. output/
 
           git add -f output/
           if git diff --cached --quiet; then

@@ -2,7 +2,7 @@
 Step 3: 专注洞察与分类 (科普增强版)
 
 在联合打分和翻译完成后运行。
-利用 sensenova-6.7-flash-lite（SenseNova Token Plan）的多模态 + 长上下文能力，
+利用 deepseek-v4-flash（SenseNova Token Plan）的 32K 上下文，
 为非专业人士补全背景常识。
 
 参考：
@@ -111,8 +111,8 @@ async def run_insights(
                 # 失败时自动降级到主链的 V3-1 / R1
                 base_url_override=SENSENOVA_TP_BASE_URL,
                 api_key_override=SENSENOVA_TP_API_KEY,
-                # 批次 60 条 × 单条 background+thought ~400 tokens = 24K 输出
-                # Token Plan 上下文 256K，留足安全余量
+                # 批次 30 条 × 单条 background+thought ~400 tokens = 12K 输出
+                # 32K 上下文，留足安全余量
                 max_tokens=24000,
             )
             items = extract_json(response.choices[0].message.content)
