@@ -229,16 +229,38 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
             contexts.append(ctx)
 
         # ===== 改动 1：会话预热 — 访问首页激活 cookie 会话 =====
+        warm_statuses = []
         for i, ctx in enumerate(contexts):
             page = await ctx.new_page()
             try:
                 await page.goto("https://x.com/home", wait_until="domcontentloaded", timeout=15000)
-                await asyncio.sleep(3)
-                log_print(f"  ✓ Cookie #{i+1} 会话预热成功")
+                status = "not_rendered"
+                title = ""
+                body = ""
+                for _ in range(10):
+                    await asyncio.sleep(1)
+                    body = await page.evaluate("document.body ? document.body.innerText : ''")
+                    title = await page.title()
+                    status = classify_validation_page(title, body)
+                    if status in ("valid", "blocked_ip"):
+                        break
+                warm_statuses.append(status)
+                if status == "valid":
+                    log_print(f"  ✓ Cookie #{i+1} 会话预热成功")
+                else:
+                    log_print(
+                        f"  ⚠️ Cookie #{i+1} 预热异常：{VALIDATION_FAILURE_LABELS[status]} "
+                        f"(title={title!r}, innerText 长度={len(body)})",
+                        "warning",
+                    )
             except Exception as e:
+                warm_statuses.append("error")
                 log_print(f"  ⚠️  Cookie #{i+1} 预热失败: {e}", "warning")
             finally:
                 await page.close()
+        if warm_statuses:
+            warm_ok = sum(1 for s in warm_statuses if s == "valid")
+            log_print(f"  🔥 会话预热结果：{warm_ok}/{len(warm_statuses)} 条泳道可用")
 
         all_tweets = []
         failed_accounts = []  # 记录 (username, 首轮所用 context_idx)

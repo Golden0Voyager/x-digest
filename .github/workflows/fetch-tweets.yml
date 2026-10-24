@@ -135,6 +135,12 @@ jobs:
               --max-time 8 https://www.gstatic.com/generate_204 || true)
             if [ "$code" = "204" ]; then
               echo "✓ CI 代理已就绪"
+              exit_ip=$(curl -s --max-time 15 -x http://127.0.0.1:7890 \
+                https://api.ipify.org || true)
+              echo "🌐 代理出口 IP: ${exit_ip:-unknown}"
+              xcode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 \
+                -x http://127.0.0.1:7890 https://x.com/robots.txt || true)
+              echo "🌐 x.com via proxy: HTTP ${xcode:-unknown}"
               echo "CI_PROXY=http://127.0.0.1:7890" >> "$GITHUB_ENV"
               exit 0
             fi
