@@ -15,13 +15,16 @@ from pipeline import Color, load_json, save_json
 from pipeline.assemble import assemble
 from pipeline.curate import curate
 from pipeline.insights import run_insights
-from pipeline.translate import run_translate
+from pipeline.translate import needs_translation, run_translate
 from pipeline.usage import usage_tracker
 
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./output"))
 
 # 中间缓存最多保留的条目数（防止无限增长）
 _MAX_CACHE_ENTRIES = 2000
+INSIGHT_MIN_COVERAGE = float(os.getenv("INSIGHT_MIN_COVERAGE", "0.8"))
+# 0.35 只拦截灾难性失败；正常批次通常在 40-80%
+TRANSLATION_MIN_COVERAGE = float(os.getenv("TRANSLATION_MIN_COVERAGE", "0.35"))
 
 
 def _prune_intermediate(intermediate_dir: Path, active_ids: set[str]):
@@ -83,9 +86,39 @@ async def run_pipeline(
     print(f"\n{Color.BOLD}━━━ Phase 1: 翻译 ━━━{Color.RESET}")
     translations = await run_translate(tweets, intermediate_dir, force_rerun)
 
+    need_translation = [t for t in tweets if needs_translation(t.get("text", ""))]
+    translated = [
+        t
+        for t in need_translation
+        if str(translations.get(str(t["tweet_id"]), "SKIP")).strip().upper() != "SKIP"
+    ]
+    translation_coverage = (
+        len(translated) / len(need_translation) if need_translation else 1.0
+    )
+    print(
+        f"  {Color.GREY}🌐 翻译覆盖率: {len(translated)}/{len(need_translation)} "
+        f"= {translation_coverage:.0%}{Color.RESET}"
+    )
+    if need_translation and translation_coverage < TRANSLATION_MIN_COVERAGE:
+        raise RuntimeError(
+            f"翻译覆盖率过低（{len(translated)}/{len(need_translation)}），"
+            "已中止，避免推送半份报告"
+        )
+
     # Phase 2: 洞察分析（需要翻译上下文）
     print(f"\n{Color.BOLD}━━━ Phase 2: 洞察分析 ━━━{Color.RESET}")
     insights = await run_insights(tweets, translations, intermediate_dir, force_rerun)
+
+    insight_coverage = len(insights) / len(tweets) if tweets else 1.0
+    print(
+        f"  {Color.GREY}🧠 洞察覆盖率: {len(insights)}/{len(tweets)} "
+        f"= {insight_coverage:.0%}{Color.RESET}"
+    )
+    if insight_coverage < INSIGHT_MIN_COVERAGE:
+        raise RuntimeError(
+            f"洞察覆盖率过低（{len(insights)}/{len(tweets)}），"
+            "已中止，避免推送半份报告"
+        )
 
     # Phase 3: 纯本地拼装（原推链接直接用 x.com 原始 URL，无需缩链）
     print(f"\n{Color.BOLD}━━━ Phase 3: 本地装配 ━━━{Color.RESET}")

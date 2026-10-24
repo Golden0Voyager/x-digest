@@ -237,7 +237,7 @@ async def fetch_all_tweets(accounts_list=None, on_success=None, hours_lookback: 
                 status = "not_rendered"
                 title = ""
                 body = ""
-                for _ in range(10):
+                for _ in range(20):
                     await asyncio.sleep(1)
                     body = await page.evaluate("document.body ? document.body.innerText : ''")
                     title = await page.title()

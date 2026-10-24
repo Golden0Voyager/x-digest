@@ -98,54 +98,65 @@ async def run_insights(
         input_text = json.dumps(tweet_input, ensure_ascii=False)
 
         print(f"  🧠 分析批次 ({idx + 1}/{len(chunks)}, {len(chunk)} 条)...")
-        try:
-            response = await asyncio.to_thread(
-                call_ai_with_retry,
-                messages=[
-                    {"role": "system", "content": insights_prompt},
-                    {"role": "user", "content": input_text},
-                ],
-                temperature=0.3,
-                model_override=AI_MODEL_INSIGHTS,
-                # 洞察任务走独立 Token Plan 端点（与主链 api.sensenova.cn 不同）
-                # 失败时自动降级到主链的 V3-1 / R1
-                base_url_override=SENSENOVA_TP_BASE_URL,
-                api_key_override=SENSENOVA_TP_API_KEY,
-                # 批次 30 条 × 单条 background+thought ~400 tokens = 12K 输出
-                # 32K 上下文，留足安全余量
-                max_tokens=24000,
-            )
-            items = extract_json(response.choices[0].message.content)
-            returned_ids = set()
-            for item in items:
-                tid = str(item.get("id", ""))
-                if tid:
-                    returned_ids.add(tid)
-                    original_tweet = next((t for t in chunk if str(t["tweet_id"]) == tid), {})
-                    insights[tid] = {
-                        "background": item.get("background", ""),
-                        "thought": item.get("thought", ""),
-                        "category": item.get("category", "其他动态"),
-                        "quality": original_tweet.get("quality", 80),
-                    }
+        items = None
+        for attempt in range(2):
+            try:
+                response = await asyncio.to_thread(
+                    call_ai_with_retry,
+                    messages=[
+                        {"role": "system", "content": insights_prompt},
+                        {"role": "user", "content": input_text},
+                    ],
+                    temperature=0.3,
+                    model_override=AI_MODEL_INSIGHTS,
+                    # 洞察任务走独立 Token Plan 端点（与主链 api.sensenova.cn 不同）
+                    base_url_override=SENSENOVA_TP_BASE_URL,
+                    api_key_override=SENSENOVA_TP_API_KEY,
+                    # 批次 30 条 × 单条 background+thought ~400 tokens = 12K 输出
+                    # 32K 上下文，留足安全余量
+                    max_tokens=24000,
+                )
+                items = extract_json(response.choices[0].message.content)
+                break
+            except Exception as e:
+                if attempt == 0:
+                    print(f"  {Color.YELLOW}⚠️ 分析批次 {idx + 1} 失败，30s 后重试: {e}{Color.RESET}")
+                    await asyncio.sleep(30)
+                else:
+                    print(f"  {Color.RED}❌ 分析批次 {idx + 1} 重试仍失败: {e}{Color.RESET}")
 
-            # 单批次覆盖率审计（决定 AI_BATCH_SIZE_TP 调大调小的关键指标）
-            missing = len(chunk) - len(returned_ids)
-            if missing > 0:
-                missing_ids = [str(t["tweet_id"]) for t in chunk if str(t["tweet_id"]) not in returned_ids]
-                print(f"    {Color.YELLOW}⚠️ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)} / 缺失 {missing} (缺失ID: {missing_ids[:3]}{'...' if len(missing_ids) > 3 else ''}){Color.RESET}")
-                print(f"    {Color.GREY}    → 持续出现说明输出截断，建议调小 AI_BATCH_SIZE_TP 或调高 max_tokens{Color.RESET}")
-            else:
-                print(f"    {Color.GREY}✓ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)}{Color.RESET}")
-
-            raw_cache.update(insights)
-            save_json(cache_file, raw_cache)
-
+        if items is None:
             if idx < len(chunks) - 1:
                 await asyncio.sleep(AI_BATCH_COOLDOWN)
+            continue
 
-        except Exception as e:
-            print(f"  {Color.RED}⚠️ 分析批次 {idx + 1} 失败: {e}{Color.RESET}")
+        returned_ids = set()
+        for item in items:
+            tid = str(item.get("id", ""))
+            if tid:
+                returned_ids.add(tid)
+                original_tweet = next((t for t in chunk if str(t["tweet_id"]) == tid), {})
+                insights[tid] = {
+                    "background": item.get("background", ""),
+                    "thought": item.get("thought", ""),
+                    "category": item.get("category", "其他动态"),
+                    "quality": original_tweet.get("quality", 80),
+                }
+
+        # 单批次覆盖率审计（决定 AI_BATCH_SIZE_TP 调大调小的关键指标）
+        missing = len(chunk) - len(returned_ids)
+        if missing > 0:
+            missing_ids = [str(t["tweet_id"]) for t in chunk if str(t["tweet_id"]) not in returned_ids]
+            print(f"    {Color.YELLOW}⚠️ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)} / 缺失 {missing} (缺失ID: {missing_ids[:3]}{'...' if len(missing_ids) > 3 else ''}){Color.RESET}")
+            print(f"    {Color.GREY}    → 持续出现说明输出截断，建议调小 AI_BATCH_SIZE_TP 或调高 max_tokens{Color.RESET}")
+        else:
+            print(f"    {Color.GREY}✓ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)}{Color.RESET}")
+
+        raw_cache.update(insights)
+        save_json(cache_file, raw_cache)
+
+        if idx < len(chunks) - 1:
+            await asyncio.sleep(AI_BATCH_COOLDOWN)
 
     print(f"  {Color.GREEN}✓ 分析与科普完成：{len(insights)} 条{Color.RESET}")
     return insights

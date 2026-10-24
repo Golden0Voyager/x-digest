@@ -7,6 +7,7 @@ LLM 只做一件事 —— 将英文推文翻译为中文。
 
 import asyncio
 import json
+import re
 from pathlib import Path
 
 from config import (
@@ -18,6 +19,16 @@ from config import (
     SENSENOVA_TP_BASE_URL,
 )
 from pipeline import Color, call_ai_with_retry, extract_json, load_json, save_json
+
+_CJK_RE = re.compile(r"[\u4e00-\u9fff]")
+
+
+def needs_translation(text: str) -> bool:
+    stripped = re.sub(r"https?://\S+|@\w+", "", text or "").strip()
+    if not stripped:
+        return False
+    return len(_CJK_RE.findall(stripped)) / len(stripped) < 0.5
+
 
 TRANSLATE_PROMPT = """\
 你是专业翻译官。将以下 X (Twitter) 推文翻译为中文。
@@ -77,6 +88,13 @@ async def run_translate(
     raw_cache: dict = {} if force_rerun else load_json(cache_file)
 
     active_ids = {str(t["tweet_id"]) for t in tweets}
+    text_by_id = {str(t["tweet_id"]): t.get("text", "") for t in tweets}
+    # 之前失败被写成 SKIP 的英文推文不能复用，否则会永久跳过翻译
+    raw_cache = {
+        k: v
+        for k, v in raw_cache.items()
+        if not (str(v).strip().upper() == "SKIP" and needs_translation(text_by_id.get(k, "")))
+    }
     # 仅保留本次需要的缓存，防止 30 天前的历史数据干扰条数统计
     translations = {k: v for k, v in raw_cache.items() if k in active_ids}
 
@@ -100,52 +118,64 @@ async def run_translate(
         input_text = json.dumps(tweet_input, ensure_ascii=False)
 
         print(f"  🌐 翻译批次 ({idx + 1}/{len(chunks)})...")
-        try:
-            response = await asyncio.to_thread(
-                call_ai_with_retry,
-                messages=[
-                    {"role": "system", "content": TRANSLATE_PROMPT},
-                    {"role": "user", "content": input_text},
-                ],
-                temperature=0.2,
-                model_override=AI_MODEL_TRANSLATE,
-                max_tokens=4000,
-                # 主链旧翻译模型已下线且端点 503，翻译统一走 Token Plan
-                base_url_override=SENSENOVA_TP_BASE_URL,
-                api_key_override=SENSENOVA_TP_API_KEY,
-            )
-            items = extract_json(response.choices[0].message.content)
-            returned_ids = set()
-            for item in items:
-                tid = str(item.get("id", ""))
-                if tid:
-                    returned_ids.add(tid)
-                    translations[tid] = item.get("translation", "SKIP")
+        items = None
+        for attempt in range(2):
+            try:
+                response = await asyncio.to_thread(
+                    call_ai_with_retry,
+                    messages=[
+                        {"role": "system", "content": TRANSLATE_PROMPT},
+                        {"role": "user", "content": input_text},
+                    ],
+                    temperature=0.2,
+                    model_override=AI_MODEL_TRANSLATE,
+                    max_tokens=4000,
+                    # 主链旧翻译模型已下线且端点 503，翻译统一走 Token Plan
+                    base_url_override=SENSENOVA_TP_BASE_URL,
+                    api_key_override=SENSENOVA_TP_API_KEY,
+                )
+                items = extract_json(response.choices[0].message.content)
+                break
+            except Exception as e:
+                if attempt == 0:
+                    print(f"  {Color.YELLOW}⚠️ 翻译批次 {idx + 1} 失败，30s 后重试: {e}{Color.RESET}")
+                    await asyncio.sleep(30)
+                else:
+                    print(f"  {Color.RED}❌ 翻译批次 {idx + 1} 重试仍失败: {e}{Color.RESET}")
 
-            # 单批次覆盖率审计
-            missing = len(chunk) - len(returned_ids)
-            if missing > 0:
-                print(f"    {Color.YELLOW}⚠️ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)} / 缺失 {missing}（将在末尾并发补译）{Color.RESET}")
-            else:
-                print(f"    {Color.GREY}✓ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)}{Color.RESET}")
-
-            # 每批次持久化全量缓存（包含历史但返回时过滤）
-            raw_cache.update(translations)
-            save_json(cache_file, raw_cache)
-
+        if items is None:
             if idx < len(chunks) - 1:
                 await asyncio.sleep(AI_BATCH_COOLDOWN)
+            continue
 
-        except Exception as e:
-            print(f"  {Color.RED}⚠️ 翻译批次 {idx + 1} 失败: {e}{Color.RESET}")
+        returned_ids = set()
+        for item in items:
+            tid = str(item.get("id", ""))
+            if tid:
+                returned_ids.add(tid)
+                translations[tid] = item.get("translation", "SKIP")
+
+        # 单批次覆盖率审计
+        missing = len(chunk) - len(returned_ids)
+        if missing > 0:
+            print(f"    {Color.YELLOW}⚠️ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)} / 缺失 {missing}（将在末尾并发补译）{Color.RESET}")
+        else:
+            print(f"    {Color.GREY}✓ 批次覆盖率: 输入 {len(chunk)} / 返回 {len(returned_ids)}{Color.RESET}")
+
+        # 每批次持久化全量缓存（包含历史但返回时过滤）
+        raw_cache.update(translations)
+        save_json(cache_file, raw_cache)
+
+        if idx < len(chunks) - 1:
+            await asyncio.sleep(AI_BATCH_COOLDOWN)
 
     # ── 3. 覆盖率校验：缺失的并发补译 ──
     missing = [t for t in tweets if str(t["tweet_id"]) not in translations]
     if missing:
         print(f"  {Color.YELLOW}⚠️ {len(missing)} 条推文缺少翻译，正在并发补译...{Color.RESET}")
 
-        # 添加信号量限制补译时的突发并发，防止大量请求瞬间打满服务商限流
-        sem = asyncio.Semaphore(5)
+        # 全局限速之外再加低并发，避免补译一次占满 Token Plan 的 RPM
+        sem = asyncio.Semaphore(2)
 
         async def _translate_one(t):
             tid = str(t["tweet_id"])
@@ -165,11 +195,14 @@ async def run_translate(
                     )
 
                     return tid, resp.choices[0].message.content.strip()
-                except Exception:
-                    return tid, "SKIP" # 失败时记录为 SKIP
+                except Exception as e:
+                    print(f"  {Color.YELLOW}⚠️ 补译失败 {tid}: {type(e).__name__}{Color.RESET}")
+                    return tid, None  # 失败不写缓存，下一轮重试
 
         results = await asyncio.gather(*[_translate_one(t) for t in missing])
         for tid, trans in results:
+            if trans is None:
+                continue
             translations[tid] = trans
             raw_cache[tid] = trans
         save_json(cache_file, raw_cache)

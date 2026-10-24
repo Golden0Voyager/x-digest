@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import re
+import threading
 import time
 from pathlib import Path
 
@@ -179,6 +180,25 @@ def _get_client(api_key: str, base_url: str) -> OpenAI:
     return _ai_clients[cache_key]
 
 
+# ── Token Plan 全局限速 ──────────────────────────────────
+# token.sensenova.cn 有每分钟请求上限；批次和补译并发时容易 429。
+# 进程内串行化所有 TP 调用，保证任意两次请求至少间隔 N 秒。
+_TP_MIN_INTERVAL = float(os.getenv("TP_MIN_INTERVAL_SECONDS", "10"))
+_tp_lock = threading.Lock()
+_tp_last_call = 0.0
+
+
+def _wait_for_tp_slot(base_url: str) -> None:
+    if "token.sensenova.cn" not in (base_url or ""):
+        return
+    global _tp_last_call
+    with _tp_lock:
+        wait = _TP_MIN_INTERVAL - (time.monotonic() - _tp_last_call)
+        if wait > 0:
+            time.sleep(wait)
+        _tp_last_call = time.monotonic()
+
+
 def call_ai_with_retry(
     messages,
     temperature=0.2,
@@ -216,6 +236,7 @@ def call_ai_with_retry(
 
         for attempt in range(1, max_attempts + 1):
             try:
+                _wait_for_tp_slot(provider["base_url"])
                 result = client.chat.completions.create(
                     model=provider["model"],
                     messages=messages,
@@ -255,6 +276,10 @@ def call_ai_with_retry(
                         completion_tokens=0,
                         finish_reason=finish_reason,
                     )
+                content = result.choices[0].message.content if result.choices else None
+                if not content or not str(content).strip():
+                    raise ValueError("模型返回空内容")
+
                 # 降级成功时提示当前实际服务的模型
                 if i > 0 or attempt > 1:
                     print(f"  {Color.GREEN}✓ [{provider['name']}] {provider['model']} 响应成功{Color.RESET}")
@@ -286,8 +311,16 @@ def call_ai_with_retry(
                         print(f"  {Color.YELLOW}⚠️ [{provider['name']}] 失败，降级到 [{next_name}]{Color.RESET}")
                     break
 
+                # RPM/速率限制是可恢复的；不能和真正的 5h 配额耗尽混为一谈
+                is_rate_limit = (
+                    "RateLimitError" in err_type
+                    or "rate limit" in err_str
+                    or "rpm" in err_str
+                    or "429" in err_str
+                )
+
                 # 硬配额耗尽 / 模型不存在 / 认证失败 → 立刻降级，无需等待
-                is_hard_fail = any(k in err_str for k in [
+                is_hard_fail = (not is_rate_limit) and any(k in err_str for k in [
                     "资源包余量已用尽", "quota", "3008",
                     "no endpoints found", "404",
                     "令牌已过期", "authentication", "401",
@@ -298,7 +331,6 @@ def call_ai_with_retry(
 
                 # 仅主模型第 1 次失败时短暂等待后重试
                 wait_sec = 3
-                is_rate_limit = "RateLimitError" in err_type or "rate" in err_str
                 if hasattr(e, "response") and hasattr(e.response, "headers"):
                     retry_after = e.response.headers.get("retry-after")
                     if retry_after:
