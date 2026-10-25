@@ -183,7 +183,7 @@ def _get_client(api_key: str, base_url: str) -> OpenAI:
 # ── Token Plan 全局限速 ──────────────────────────────────
 # token.sensenova.cn 有每分钟请求上限；批次和补译并发时容易 429。
 # 进程内串行化所有 TP 调用，保证任意两次请求至少间隔 N 秒。
-_TP_MIN_INTERVAL = float(os.getenv("TP_MIN_INTERVAL_SECONDS", "10"))
+_TP_MIN_INTERVAL = float(os.getenv("TP_MIN_INTERVAL_SECONDS", "15"))
 _tp_lock = threading.Lock()
 _tp_last_call = 0.0
 
