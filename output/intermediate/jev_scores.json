@@ -1807,5 +1807,3434 @@
     "depth_normalized": 0.4325,
     "novelty": 0.78,
     "depth_confidence": 0.75
+  },
+  "2116364545279000589": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.89,
+    "depth": 2.44,
+    "depth_normalized": 0.61,
+    "novelty": 0.76,
+    "depth_confidence": 0.62
+  },
+  "2116349472225538242": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.6,
+    "depth": 1.88,
+    "depth_normalized": 0.47,
+    "novelty": 0.76,
+    "depth_confidence": 0.87
+  },
+  "2116287284978823303": {
+    "scorer_version": 2,
+    "quality": 66,
+    "signal": 0.69,
+    "depth": 1.98,
+    "depth_normalized": 0.495,
+    "novelty": 0.73,
+    "depth_confidence": 0.79
+  },
+  "2116258595545206802": {
+    "scorer_version": 2,
+    "quality": 79,
+    "signal": 0.83,
+    "depth": 2.68,
+    "depth_normalized": 0.67,
+    "novelty": 0.79,
+    "depth_confidence": 0.68
+  },
+  "2116234942136930685": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.95,
+    "depth": 2.84,
+    "depth_normalized": 0.71,
+    "novelty": 0.74,
+    "depth_confidence": 0.71
+  },
+  "2116204790782759274": {
+    "scorer_version": 2,
+    "quality": 56,
+    "signal": 0.55,
+    "depth": 1.91,
+    "depth_normalized": 0.4775,
+    "novelty": 0.63,
+    "depth_confidence": 0.83
+  },
+  "2116161202963271903": {
+    "scorer_version": 2,
+    "quality": 68,
+    "signal": 0.68,
+    "depth": 2.11,
+    "depth_normalized": 0.5275,
+    "novelty": 0.78,
+    "depth_confidence": 0.76
+  },
+  "2116380389031960727": {
+    "scorer_version": 2,
+    "quality": 35,
+    "signal": 0.26,
+    "depth": 1.09,
+    "depth_normalized": 0.2725,
+    "novelty": 0.56,
+    "depth_confidence": 0.11
+  },
+  "2116363392005165190": {
+    "scorer_version": 2,
+    "quality": 47,
+    "signal": 0.37,
+    "depth": 1.39,
+    "depth_normalized": 0.3475,
+    "novelty": 0.71,
+    "depth_confidence": 0.59
+  },
+  "2116305793046003991": {
+    "scorer_version": 2,
+    "quality": 66,
+    "signal": 0.77,
+    "depth": 1.93,
+    "depth_normalized": 0.4825,
+    "novelty": 0.6,
+    "depth_confidence": 0.85
+  },
+  "2116203468360953872": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.37,
+    "depth": 0.99,
+    "depth_normalized": 0.2475,
+    "novelty": 0.75,
+    "depth_confidence": 0.19
+  },
+  "2116185780620321239": {
+    "scorer_version": 2,
+    "quality": 56,
+    "signal": 0.55,
+    "depth": 1.76,
+    "depth_normalized": 0.44,
+    "novelty": 0.66,
+    "depth_confidence": 0.76
+  },
+  "2116271324280787222": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.54,
+    "depth": 1.76,
+    "depth_normalized": 0.44,
+    "novelty": 0.33,
+    "depth_confidence": 0.78
+  },
+  "2116253388883345623": {
+    "scorer_version": 2,
+    "quality": 14,
+    "signal": 0.04,
+    "depth": 0.8,
+    "depth_normalized": 0.2,
+    "novelty": 0.28,
+    "depth_confidence": 0.82
+  },
+  "2116186509384815084": {
+    "scorer_version": 2,
+    "quality": 67,
+    "signal": 0.72,
+    "depth": 2.06,
+    "depth_normalized": 0.515,
+    "novelty": 0.68,
+    "depth_confidence": 0.82
+  },
+  "2116343923925041462": {
+    "scorer_version": 2,
+    "quality": 57,
+    "signal": 0.59,
+    "depth": 1.61,
+    "depth_normalized": 0.4025,
+    "novelty": 0.66,
+    "depth_confidence": 0.68
+  },
+  "2116341851825287476": {
+    "scorer_version": 2,
+    "quality": 56,
+    "signal": 0.47,
+    "depth": 1.97,
+    "depth_normalized": 0.4925,
+    "novelty": 0.74,
+    "depth_confidence": 0.77
+  },
+  "2116179892991922433": {
+    "scorer_version": 2,
+    "quality": 63,
+    "signal": 0.71,
+    "depth": 1.95,
+    "depth_normalized": 0.4875,
+    "novelty": 0.59,
+    "depth_confidence": 0.89
+  },
+  "2116170090991484947": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.75,
+    "depth": 2.9,
+    "depth_normalized": 0.725,
+    "novelty": 0.71,
+    "depth_confidence": 0.66
+  },
+  "2116183233784394039": {
+    "scorer_version": 2,
+    "quality": 56,
+    "signal": 0.47,
+    "depth": 1.99,
+    "depth_normalized": 0.4975,
+    "novelty": 0.74,
+    "depth_confidence": 0.77
+  },
+  "2116172978371399757": {
+    "scorer_version": 2,
+    "quality": 57,
+    "signal": 0.59,
+    "depth": 1.87,
+    "depth_normalized": 0.4675,
+    "novelty": 0.61,
+    "depth_confidence": 0.72
+  },
+  "2116146641766137876": {
+    "scorer_version": 2,
+    "quality": 22,
+    "signal": 0.11,
+    "depth": 0.87,
+    "depth_normalized": 0.2175,
+    "novelty": 0.42,
+    "depth_confidence": 0.74
+  },
+  "2116320459881144468": {
+    "scorer_version": 2,
+    "quality": 24,
+    "signal": 0.12,
+    "depth": 0.87,
+    "depth_normalized": 0.2175,
+    "novelty": 0.47,
+    "depth_confidence": 0.74
+  },
+  "2116146977230459383": {
+    "scorer_version": 2,
+    "quality": 54,
+    "signal": 0.55,
+    "depth": 1.78,
+    "depth_normalized": 0.445,
+    "novelty": 0.59,
+    "depth_confidence": 0.8
+  },
+  "2116299214770819452": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.59,
+    "depth": 1.68,
+    "depth_normalized": 0.42,
+    "novelty": 0.45,
+    "depth_confidence": 0.37
+  },
+  "2116198463847408066": {
+    "scorer_version": 2,
+    "quality": 76,
+    "signal": 0.84,
+    "depth": 2.41,
+    "depth_normalized": 0.6025,
+    "novelty": 0.73,
+    "depth_confidence": 0.62
+  },
+  "2116288817938497574": {
+    "scorer_version": 2,
+    "quality": 72,
+    "signal": 0.76,
+    "depth": 2.0,
+    "depth_normalized": 0.5,
+    "novelty": 0.8,
+    "depth_confidence": 0.73
+  },
+  "2116254517805109309": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.91,
+    "depth": 1.95,
+    "depth_normalized": 0.4875,
+    "novelty": 0.84,
+    "depth_confidence": 0.91
+  },
+  "2116377535818891690": {
+    "scorer_version": 2,
+    "quality": 64,
+    "signal": 0.63,
+    "depth": 1.94,
+    "depth_normalized": 0.485,
+    "novelty": 0.77,
+    "depth_confidence": 0.93
+  },
+  "2116375639821337021": {
+    "scorer_version": 2,
+    "quality": 30,
+    "signal": 0.2,
+    "depth": 0.92,
+    "depth_normalized": 0.23,
+    "novelty": 0.51,
+    "depth_confidence": 0.7
+  },
+  "2116275422573056323": {
+    "scorer_version": 2,
+    "quality": 48,
+    "signal": 0.42,
+    "depth": 1.44,
+    "depth_normalized": 0.36,
+    "novelty": 0.65,
+    "depth_confidence": 0.59
+  },
+  "2116369601508593911": {
+    "scorer_version": 2,
+    "quality": 27,
+    "signal": 0.11,
+    "depth": 0.98,
+    "depth_normalized": 0.245,
+    "novelty": 0.56,
+    "depth_confidence": 0.74
+  },
+  "2116345666108854781": {
+    "scorer_version": 2,
+    "quality": 29,
+    "signal": 0.22,
+    "depth": 1.23,
+    "depth_normalized": 0.3075,
+    "novelty": 0.41,
+    "depth_confidence": 0.72
+  },
+  "2116323148706771302": {
+    "scorer_version": 2,
+    "quality": 85,
+    "signal": 0.95,
+    "depth": 2.61,
+    "depth_normalized": 0.6525,
+    "novelty": 0.81,
+    "depth_confidence": 0.63
+  },
+  "2116253050742694182": {
+    "scorer_version": 2,
+    "quality": 69,
+    "signal": 0.74,
+    "depth": 1.91,
+    "depth_normalized": 0.4775,
+    "novelty": 0.76,
+    "depth_confidence": 0.8
+  },
+  "2116229954551812364": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.95,
+    "depth": 2.03,
+    "depth_normalized": 0.5075,
+    "novelty": 0.83,
+    "depth_confidence": 0.89
+  },
+  "2116213830439280809": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.53,
+    "depth": 1.77,
+    "depth_normalized": 0.4425,
+    "novelty": 0.67,
+    "depth_confidence": 0.62
+  },
+  "2116197836362772776": {
+    "scorer_version": 2,
+    "quality": 40,
+    "signal": 0.36,
+    "depth": 0.95,
+    "depth_normalized": 0.2375,
+    "novelty": 0.58,
+    "depth_confidence": 0.54
+  },
+  "2116195834836779269": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.95,
+    "depth": 2.25,
+    "depth_normalized": 0.5625,
+    "novelty": 0.81,
+    "depth_confidence": 0.76
+  },
+  "2116143077656322310": {
+    "scorer_version": 2,
+    "quality": 27,
+    "signal": 0.17,
+    "depth": 1.09,
+    "depth_normalized": 0.2725,
+    "novelty": 0.45,
+    "depth_confidence": 0.91
+  },
+  "2116293862205296643": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.44,
+    "depth": 1.72,
+    "depth_normalized": 0.43,
+    "novelty": 0.69,
+    "depth_confidence": 0.77
+  },
+  "2116280530370982257": {
+    "scorer_version": 2,
+    "quality": 66,
+    "signal": 0.73,
+    "depth": 2.16,
+    "depth_normalized": 0.54,
+    "novelty": 0.64,
+    "depth_confidence": 0.73
+  },
+  "2116270281320808472": {
+    "scorer_version": 2,
+    "quality": 82,
+    "signal": 0.92,
+    "depth": 2.96,
+    "depth_normalized": 0.74,
+    "novelty": 0.72,
+    "depth_confidence": 0.89
+  },
+  "2116258950584615109": {
+    "scorer_version": 2,
+    "quality": 54,
+    "signal": 0.46,
+    "depth": 1.98,
+    "depth_normalized": 0.495,
+    "novelty": 0.69,
+    "depth_confidence": 0.77
+  },
+  "2116258093071741047": {
+    "scorer_version": 2,
+    "quality": 42,
+    "signal": 0.46,
+    "depth": 1.47,
+    "depth_normalized": 0.3675,
+    "novelty": 0.4,
+    "depth_confidence": 0.62
+  },
+  "2116236331751760227": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.64,
+    "depth": 1.66,
+    "depth_normalized": 0.415,
+    "novelty": 0.69,
+    "depth_confidence": 0.71
+  },
+  "2116227834041758185": {
+    "scorer_version": 2,
+    "quality": 56,
+    "signal": 0.53,
+    "depth": 1.51,
+    "depth_normalized": 0.3775,
+    "novelty": 0.72,
+    "depth_confidence": 0.55
+  },
+  "2116227835748892706": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.52,
+    "depth": 1.43,
+    "depth_normalized": 0.3575,
+    "novelty": 0.72,
+    "depth_confidence": 0.59
+  },
+  "2116222028080406977": {
+    "scorer_version": 2,
+    "quality": 74,
+    "signal": 0.86,
+    "depth": 2.28,
+    "depth_normalized": 0.57,
+    "novelty": 0.67,
+    "depth_confidence": 0.72
+  },
+  "2116217832727789790": {
+    "scorer_version": 2,
+    "quality": 36,
+    "signal": 0.19,
+    "depth": 1.48,
+    "depth_normalized": 0.37,
+    "novelty": 0.64,
+    "depth_confidence": 0.58
+  },
+  "2116199657780994340": {
+    "scorer_version": 2,
+    "quality": 69,
+    "signal": 0.78,
+    "depth": 2.06,
+    "depth_normalized": 0.515,
+    "novelty": 0.66,
+    "depth_confidence": 0.86
+  },
+  "2116184632240603471": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.66,
+    "depth": 1.82,
+    "depth_normalized": 0.455,
+    "novelty": 0.68,
+    "depth_confidence": 0.76
+  },
+  "2116179362064351736": {
+    "scorer_version": 2,
+    "quality": 64,
+    "signal": 0.68,
+    "depth": 2.17,
+    "depth_normalized": 0.5425,
+    "novelty": 0.65,
+    "depth_confidence": 0.78
+  },
+  "2116179364870074804": {
+    "scorer_version": 2,
+    "quality": 65,
+    "signal": 0.68,
+    "depth": 2.18,
+    "depth_normalized": 0.545,
+    "novelty": 0.68,
+    "depth_confidence": 0.77
+  },
+  "2116133589616111672": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.93,
+    "depth": 3.42,
+    "depth_normalized": 0.855,
+    "novelty": 0.65,
+    "depth_confidence": 0.6
+  },
+  "2116124316064436588": {
+    "scorer_version": 2,
+    "quality": 76,
+    "signal": 0.89,
+    "depth": 1.93,
+    "depth_normalized": 0.4825,
+    "novelty": 0.73,
+    "depth_confidence": 0.93
+  },
+  "2116119534918570171": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.46,
+    "depth": 1.86,
+    "depth_normalized": 0.465,
+    "novelty": 0.56,
+    "depth_confidence": 0.8
+  },
+  "2116116972270194835": {
+    "scorer_version": 2,
+    "quality": 67,
+    "signal": 0.69,
+    "depth": 2.04,
+    "depth_normalized": 0.51,
+    "novelty": 0.73,
+    "depth_confidence": 0.88
+  },
+  "2116409662635692138": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.48,
+    "depth": 1.36,
+    "depth_normalized": 0.34,
+    "novelty": 0.66,
+    "depth_confidence": 0.6
+  },
+  "2116405414921384099": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.84,
+    "depth": 1.84,
+    "depth_normalized": 0.46,
+    "novelty": 0.72,
+    "depth_confidence": 0.79
+  },
+  "2116366460939386990": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.95,
+    "depth": 2.49,
+    "depth_normalized": 0.6225,
+    "novelty": 0.68,
+    "depth_confidence": 0.57
+  },
+  "2116304098228068572": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.91,
+    "depth": 3.27,
+    "depth_normalized": 0.8175,
+    "novelty": 0.71,
+    "depth_confidence": 0.67
+  },
+  "2116336030584574076": {
+    "scorer_version": 2,
+    "quality": 77,
+    "signal": 0.84,
+    "depth": 1.98,
+    "depth_normalized": 0.495,
+    "novelty": 0.85,
+    "depth_confidence": 0.93
+  },
+  "2116339235443847533": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.62,
+    "depth": 1.74,
+    "depth_normalized": 0.435,
+    "novelty": 0.76,
+    "depth_confidence": 0.78
+  },
+  "2116334522748809566": {
+    "scorer_version": 2,
+    "quality": 71,
+    "signal": 0.78,
+    "depth": 2.17,
+    "depth_normalized": 0.5425,
+    "novelty": 0.7,
+    "depth_confidence": 0.77
+  },
+  "2116258713187312073": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.7,
+    "depth": 1.9,
+    "depth_normalized": 0.475,
+    "novelty": 0.56,
+    "depth_confidence": 0.92
+  },
+  "2116233564823974005": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.96,
+    "depth": 2.39,
+    "depth_normalized": 0.5975,
+    "novelty": 0.76,
+    "depth_confidence": 0.66
+  },
+  "2116220869479428500": {
+    "scorer_version": 2,
+    "quality": 85,
+    "signal": 0.96,
+    "depth": 2.49,
+    "depth_normalized": 0.6225,
+    "novelty": 0.81,
+    "depth_confidence": 0.57
+  },
+  "2116219659544399897": {
+    "scorer_version": 2,
+    "quality": 79,
+    "signal": 0.88,
+    "depth": 2.84,
+    "depth_normalized": 0.71,
+    "novelty": 0.69,
+    "depth_confidence": 0.42
+  },
+  "2116214866444943853": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.92,
+    "depth": 2.58,
+    "depth_normalized": 0.645,
+    "novelty": 0.84,
+    "depth_confidence": 0.45
+  },
+  "2116219345215074538": {
+    "scorer_version": 2,
+    "quality": 82,
+    "signal": 0.88,
+    "depth": 2.92,
+    "depth_normalized": 0.73,
+    "novelty": 0.77,
+    "depth_confidence": 0.52
+  },
+  "2116218545906319826": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.92,
+    "depth": 2.65,
+    "depth_normalized": 0.6625,
+    "novelty": 0.68,
+    "depth_confidence": 0.64
+  },
+  "2116180142036828484": {
+    "scorer_version": 2,
+    "quality": 75,
+    "signal": 0.83,
+    "depth": 2.05,
+    "depth_normalized": 0.5125,
+    "novelty": 0.78,
+    "depth_confidence": 0.86
+  },
+  "2116211825557856606": {
+    "scorer_version": 2,
+    "quality": 44,
+    "signal": 0.31,
+    "depth": 1.41,
+    "depth_normalized": 0.3525,
+    "novelty": 0.72,
+    "depth_confidence": 0.57
+  },
+  "2116186362097602589": {
+    "scorer_version": 2,
+    "quality": 50,
+    "signal": 0.46,
+    "depth": 1.66,
+    "depth_normalized": 0.415,
+    "novelty": 0.64,
+    "depth_confidence": 0.72
+  },
+  "2116149721601577211": {
+    "scorer_version": 2,
+    "quality": 18,
+    "signal": 0.07,
+    "depth": 0.73,
+    "depth_normalized": 0.1825,
+    "novelty": 0.36,
+    "depth_confidence": 0.71
+  },
+  "2116151847933345798": {
+    "scorer_version": 2,
+    "quality": 48,
+    "signal": 0.35,
+    "depth": 1.38,
+    "depth_normalized": 0.345,
+    "novelty": 0.79,
+    "depth_confidence": 0.65
+  },
+  "2116147613267280226": {
+    "scorer_version": 2,
+    "quality": 45,
+    "signal": 0.39,
+    "depth": 1.36,
+    "depth_normalized": 0.34,
+    "novelty": 0.63,
+    "depth_confidence": 0.63
+  },
+  "2116368220378829211": {
+    "scorer_version": 2,
+    "quality": 76,
+    "signal": 0.83,
+    "depth": 1.97,
+    "depth_normalized": 0.4925,
+    "novelty": 0.82,
+    "depth_confidence": 0.96
+  },
+  "2116166770943754333": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.36,
+    "depth": 1.61,
+    "depth_normalized": 0.4025,
+    "novelty": 0.76,
+    "depth_confidence": 0.68
+  },
+  "2116154460473081991": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.84,
+    "depth": 2.1,
+    "depth_normalized": 0.525,
+    "novelty": 0.68,
+    "depth_confidence": 0.87
+  },
+  "2116137815951991091": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.58,
+    "depth": 1.87,
+    "depth_normalized": 0.4675,
+    "novelty": 0.8,
+    "depth_confidence": 0.75
+  },
+  "2116452657346851192": {
+    "scorer_version": 2,
+    "quality": 59,
+    "signal": 0.56,
+    "depth": 2.26,
+    "depth_normalized": 0.565,
+    "novelty": 0.66,
+    "depth_confidence": 0.72
+  },
+  "2116451408413167939": {
+    "scorer_version": 2,
+    "quality": 50,
+    "signal": 0.44,
+    "depth": 1.5,
+    "depth_normalized": 0.375,
+    "novelty": 0.7,
+    "depth_confidence": 0.58
+  },
+  "2116447654179651767": {
+    "scorer_version": 2,
+    "quality": 59,
+    "signal": 0.54,
+    "depth": 2.14,
+    "depth_normalized": 0.535,
+    "novelty": 0.7,
+    "depth_confidence": 0.82
+  },
+  "2116445105900962167": {
+    "scorer_version": 2,
+    "quality": 63,
+    "signal": 0.55,
+    "depth": 2.52,
+    "depth_normalized": 0.63,
+    "novelty": 0.75,
+    "depth_confidence": 0.48
+  },
+  "2116414910808629743": {
+    "scorer_version": 2,
+    "quality": 60,
+    "signal": 0.57,
+    "depth": 2.07,
+    "depth_normalized": 0.5175,
+    "novelty": 0.69,
+    "depth_confidence": 0.83
+  },
+  "2116409971302609092": {
+    "scorer_version": 2,
+    "quality": 70,
+    "signal": 0.78,
+    "depth": 2.33,
+    "depth_normalized": 0.5825,
+    "novelty": 0.65,
+    "depth_confidence": 0.69
+  },
+  "2116409857200824493": {
+    "scorer_version": 2,
+    "quality": 75,
+    "signal": 0.81,
+    "depth": 2.63,
+    "depth_normalized": 0.6575,
+    "novelty": 0.7,
+    "depth_confidence": 0.66
+  },
+  "2116407361162092656": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.53,
+    "depth": 2.14,
+    "depth_normalized": 0.535,
+    "novelty": 0.78,
+    "depth_confidence": 0.8
+  },
+  "2116404839383027935": {
+    "scorer_version": 2,
+    "quality": 60,
+    "signal": 0.54,
+    "depth": 2.18,
+    "depth_normalized": 0.545,
+    "novelty": 0.73,
+    "depth_confidence": 0.77
+  },
+  "2116402330224447753": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.61,
+    "depth": 2.48,
+    "depth_normalized": 0.62,
+    "novelty": 0.63,
+    "depth_confidence": 0.57
+  },
+  "2116399802934005833": {
+    "scorer_version": 2,
+    "quality": 39,
+    "signal": 0.33,
+    "depth": 1.6,
+    "depth_normalized": 0.4,
+    "novelty": 0.49,
+    "depth_confidence": 0.5
+  },
+  "2116397285944791251": {
+    "scorer_version": 2,
+    "quality": 86,
+    "signal": 0.96,
+    "depth": 2.94,
+    "depth_normalized": 0.735,
+    "novelty": 0.76,
+    "depth_confidence": 0.92
+  },
+  "2116394792867307542": {
+    "scorer_version": 2,
+    "quality": 74,
+    "signal": 0.8,
+    "depth": 2.63,
+    "depth_normalized": 0.6575,
+    "novelty": 0.7,
+    "depth_confidence": 0.66
+  },
+  "2116392252377313751": {
+    "scorer_version": 2,
+    "quality": 54,
+    "signal": 0.46,
+    "depth": 2.16,
+    "depth_normalized": 0.54,
+    "novelty": 0.66,
+    "depth_confidence": 0.78
+  },
+  "2116387230553956371": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.86,
+    "depth": 3.16,
+    "depth_normalized": 0.79,
+    "novelty": 0.72,
+    "depth_confidence": 0.67
+  },
+  "2116384705624850635": {
+    "scorer_version": 2,
+    "quality": 60,
+    "signal": 0.52,
+    "depth": 2.36,
+    "depth_normalized": 0.59,
+    "novelty": 0.73,
+    "depth_confidence": 0.62
+  },
+  "2116382185695391867": {
+    "scorer_version": 2,
+    "quality": 60,
+    "signal": 0.58,
+    "depth": 2.14,
+    "depth_normalized": 0.535,
+    "novelty": 0.69,
+    "depth_confidence": 0.83
+  },
+  "2116379705490235593": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.54,
+    "depth": 2.3,
+    "depth_normalized": 0.575,
+    "novelty": 0.76,
+    "depth_confidence": 0.69
+  },
+  "2116377153797304775": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.55,
+    "depth": 2.29,
+    "depth_normalized": 0.5725,
+    "novelty": 0.72,
+    "depth_confidence": 0.69
+  },
+  "2116263766572548308": {
+    "scorer_version": 2,
+    "quality": 34,
+    "signal": 0.15,
+    "depth": 1.79,
+    "depth_normalized": 0.4475,
+    "novelty": 0.57,
+    "depth_confidence": 0.69
+  },
+  "2116357848464601125": {
+    "scorer_version": 2,
+    "quality": 86,
+    "signal": 0.96,
+    "depth": 3.26,
+    "depth_normalized": 0.815,
+    "novelty": 0.74,
+    "depth_confidence": 0.77
+  },
+  "2116313518911668301": {
+    "scorer_version": 2,
+    "quality": 77,
+    "signal": 0.8,
+    "depth": 2.81,
+    "depth_normalized": 0.7025,
+    "novelty": 0.76,
+    "depth_confidence": 0.84
+  },
+  "2116280985612636573": {
+    "scorer_version": 2,
+    "quality": 87,
+    "signal": 0.95,
+    "depth": 3.03,
+    "depth_normalized": 0.7575,
+    "novelty": 0.8,
+    "depth_confidence": 0.88
+  },
+  "2116271956987154764": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.92,
+    "depth": 2.8,
+    "depth_normalized": 0.7,
+    "novelty": 0.81,
+    "depth_confidence": 0.83
+  },
+  "2116261977559544282": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.71,
+    "depth": 2.81,
+    "depth_normalized": 0.7025,
+    "novelty": 0.79,
+    "depth_confidence": 0.82
+  },
+  "2116251100517216634": {
+    "scorer_version": 2,
+    "quality": 77,
+    "signal": 0.87,
+    "depth": 2.22,
+    "depth_normalized": 0.555,
+    "novelty": 0.76,
+    "depth_confidence": 0.77
+  },
+  "2116243866718523645": {
+    "scorer_version": 2,
+    "quality": 85,
+    "signal": 0.94,
+    "depth": 2.89,
+    "depth_normalized": 0.7225,
+    "novelty": 0.79,
+    "depth_confidence": 0.74
+  },
+  "2116240066142154894": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.86,
+    "depth": 2.56,
+    "depth_normalized": 0.64,
+    "novelty": 0.81,
+    "depth_confidence": 0.64
+  },
+  "2116218071153295381": {
+    "scorer_version": 2,
+    "quality": 82,
+    "signal": 0.91,
+    "depth": 2.84,
+    "depth_normalized": 0.71,
+    "novelty": 0.76,
+    "depth_confidence": 0.79
+  },
+  "2116228648978055455": {
+    "scorer_version": 2,
+    "quality": 86,
+    "signal": 0.93,
+    "depth": 3.11,
+    "depth_normalized": 0.7775,
+    "novelty": 0.79,
+    "depth_confidence": 0.77
+  },
+  "2116207249987383572": {
+    "scorer_version": 2,
+    "quality": 70,
+    "signal": 0.74,
+    "depth": 2.31,
+    "depth_normalized": 0.5775,
+    "novelty": 0.73,
+    "depth_confidence": 0.68
+  },
+  "2116191185677246814": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.81,
+    "depth": 2.2,
+    "depth_normalized": 0.55,
+    "novelty": 0.71,
+    "depth_confidence": 0.69
+  },
+  "2116139805516210579": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.86,
+    "depth": 2.77,
+    "depth_normalized": 0.6925,
+    "novelty": 0.69,
+    "depth_confidence": 0.79
+  },
+  "2116179386030342497": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.89,
+    "depth": 2.47,
+    "depth_normalized": 0.6175,
+    "novelty": 0.7,
+    "depth_confidence": 0.57
+  },
+  "2116158382881038840": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.72,
+    "depth": 2.54,
+    "depth_normalized": 0.635,
+    "novelty": 0.81,
+    "depth_confidence": 0.6
+  },
+  "2116304249093345284": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.93,
+    "depth": 2.77,
+    "depth_normalized": 0.6925,
+    "novelty": 0.75,
+    "depth_confidence": 0.68
+  },
+  "2116132621570723845": {
+    "scorer_version": 2,
+    "quality": 82,
+    "signal": 0.93,
+    "depth": 2.83,
+    "depth_normalized": 0.7075,
+    "novelty": 0.7,
+    "depth_confidence": 0.82
+  },
+  "2116440869863899219": {
+    "scorer_version": 2,
+    "quality": 22,
+    "signal": 0.08,
+    "depth": 1.12,
+    "depth_normalized": 0.28,
+    "novelty": 0.42,
+    "depth_confidence": 0.87
+  },
+  "2116425518581153899": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.09,
+    "depth": 1.06,
+    "depth_normalized": 0.265,
+    "novelty": 0.53,
+    "depth_confidence": 0.88
+  },
+  "2116410353005551798": {
+    "scorer_version": 2,
+    "quality": 18,
+    "signal": 0.05,
+    "depth": 0.38,
+    "depth_normalized": 0.095,
+    "novelty": 0.44,
+    "depth_confidence": 0.7
+  },
+  "2116395179980771775": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.35,
+    "depth": 1.91,
+    "depth_normalized": 0.4775,
+    "novelty": 0.63,
+    "depth_confidence": 0.85
+  },
+  "2116380071829364928": {
+    "scorer_version": 2,
+    "quality": 43,
+    "signal": 0.38,
+    "depth": 1.86,
+    "depth_normalized": 0.465,
+    "novelty": 0.49,
+    "depth_confidence": 0.7
+  },
+  "2116364749785211242": {
+    "scorer_version": 2,
+    "quality": 16,
+    "signal": 0.06,
+    "depth": 0.32,
+    "depth_normalized": 0.08,
+    "novelty": 0.39,
+    "depth_confidence": 0.74
+  },
+  "2116349755492319283": {
+    "scorer_version": 2,
+    "quality": 17,
+    "signal": 0.04,
+    "depth": 0.54,
+    "depth_normalized": 0.135,
+    "novelty": 0.4,
+    "depth_confidence": 0.54
+  },
+  "2116334521402675515": {
+    "scorer_version": 2,
+    "quality": 19,
+    "signal": 0.04,
+    "depth": 0.64,
+    "depth_normalized": 0.16,
+    "novelty": 0.47,
+    "depth_confidence": 0.65
+  },
+  "2116326971340968069": {
+    "scorer_version": 2,
+    "quality": 22,
+    "signal": 0.05,
+    "depth": 0.99,
+    "depth_normalized": 0.2475,
+    "novelty": 0.49,
+    "depth_confidence": 0.89
+  },
+  "2116319419169480998": {
+    "scorer_version": 2,
+    "quality": 52,
+    "signal": 0.43,
+    "depth": 1.79,
+    "depth_normalized": 0.4475,
+    "novelty": 0.73,
+    "depth_confidence": 0.82
+  },
+  "2116311934819877299": {
+    "scorer_version": 2,
+    "quality": 45,
+    "signal": 0.3,
+    "depth": 1.88,
+    "depth_normalized": 0.47,
+    "novelty": 0.7,
+    "depth_confidence": 0.85
+  },
+  "2116304319574372447": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.46,
+    "depth": 2.0,
+    "depth_normalized": 0.5,
+    "novelty": 0.61,
+    "depth_confidence": 0.77
+  },
+  "2116289244549492946": {
+    "scorer_version": 2,
+    "quality": 23,
+    "signal": 0.08,
+    "depth": 1.0,
+    "depth_normalized": 0.25,
+    "novelty": 0.46,
+    "depth_confidence": 0.9
+  },
+  "2116281670357876977": {
+    "scorer_version": 2,
+    "quality": 34,
+    "signal": 0.12,
+    "depth": 1.67,
+    "depth_normalized": 0.4175,
+    "novelty": 0.65,
+    "depth_confidence": 0.62
+  },
+  "2116266574248386785": {
+    "scorer_version": 2,
+    "quality": 63,
+    "signal": 0.62,
+    "depth": 1.88,
+    "depth_normalized": 0.47,
+    "novelty": 0.76,
+    "depth_confidence": 0.86
+  },
+  "2116259242365813111": {
+    "scorer_version": 2,
+    "quality": 20,
+    "signal": 0.06,
+    "depth": 0.5,
+    "depth_normalized": 0.125,
+    "novelty": 0.47,
+    "depth_confidence": 0.59
+  },
+  "2116244045836239206": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.35,
+    "depth": 1.78,
+    "depth_normalized": 0.445,
+    "novelty": 0.75,
+    "depth_confidence": 0.78
+  },
+  "2116236441219158315": {
+    "scorer_version": 2,
+    "quality": 39,
+    "signal": 0.28,
+    "depth": 1.3,
+    "depth_normalized": 0.325,
+    "novelty": 0.61,
+    "depth_confidence": 0.69
+  },
+  "2116228867040088376": {
+    "scorer_version": 2,
+    "quality": 44,
+    "signal": 0.4,
+    "depth": 1.69,
+    "depth_normalized": 0.4225,
+    "novelty": 0.51,
+    "depth_confidence": 0.73
+  },
+  "2116399240880480429": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.68,
+    "depth": 1.4,
+    "depth_normalized": 0.35,
+    "novelty": 0.69,
+    "depth_confidence": 0.61
+  },
+  "2116345289250418703": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.95,
+    "depth": 2.62,
+    "depth_normalized": 0.655,
+    "novelty": 0.79,
+    "depth_confidence": 0.66
+  },
+  "2116341067054297451": {
+    "scorer_version": 2,
+    "quality": 29,
+    "signal": 0.08,
+    "depth": 0.93,
+    "depth_normalized": 0.2325,
+    "novelty": 0.67,
+    "depth_confidence": 0.77
+  },
+  "2116306239667995111": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.41,
+    "depth": 1.59,
+    "depth_normalized": 0.3975,
+    "novelty": 0.68,
+    "depth_confidence": 0.66
+  },
+  "2116297825772589318": {
+    "scorer_version": 2,
+    "quality": 66,
+    "signal": 0.75,
+    "depth": 2.44,
+    "depth_normalized": 0.61,
+    "novelty": 0.54,
+    "depth_confidence": 0.57
+  },
+  "2116239052676415821": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.6,
+    "depth": 1.9,
+    "depth_normalized": 0.475,
+    "novelty": 0.72,
+    "depth_confidence": 0.83
+  },
+  "2116234164600963206": {
+    "scorer_version": 2,
+    "quality": 75,
+    "signal": 0.84,
+    "depth": 2.26,
+    "depth_normalized": 0.565,
+    "novelty": 0.72,
+    "depth_confidence": 0.72
+  },
+  "2116181576081928438": {
+    "scorer_version": 2,
+    "quality": 58,
+    "signal": 0.6,
+    "depth": 1.66,
+    "depth_normalized": 0.415,
+    "novelty": 0.67,
+    "depth_confidence": 0.7
+  },
+  "2116178912799515062": {
+    "scorer_version": 2,
+    "quality": 85,
+    "signal": 0.96,
+    "depth": 2.91,
+    "depth_normalized": 0.7275,
+    "novelty": 0.74,
+    "depth_confidence": 0.92
+  },
+  "2116173552214806982": {
+    "scorer_version": 2,
+    "quality": 85,
+    "signal": 0.96,
+    "depth": 2.91,
+    "depth_normalized": 0.7275,
+    "novelty": 0.76,
+    "depth_confidence": 0.86
+  },
+  "2116315474287804895": {
+    "scorer_version": 2,
+    "quality": 65,
+    "signal": 0.64,
+    "depth": 2.11,
+    "depth_normalized": 0.5275,
+    "novelty": 0.74,
+    "depth_confidence": 0.86
+  },
+  "2116285277253648547": {
+    "scorer_version": 2,
+    "quality": 86,
+    "signal": 0.96,
+    "depth": 3.07,
+    "depth_normalized": 0.7675,
+    "novelty": 0.74,
+    "depth_confidence": 0.89
+  },
+  "2116280881685975134": {
+    "scorer_version": 2,
+    "quality": 74,
+    "signal": 0.9,
+    "depth": 2.13,
+    "depth_normalized": 0.5325,
+    "novelty": 0.6,
+    "depth_confidence": 0.82
+  },
+  "2116280446266859708": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.95,
+    "depth": 2.98,
+    "depth_normalized": 0.745,
+    "novelty": 0.7,
+    "depth_confidence": 0.89
+  },
+  "2116278165416890852": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.14,
+    "depth": 1.19,
+    "depth_normalized": 0.2975,
+    "novelty": 0.43,
+    "depth_confidence": 0.78
+  },
+  "2116268342981828952": {
+    "scorer_version": 2,
+    "quality": 60,
+    "signal": 0.66,
+    "depth": 2.13,
+    "depth_normalized": 0.5325,
+    "novelty": 0.53,
+    "depth_confidence": 0.77
+  },
+  "2116265992401645878": {
+    "scorer_version": 2,
+    "quality": 81,
+    "signal": 0.92,
+    "depth": 2.92,
+    "depth_normalized": 0.73,
+    "novelty": 0.68,
+    "depth_confidence": 0.8
+  },
+  "2116253919714152958": {
+    "scorer_version": 2,
+    "quality": 86,
+    "signal": 0.96,
+    "depth": 3.01,
+    "depth_normalized": 0.7525,
+    "novelty": 0.78,
+    "depth_confidence": 0.94
+  },
+  "2116243626871128458": {
+    "scorer_version": 2,
+    "quality": 77,
+    "signal": 0.88,
+    "depth": 2.3,
+    "depth_normalized": 0.575,
+    "novelty": 0.73,
+    "depth_confidence": 0.7
+  },
+  "2116225800588443787": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.87,
+    "depth": 2.42,
+    "depth_normalized": 0.605,
+    "novelty": 0.74,
+    "depth_confidence": 0.6
+  },
+  "2116224569782485136": {
+    "scorer_version": 2,
+    "quality": 66,
+    "signal": 0.73,
+    "depth": 2.15,
+    "depth_normalized": 0.5375,
+    "novelty": 0.63,
+    "depth_confidence": 0.81
+  },
+  "2116217534366011546": {
+    "scorer_version": 2,
+    "quality": 41,
+    "signal": 0.27,
+    "depth": 1.7,
+    "depth_normalized": 0.425,
+    "novelty": 0.63,
+    "depth_confidence": 0.68
+  },
+  "2116216370945741195": {
+    "scorer_version": 2,
+    "quality": 81,
+    "signal": 0.94,
+    "depth": 2.05,
+    "depth_normalized": 0.5125,
+    "novelty": 0.8,
+    "depth_confidence": 0.91
+  },
+  "2116213867432800577": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.6,
+    "depth": 1.61,
+    "depth_normalized": 0.4025,
+    "novelty": 0.58,
+    "depth_confidence": 0.68
+  },
+  "2116207976641970311": {
+    "scorer_version": 2,
+    "quality": 76,
+    "signal": 0.87,
+    "depth": 2.48,
+    "depth_normalized": 0.62,
+    "novelty": 0.67,
+    "depth_confidence": 0.55
+  },
+  "2116198217813737668": {
+    "scorer_version": 2,
+    "quality": 18,
+    "signal": 0.1,
+    "depth": 1.06,
+    "depth_normalized": 0.265,
+    "novelty": 0.26,
+    "depth_confidence": 0.89
+  },
+  "2116197942755233848": {
+    "scorer_version": 2,
+    "quality": 71,
+    "signal": 0.83,
+    "depth": 2.04,
+    "depth_normalized": 0.51,
+    "novelty": 0.64,
+    "depth_confidence": 0.88
+  },
+  "2116197358954324137": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.86,
+    "depth": 2.5,
+    "depth_normalized": 0.625,
+    "novelty": 0.74,
+    "depth_confidence": 0.57
+  },
+  "2116172114474516958": {
+    "scorer_version": 2,
+    "quality": 86,
+    "signal": 0.95,
+    "depth": 3.58,
+    "depth_normalized": 0.895,
+    "novelty": 0.67,
+    "depth_confidence": 0.65
+  },
+  "2116336166379409779": {
+    "scorer_version": 2,
+    "quality": 36,
+    "signal": 0.18,
+    "depth": 1.63,
+    "depth_normalized": 0.4075,
+    "novelty": 0.63,
+    "depth_confidence": 0.62
+  },
+  "2116299359822156024": {
+    "scorer_version": 2,
+    "quality": 17,
+    "signal": 0.07,
+    "depth": 1.08,
+    "depth_normalized": 0.27,
+    "novelty": 0.27,
+    "depth_confidence": 0.84
+  },
+  "2116155439562068186": {
+    "scorer_version": 2,
+    "quality": 21,
+    "signal": 0.07,
+    "depth": 1.15,
+    "depth_normalized": 0.2875,
+    "novelty": 0.39,
+    "depth_confidence": 0.83
+  },
+  "2116142027486400837": {
+    "scorer_version": 2,
+    "quality": 76,
+    "signal": 0.84,
+    "depth": 2.5,
+    "depth_normalized": 0.625,
+    "novelty": 0.72,
+    "depth_confidence": 0.58
+  },
+  "2116132943332512152": {
+    "scorer_version": 2,
+    "quality": 21,
+    "signal": 0.13,
+    "depth": 1.05,
+    "depth_normalized": 0.2625,
+    "novelty": 0.3,
+    "depth_confidence": 0.88
+  },
+  "2116327265621487992": {
+    "scorer_version": 2,
+    "quality": 47,
+    "signal": 0.46,
+    "depth": 1.34,
+    "depth_normalized": 0.335,
+    "novelty": 0.58,
+    "depth_confidence": 0.72
+  },
+  "2116304955640578341": {
+    "scorer_version": 2,
+    "quality": 57,
+    "signal": 0.56,
+    "depth": 1.67,
+    "depth_normalized": 0.4175,
+    "novelty": 0.68,
+    "depth_confidence": 0.72
+  },
+  "2116210615274402145": {
+    "scorer_version": 2,
+    "quality": 13,
+    "signal": 0.03,
+    "depth": 0.64,
+    "depth_normalized": 0.16,
+    "novelty": 0.29,
+    "depth_confidence": 0.66
+  },
+  "2116293523213320380": {
+    "scorer_version": 2,
+    "quality": 48,
+    "signal": 0.39,
+    "depth": 1.5,
+    "depth_normalized": 0.375,
+    "novelty": 0.69,
+    "depth_confidence": 0.57
+  },
+  "2116290847599915392": {
+    "scorer_version": 2,
+    "quality": 38,
+    "signal": 0.32,
+    "depth": 1.28,
+    "depth_normalized": 0.32,
+    "novelty": 0.52,
+    "depth_confidence": 0.77
+  },
+  "2116286608227852523": {
+    "scorer_version": 2,
+    "quality": 42,
+    "signal": 0.37,
+    "depth": 1.19,
+    "depth_normalized": 0.2975,
+    "novelty": 0.58,
+    "depth_confidence": 0.84
+  },
+  "2116284889297510723": {
+    "scorer_version": 2,
+    "quality": 30,
+    "signal": 0.18,
+    "depth": 1.19,
+    "depth_normalized": 0.2975,
+    "novelty": 0.5,
+    "depth_confidence": 0.84
+  },
+  "2116251849728647579": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.59,
+    "depth": 1.79,
+    "depth_normalized": 0.4475,
+    "novelty": 0.78,
+    "depth_confidence": 0.8
+  },
+  "2116235602018578598": {
+    "scorer_version": 2,
+    "quality": 58,
+    "signal": 0.65,
+    "depth": 1.89,
+    "depth_normalized": 0.4725,
+    "novelty": 0.54,
+    "depth_confidence": 0.84
+  },
+  "2116229144430170207": {
+    "scorer_version": 2,
+    "quality": 59,
+    "signal": 0.65,
+    "depth": 1.67,
+    "depth_normalized": 0.4175,
+    "novelty": 0.62,
+    "depth_confidence": 0.68
+  },
+  "2116130745978695686": {
+    "scorer_version": 2,
+    "quality": 22,
+    "signal": 0.08,
+    "depth": 1.16,
+    "depth_normalized": 0.29,
+    "novelty": 0.39,
+    "depth_confidence": 0.85
+  },
+  "2116130746280673686": {
+    "scorer_version": 2,
+    "quality": 23,
+    "signal": 0.06,
+    "depth": 1.07,
+    "depth_normalized": 0.2675,
+    "novelty": 0.48,
+    "depth_confidence": 0.91
+  },
+  "2116374304833052848": {
+    "scorer_version": 2,
+    "quality": 20,
+    "signal": 0.05,
+    "depth": 0.86,
+    "depth_normalized": 0.215,
+    "novelty": 0.44,
+    "depth_confidence": 0.85
+  },
+  "2116345010442678583": {
+    "scorer_version": 2,
+    "quality": 30,
+    "signal": 0.14,
+    "depth": 0.85,
+    "depth_normalized": 0.2125,
+    "novelty": 0.62,
+    "depth_confidence": 0.59
+  },
+  "2116333324851347620": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.41,
+    "depth": 1.4,
+    "depth_normalized": 0.35,
+    "novelty": 0.63,
+    "depth_confidence": 0.68
+  },
+  "2116326836015968326": {
+    "scorer_version": 2,
+    "quality": 17,
+    "signal": 0.03,
+    "depth": 0.25,
+    "depth_normalized": 0.0625,
+    "novelty": 0.46,
+    "depth_confidence": 0.79
+  },
+  "2116322086285168894": {
+    "scorer_version": 2,
+    "quality": 30,
+    "signal": 0.08,
+    "depth": 1.16,
+    "depth_normalized": 0.29,
+    "novelty": 0.68,
+    "depth_confidence": 0.82
+  },
+  "2116319368141218126": {
+    "scorer_version": 2,
+    "quality": 32,
+    "signal": 0.15,
+    "depth": 0.75,
+    "depth_normalized": 0.1875,
+    "novelty": 0.7,
+    "depth_confidence": 0.68
+  },
+  "2116304504136306898": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.59,
+    "depth": 1.75,
+    "depth_normalized": 0.4375,
+    "novelty": 0.75,
+    "depth_confidence": 0.77
+  },
+  "2116286993650843860": {
+    "scorer_version": 2,
+    "quality": 19,
+    "signal": 0.05,
+    "depth": 0.47,
+    "depth_normalized": 0.1175,
+    "novelty": 0.48,
+    "depth_confidence": 0.62
+  },
+  "2116271242500042754": {
+    "scorer_version": 2,
+    "quality": 43,
+    "signal": 0.36,
+    "depth": 1.26,
+    "depth_normalized": 0.315,
+    "novelty": 0.62,
+    "depth_confidence": 0.77
+  },
+  "2116266089718108424": {
+    "scorer_version": 2,
+    "quality": 18,
+    "signal": 0.06,
+    "depth": 0.69,
+    "depth_normalized": 0.1725,
+    "novelty": 0.39,
+    "depth_confidence": 0.7
+  },
+  "2116252616455823669": {
+    "scorer_version": 2,
+    "quality": 64,
+    "signal": 0.7,
+    "depth": 1.56,
+    "depth_normalized": 0.39,
+    "novelty": 0.71,
+    "depth_confidence": 0.63
+  },
+  "2116248958037061670": {
+    "scorer_version": 2,
+    "quality": 57,
+    "signal": 0.53,
+    "depth": 1.68,
+    "depth_normalized": 0.42,
+    "novelty": 0.74,
+    "depth_confidence": 0.72
+  },
+  "2116237070490284357": {
+    "scorer_version": 2,
+    "quality": 28,
+    "signal": 0.22,
+    "depth": 1.14,
+    "depth_normalized": 0.285,
+    "novelty": 0.37,
+    "depth_confidence": 0.87
+  },
+  "2116234368507412637": {
+    "scorer_version": 2,
+    "quality": 14,
+    "signal": 0.04,
+    "depth": 0.71,
+    "depth_normalized": 0.1775,
+    "novelty": 0.28,
+    "depth_confidence": 0.7
+  },
+  "2116233570884972595": {
+    "scorer_version": 2,
+    "quality": 34,
+    "signal": 0.17,
+    "depth": 1.4,
+    "depth_normalized": 0.35,
+    "novelty": 0.63,
+    "depth_confidence": 0.53
+  },
+  "2116223875549663300": {
+    "scorer_version": 2,
+    "quality": 53,
+    "signal": 0.48,
+    "depth": 1.84,
+    "depth_normalized": 0.46,
+    "novelty": 0.67,
+    "depth_confidence": 0.84
+  },
+  "2116223112316334587": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.42,
+    "depth": 2.23,
+    "depth_normalized": 0.5575,
+    "novelty": 0.76,
+    "depth_confidence": 0.74
+  },
+  "2116167743330287975": {
+    "scorer_version": 2,
+    "quality": 65,
+    "signal": 0.61,
+    "depth": 2.13,
+    "depth_normalized": 0.5325,
+    "novelty": 0.8,
+    "depth_confidence": 0.83
+  },
+  "2116143498734838086": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.82,
+    "depth": 2.97,
+    "depth_normalized": 0.7425,
+    "novelty": 0.81,
+    "depth_confidence": 0.98
+  },
+  "2116139473222107471": {
+    "scorer_version": 2,
+    "quality": 54,
+    "signal": 0.37,
+    "depth": 2.11,
+    "depth_normalized": 0.5275,
+    "novelty": 0.83,
+    "depth_confidence": 0.76
+  },
+  "2116214050006654980": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.36,
+    "depth": 1.77,
+    "depth_normalized": 0.4425,
+    "novelty": 0.65,
+    "depth_confidence": 0.77
+  },
+  "2116200728649736597": {
+    "scorer_version": 2,
+    "quality": 63,
+    "signal": 0.61,
+    "depth": 2.43,
+    "depth_normalized": 0.6075,
+    "novelty": 0.69,
+    "depth_confidence": 0.6
+  },
+  "2116259362352033918": {
+    "scorer_version": 2,
+    "quality": 33,
+    "signal": 0.2,
+    "depth": 1.32,
+    "depth_normalized": 0.33,
+    "novelty": 0.56,
+    "depth_confidence": 0.73
+  },
+  "2116228725507334179": {
+    "scorer_version": 2,
+    "quality": 64,
+    "signal": 0.62,
+    "depth": 2.02,
+    "depth_normalized": 0.505,
+    "novelty": 0.77,
+    "depth_confidence": 0.85
+  },
+  "2116198967683739812": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.4,
+    "depth": 1.58,
+    "depth_normalized": 0.395,
+    "novelty": 0.71,
+    "depth_confidence": 0.66
+  },
+  "2116198539105563099": {
+    "scorer_version": 2,
+    "quality": 63,
+    "signal": 0.84,
+    "depth": 2.02,
+    "depth_normalized": 0.505,
+    "novelty": 0.37,
+    "depth_confidence": 0.92
+  },
+  "2116289113548562466": {
+    "scorer_version": 2,
+    "quality": 35,
+    "signal": 0.22,
+    "depth": 1.31,
+    "depth_normalized": 0.3275,
+    "novelty": 0.58,
+    "depth_confidence": 0.72
+  },
+  "2116216149348405553": {
+    "scorer_version": 2,
+    "quality": 39,
+    "signal": 0.28,
+    "depth": 1.06,
+    "depth_normalized": 0.265,
+    "novelty": 0.67,
+    "depth_confidence": 0.63
+  },
+  "2116349211549843666": {
+    "scorer_version": 2,
+    "quality": 79,
+    "signal": 0.86,
+    "depth": 2.7,
+    "depth_normalized": 0.675,
+    "novelty": 0.75,
+    "depth_confidence": 0.73
+  },
+  "2116347470078951717": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.79,
+    "depth": 2.47,
+    "depth_normalized": 0.6175,
+    "novelty": 0.72,
+    "depth_confidence": 0.54
+  },
+  "2116378109218009267": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.93,
+    "depth": 1.99,
+    "depth_normalized": 0.4975,
+    "novelty": 0.73,
+    "depth_confidence": 0.8
+  },
+  "2116396849443598707": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.94,
+    "depth": 1.9,
+    "depth_normalized": 0.475,
+    "novelty": 0.72,
+    "depth_confidence": 0.78
+  },
+  "2116200444276178966": {
+    "scorer_version": 2,
+    "quality": 24,
+    "signal": 0.1,
+    "depth": 0.94,
+    "depth_normalized": 0.235,
+    "novelty": 0.48,
+    "depth_confidence": 0.77
+  },
+  "2116241841742053737": {
+    "scorer_version": 2,
+    "quality": 50,
+    "signal": 0.72,
+    "depth": 1.81,
+    "depth_normalized": 0.4525,
+    "novelty": 0.17,
+    "depth_confidence": 0.82
+  },
+  "2116168762269605888": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.86,
+    "depth": 2.1,
+    "depth_normalized": 0.525,
+    "novelty": 0.82,
+    "depth_confidence": 0.87
+  },
+  "2116153552078852157": {
+    "scorer_version": 2,
+    "quality": 42,
+    "signal": 0.26,
+    "depth": 1.52,
+    "depth_normalized": 0.38,
+    "novelty": 0.71,
+    "depth_confidence": 0.6
+  },
+  "2116348216300192245": {
+    "scorer_version": 2,
+    "quality": 27,
+    "signal": 0.12,
+    "depth": 0.81,
+    "depth_normalized": 0.2025,
+    "novelty": 0.58,
+    "depth_confidence": 0.33
+  },
+  "2116233367020859888": {
+    "scorer_version": 2,
+    "quality": 16,
+    "signal": 0.03,
+    "depth": 0.59,
+    "depth_normalized": 0.1475,
+    "novelty": 0.37,
+    "depth_confidence": 0.66
+  },
+  "2116281564225057087": {
+    "scorer_version": 2,
+    "quality": 77,
+    "signal": 0.84,
+    "depth": 2.56,
+    "depth_normalized": 0.64,
+    "novelty": 0.75,
+    "depth_confidence": 0.63
+  },
+  "2116278761125535913": {
+    "scorer_version": 2,
+    "quality": 85,
+    "signal": 0.92,
+    "depth": 3.7,
+    "depth_normalized": 0.925,
+    "novelty": 0.67,
+    "depth_confidence": 0.76
+  },
+  "2116266432073723907": {
+    "scorer_version": 2,
+    "quality": 88,
+    "signal": 0.96,
+    "depth": 3.35,
+    "depth_normalized": 0.8375,
+    "novelty": 0.79,
+    "depth_confidence": 0.71
+  },
+  "2116258887615529136": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.92,
+    "depth": 2.4,
+    "depth_normalized": 0.6,
+    "novelty": 0.75,
+    "depth_confidence": 0.66
+  },
+  "2116251317819609165": {
+    "scorer_version": 2,
+    "quality": 83,
+    "signal": 0.89,
+    "depth": 3.28,
+    "depth_normalized": 0.82,
+    "novelty": 0.74,
+    "depth_confidence": 0.7
+  },
+  "2116236212046266792": {
+    "scorer_version": 2,
+    "quality": 89,
+    "signal": 0.95,
+    "depth": 3.42,
+    "depth_normalized": 0.855,
+    "novelty": 0.8,
+    "depth_confidence": 0.64
+  },
+  "2116228717970137467": {
+    "scorer_version": 2,
+    "quality": 81,
+    "signal": 0.82,
+    "depth": 3.46,
+    "depth_normalized": 0.865,
+    "novelty": 0.77,
+    "depth_confidence": 0.56
+  },
+  "2116221130373546207": {
+    "scorer_version": 2,
+    "quality": 79,
+    "signal": 0.85,
+    "depth": 2.97,
+    "depth_normalized": 0.7425,
+    "novelty": 0.73,
+    "depth_confidence": 0.77
+  },
+  "2116213986563645442": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.96,
+    "depth": 2.85,
+    "depth_normalized": 0.7125,
+    "novelty": 0.73,
+    "depth_confidence": 0.87
+  },
+  "2116213571608776732": {
+    "scorer_version": 2,
+    "quality": 19,
+    "signal": 0.07,
+    "depth": 1.0,
+    "depth_normalized": 0.25,
+    "novelty": 0.34,
+    "depth_confidence": 0.67
+  },
+  "2116198589219135644": {
+    "scorer_version": 2,
+    "quality": 87,
+    "signal": 0.96,
+    "depth": 3.23,
+    "depth_normalized": 0.8075,
+    "novelty": 0.75,
+    "depth_confidence": 0.79
+  },
+  "2116190922417344772": {
+    "scorer_version": 2,
+    "quality": 89,
+    "signal": 0.96,
+    "depth": 3.34,
+    "depth_normalized": 0.835,
+    "novelty": 0.8,
+    "depth_confidence": 0.68
+  },
+  "2116183484662173787": {
+    "scorer_version": 2,
+    "quality": 90,
+    "signal": 0.97,
+    "depth": 3.48,
+    "depth_normalized": 0.87,
+    "novelty": 0.81,
+    "depth_confidence": 0.58
+  },
+  "2116175824609063092": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.88,
+    "depth": 2.74,
+    "depth_normalized": 0.685,
+    "novelty": 0.74,
+    "depth_confidence": 0.77
+  },
+  "2116168396354072975": {
+    "scorer_version": 2,
+    "quality": 89,
+    "signal": 0.93,
+    "depth": 3.77,
+    "depth_normalized": 0.9425,
+    "novelty": 0.78,
+    "depth_confidence": 0.82
+  },
+  "2116165392146092277": {
+    "scorer_version": 2,
+    "quality": 72,
+    "signal": 0.78,
+    "depth": 2.55,
+    "depth_normalized": 0.6375,
+    "novelty": 0.68,
+    "depth_confidence": 0.6
+  },
+  "2116160725030670764": {
+    "scorer_version": 2,
+    "quality": 86,
+    "signal": 0.92,
+    "depth": 3.54,
+    "depth_normalized": 0.885,
+    "novelty": 0.76,
+    "depth_confidence": 0.62
+  },
+  "2116153236939845789": {
+    "scorer_version": 2,
+    "quality": 69,
+    "signal": 0.73,
+    "depth": 2.09,
+    "depth_normalized": 0.5225,
+    "novelty": 0.72,
+    "depth_confidence": 0.82
+  },
+  "2116450373497966737": {
+    "scorer_version": 2,
+    "quality": 58,
+    "signal": 0.56,
+    "depth": 1.99,
+    "depth_normalized": 0.4975,
+    "novelty": 0.66,
+    "depth_confidence": 0.75
+  },
+  "2116423094013211066": {
+    "scorer_version": 2,
+    "quality": 69,
+    "signal": 0.69,
+    "depth": 2.81,
+    "depth_normalized": 0.7025,
+    "novelty": 0.69,
+    "depth_confidence": 0.62
+  },
+  "2116413458891657273": {
+    "scorer_version": 2,
+    "quality": 50,
+    "signal": 0.46,
+    "depth": 1.96,
+    "depth_normalized": 0.49,
+    "novelty": 0.59,
+    "depth_confidence": 0.83
+  },
+  "2116412886000005228": {
+    "scorer_version": 2,
+    "quality": 67,
+    "signal": 0.62,
+    "depth": 2.85,
+    "depth_normalized": 0.7125,
+    "novelty": 0.72,
+    "depth_confidence": 0.87
+  },
+  "2116408044556812407": {
+    "scorer_version": 2,
+    "quality": 48,
+    "signal": 0.37,
+    "depth": 1.73,
+    "depth_normalized": 0.4325,
+    "novelty": 0.68,
+    "depth_confidence": 0.74
+  },
+  "2116408043848057340": {
+    "scorer_version": 2,
+    "quality": 37,
+    "signal": 0.2,
+    "depth": 1.51,
+    "depth_normalized": 0.3775,
+    "novelty": 0.66,
+    "depth_confidence": 0.59
+  },
+  "2116408040349987259": {
+    "scorer_version": 2,
+    "quality": 37,
+    "signal": 0.2,
+    "depth": 1.32,
+    "depth_normalized": 0.33,
+    "novelty": 0.68,
+    "depth_confidence": 0.63
+  },
+  "2116408039800545668": {
+    "scorer_version": 2,
+    "quality": 47,
+    "signal": 0.37,
+    "depth": 1.75,
+    "depth_normalized": 0.4375,
+    "novelty": 0.66,
+    "depth_confidence": 0.77
+  },
+  "2116408035354493241": {
+    "scorer_version": 2,
+    "quality": 37,
+    "signal": 0.22,
+    "depth": 1.31,
+    "depth_normalized": 0.3275,
+    "novelty": 0.65,
+    "depth_confidence": 0.67
+  },
+  "2116408035295781210": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.41,
+    "depth": 1.73,
+    "depth_normalized": 0.4325,
+    "novelty": 0.56,
+    "depth_confidence": 0.76
+  },
+  "2116402570461581562": {
+    "scorer_version": 2,
+    "quality": 28,
+    "signal": 0.06,
+    "depth": 1.05,
+    "depth_normalized": 0.2625,
+    "novelty": 0.65,
+    "depth_confidence": 0.71
+  },
+  "2116402140000219158": {
+    "scorer_version": 2,
+    "quality": 40,
+    "signal": 0.29,
+    "depth": 1.61,
+    "depth_normalized": 0.4025,
+    "novelty": 0.59,
+    "depth_confidence": 0.62
+  },
+  "2116402131645207002": {
+    "scorer_version": 2,
+    "quality": 22,
+    "signal": 0.06,
+    "depth": 1.18,
+    "depth_normalized": 0.295,
+    "novelty": 0.45,
+    "depth_confidence": 0.68
+  },
+  "2116400487620575275": {
+    "scorer_version": 2,
+    "quality": 33,
+    "signal": 0.14,
+    "depth": 1.31,
+    "depth_normalized": 0.3275,
+    "novelty": 0.64,
+    "depth_confidence": 0.68
+  },
+  "2116400487536718248": {
+    "scorer_version": 2,
+    "quality": 40,
+    "signal": 0.23,
+    "depth": 1.65,
+    "depth_normalized": 0.4125,
+    "novelty": 0.69,
+    "depth_confidence": 0.69
+  },
+  "2116324028579184888": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.94,
+    "depth": 3.06,
+    "depth_normalized": 0.765,
+    "novelty": 0.73,
+    "depth_confidence": 0.85
+  },
+  "2116319516661563796": {
+    "scorer_version": 2,
+    "quality": 66,
+    "signal": 0.62,
+    "depth": 2.8,
+    "depth_normalized": 0.7,
+    "novelty": 0.71,
+    "depth_confidence": 0.31
+  },
+  "2116306432467362125": {
+    "scorer_version": 2,
+    "quality": 59,
+    "signal": 0.54,
+    "depth": 2.35,
+    "depth_normalized": 0.5875,
+    "novelty": 0.69,
+    "depth_confidence": 0.65
+  },
+  "2116286803942478043": {
+    "scorer_version": 2,
+    "quality": 65,
+    "signal": 0.76,
+    "depth": 1.99,
+    "depth_normalized": 0.4975,
+    "novelty": 0.56,
+    "depth_confidence": 0.91
+  },
+  "2116285541251465517": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.94,
+    "depth": 2.95,
+    "depth_normalized": 0.7375,
+    "novelty": 0.73,
+    "depth_confidence": 0.7
+  },
+  "2116304186841211303": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.21,
+    "depth": 1.26,
+    "depth_normalized": 0.315,
+    "novelty": 0.31,
+    "depth_confidence": 0.78
+  },
+  "2116301443632398814": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.85,
+    "depth": 2.66,
+    "depth_normalized": 0.665,
+    "novelty": 0.8,
+    "depth_confidence": 0.72
+  },
+  "2116296185346490440": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.86,
+    "depth": 2.29,
+    "depth_normalized": 0.5725,
+    "novelty": 0.77,
+    "depth_confidence": 0.69
+  },
+  "2116295239728238859": {
+    "scorer_version": 2,
+    "quality": 75,
+    "signal": 0.77,
+    "depth": 2.64,
+    "depth_normalized": 0.66,
+    "novelty": 0.77,
+    "depth_confidence": 0.7
+  },
+  "2116292892058870142": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.44,
+    "depth": 2.01,
+    "depth_normalized": 0.5025,
+    "novelty": 0.75,
+    "depth_confidence": 0.73
+  },
+  "2116286212340342990": {
+    "scorer_version": 2,
+    "quality": 76,
+    "signal": 0.77,
+    "depth": 2.7,
+    "depth_normalized": 0.675,
+    "novelty": 0.81,
+    "depth_confidence": 0.74
+  },
+  "2116270736922878178": {
+    "scorer_version": 2,
+    "quality": 15,
+    "signal": 0.04,
+    "depth": 1.02,
+    "depth_normalized": 0.255,
+    "novelty": 0.25,
+    "depth_confidence": 0.92
+  },
+  "2116264164482322693": {
+    "scorer_version": 2,
+    "quality": 59,
+    "signal": 0.58,
+    "depth": 1.42,
+    "depth_normalized": 0.355,
+    "novelty": 0.76,
+    "depth_confidence": 0.62
+  },
+  "2116259323328475526": {
+    "scorer_version": 2,
+    "quality": 62,
+    "signal": 0.6,
+    "depth": 2.14,
+    "depth_normalized": 0.535,
+    "novelty": 0.71,
+    "depth_confidence": 0.82
+  },
+  "2116258759014248709": {
+    "scorer_version": 2,
+    "quality": 66,
+    "signal": 0.72,
+    "depth": 1.73,
+    "depth_normalized": 0.4325,
+    "novelty": 0.7,
+    "depth_confidence": 0.76
+  },
+  "2116228872887001308": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.88,
+    "depth": 2.18,
+    "depth_normalized": 0.545,
+    "novelty": 0.77,
+    "depth_confidence": 0.8
+  },
+  "2116228098798887000": {
+    "scorer_version": 2,
+    "quality": 77,
+    "signal": 0.88,
+    "depth": 2.13,
+    "depth_normalized": 0.5325,
+    "novelty": 0.74,
+    "depth_confidence": 0.79
+  },
+  "2116227119978275299": {
+    "scorer_version": 2,
+    "quality": 65,
+    "signal": 0.65,
+    "depth": 1.97,
+    "depth_normalized": 0.4925,
+    "novelty": 0.76,
+    "depth_confidence": 0.84
+  },
+  "2116216799368778033": {
+    "scorer_version": 2,
+    "quality": 69,
+    "signal": 0.64,
+    "depth": 2.57,
+    "depth_normalized": 0.6425,
+    "novelty": 0.81,
+    "depth_confidence": 0.65
+  },
+  "2116212579487854872": {
+    "scorer_version": 2,
+    "quality": 65,
+    "signal": 0.66,
+    "depth": 1.93,
+    "depth_normalized": 0.4825,
+    "novelty": 0.73,
+    "depth_confidence": 0.82
+  },
+  "2116203578608021806": {
+    "scorer_version": 2,
+    "quality": 73,
+    "signal": 0.87,
+    "depth": 1.93,
+    "depth_normalized": 0.4825,
+    "novelty": 0.65,
+    "depth_confidence": 0.82
+  },
+  "2116199845245473051": {
+    "scorer_version": 2,
+    "quality": 68,
+    "signal": 0.76,
+    "depth": 1.71,
+    "depth_normalized": 0.4275,
+    "novelty": 0.73,
+    "depth_confidence": 0.76
+  },
+  "2116440181675081880": {
+    "scorer_version": 2,
+    "quality": 81,
+    "signal": 0.89,
+    "depth": 2.85,
+    "depth_normalized": 0.7125,
+    "novelty": 0.73,
+    "depth_confidence": 0.73
+  },
+  "2116426217050058877": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.54,
+    "depth": 1.71,
+    "depth_normalized": 0.4275,
+    "novelty": 0.64,
+    "depth_confidence": 0.75
+  },
+  "2116411121250844956": {
+    "scorer_version": 2,
+    "quality": 27,
+    "signal": 0.2,
+    "depth": 1.35,
+    "depth_normalized": 0.3375,
+    "novelty": 0.33,
+    "depth_confidence": 0.71
+  },
+  "2116409880500371783": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.65,
+    "depth": 1.62,
+    "depth_normalized": 0.405,
+    "novelty": 0.69,
+    "depth_confidence": 0.65
+  },
+  "2116379677040562330": {
+    "scorer_version": 2,
+    "quality": 71,
+    "signal": 0.76,
+    "depth": 2.54,
+    "depth_normalized": 0.635,
+    "novelty": 0.69,
+    "depth_confidence": 0.52
+  },
+  "2116349485190467607": {
+    "scorer_version": 2,
+    "quality": 60,
+    "signal": 0.57,
+    "depth": 2.17,
+    "depth_normalized": 0.5425,
+    "novelty": 0.69,
+    "depth_confidence": 0.81
+  },
+  "2116289172881518829": {
+    "scorer_version": 2,
+    "quality": 84,
+    "signal": 0.95,
+    "depth": 2.9,
+    "depth_normalized": 0.725,
+    "novelty": 0.72,
+    "depth_confidence": 0.68
+  },
+  "2116259031627248051": {
+    "scorer_version": 2,
+    "quality": 58,
+    "signal": 0.52,
+    "depth": 1.76,
+    "depth_normalized": 0.44,
+    "novelty": 0.77,
+    "depth_confidence": 0.78
+  },
+  "2116259015063982300": {
+    "scorer_version": 2,
+    "quality": 48,
+    "signal": 0.34,
+    "depth": 1.84,
+    "depth_normalized": 0.46,
+    "novelty": 0.73,
+    "depth_confidence": 0.78
+  },
+  "2116248803158192131": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.49,
+    "depth": 1.54,
+    "depth_normalized": 0.385,
+    "novelty": 0.63,
+    "depth_confidence": 0.61
+  },
+  "2116243978266071286": {
+    "scorer_version": 2,
+    "quality": 76,
+    "signal": 0.92,
+    "depth": 2.23,
+    "depth_normalized": 0.5575,
+    "novelty": 0.64,
+    "depth_confidence": 0.76
+  },
+  "2116232452087730285": {
+    "scorer_version": 2,
+    "quality": 57,
+    "signal": 0.53,
+    "depth": 2.23,
+    "depth_normalized": 0.5575,
+    "novelty": 0.66,
+    "depth_confidence": 0.68
+  },
+  "2116228808143667689": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.48,
+    "depth": 1.82,
+    "depth_normalized": 0.455,
+    "novelty": 0.74,
+    "depth_confidence": 0.01
+  },
+  "2116221097318420602": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.34,
+    "depth": 1.94,
+    "depth_normalized": 0.485,
+    "novelty": 0.65,
+    "depth_confidence": 0.84
+  },
+  "2116218604744044937": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.83,
+    "depth": 3.24,
+    "depth_normalized": 0.81,
+    "novelty": 0.73,
+    "depth_confidence": 0.66
+  },
+  "2116213869173678372": {
+    "scorer_version": 2,
+    "quality": 47,
+    "signal": 0.36,
+    "depth": 1.81,
+    "depth_normalized": 0.4525,
+    "novelty": 0.66,
+    "depth_confidence": 0.81
+  },
+  "2116212315917820401": {
+    "scorer_version": 2,
+    "quality": 53,
+    "signal": 0.46,
+    "depth": 2.01,
+    "depth_normalized": 0.5025,
+    "novelty": 0.66,
+    "depth_confidence": 0.61
+  },
+  "2116203501810303462": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.47,
+    "depth": 2.13,
+    "depth_normalized": 0.5325,
+    "novelty": 0.57,
+    "depth_confidence": 0.79
+  },
+  "2116263492625862726": {
+    "scorer_version": 2,
+    "quality": 44,
+    "signal": 0.32,
+    "depth": 1.8,
+    "depth_normalized": 0.45,
+    "novelty": 0.64,
+    "depth_confidence": 0.7
+  },
+  "2116153380116558210": {
+    "scorer_version": 2,
+    "quality": 50,
+    "signal": 0.44,
+    "depth": 1.75,
+    "depth_normalized": 0.4375,
+    "novelty": 0.65,
+    "depth_confidence": 0.7
+  },
+  "2116279337708388729": {
+    "scorer_version": 2,
+    "quality": 7,
+    "signal": 0.03,
+    "depth": 0.29,
+    "depth_normalized": 0.0725,
+    "novelty": 0.12,
+    "depth_confidence": 0.76
+  },
+  "2116275077163757864": {
+    "scorer_version": 2,
+    "quality": 53,
+    "signal": 0.41,
+    "depth": 1.85,
+    "depth_normalized": 0.4625,
+    "novelty": 0.78,
+    "depth_confidence": 0.88
+  },
+  "2116209074283131298": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.57,
+    "depth": 1.74,
+    "depth_normalized": 0.435,
+    "novelty": 0.79,
+    "depth_confidence": 0.76
+  },
+  "2116261973981814851": {
+    "scorer_version": 2,
+    "quality": 29,
+    "signal": 0.06,
+    "depth": 0.92,
+    "depth_normalized": 0.23,
+    "novelty": 0.7,
+    "depth_confidence": 0.61
+  },
+  "2116192118624375139": {
+    "scorer_version": 2,
+    "quality": 24,
+    "signal": 0.09,
+    "depth": 1.05,
+    "depth_normalized": 0.2625,
+    "novelty": 0.48,
+    "depth_confidence": 0.76
+  },
+  "2116247246383768023": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.47,
+    "depth": 1.5,
+    "depth_normalized": 0.375,
+    "novelty": 0.66,
+    "depth_confidence": 0.58
+  },
+  "2116240841698324494": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.48,
+    "depth": 1.79,
+    "depth_normalized": 0.4475,
+    "novelty": 0.75,
+    "depth_confidence": 0.83
+  },
+  "2116239691137908840": {
+    "scorer_version": 2,
+    "quality": 87,
+    "signal": 0.95,
+    "depth": 3.01,
+    "depth_normalized": 0.7525,
+    "novelty": 0.8,
+    "depth_confidence": 0.98
+  },
+  "2116238236226056540": {
+    "scorer_version": 2,
+    "quality": 39,
+    "signal": 0.2,
+    "depth": 1.29,
+    "depth_normalized": 0.3225,
+    "novelty": 0.74,
+    "depth_confidence": 0.71
+  },
+  "2116228907846553654": {
+    "scorer_version": 2,
+    "quality": 70,
+    "signal": 0.74,
+    "depth": 2.1,
+    "depth_normalized": 0.525,
+    "novelty": 0.74,
+    "depth_confidence": 0.85
+  },
+  "2116465231295570021": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.38,
+    "depth": 2.21,
+    "depth_normalized": 0.5525,
+    "novelty": 0.63,
+    "depth_confidence": 0.73
+  },
+  "2116460198705402281": {
+    "scorer_version": 2,
+    "quality": 64,
+    "signal": 0.72,
+    "depth": 1.69,
+    "depth_normalized": 0.4225,
+    "novelty": 0.64,
+    "depth_confidence": 0.73
+  },
+  "2116455187602661382": {
+    "scorer_version": 2,
+    "quality": 78,
+    "signal": 0.85,
+    "depth": 2.71,
+    "depth_normalized": 0.6775,
+    "novelty": 0.73,
+    "depth_confidence": 0.59
+  },
+  "2116450131406942452": {
+    "scorer_version": 2,
+    "quality": 44,
+    "signal": 0.27,
+    "depth": 1.56,
+    "depth_normalized": 0.39,
+    "novelty": 0.74,
+    "depth_confidence": 0.62
+  },
+  "2116445099441762516": {
+    "scorer_version": 2,
+    "quality": 61,
+    "signal": 0.67,
+    "depth": 2.02,
+    "depth_normalized": 0.505,
+    "novelty": 0.59,
+    "depth_confidence": 0.87
+  },
+  "2116441338648391693": {
+    "scorer_version": 2,
+    "quality": 18,
+    "signal": 0.04,
+    "depth": 0.74,
+    "depth_normalized": 0.185,
+    "novelty": 0.4,
+    "depth_confidence": 0.75
+  },
+  "2116440075554697533": {
+    "scorer_version": 2,
+    "quality": 52,
+    "signal": 0.44,
+    "depth": 1.97,
+    "depth_normalized": 0.4925,
+    "novelty": 0.67,
+    "depth_confidence": 0.86
+  },
+  "2116435031929377176": {
+    "scorer_version": 2,
+    "quality": 67,
+    "signal": 0.58,
+    "depth": 3.26,
+    "depth_normalized": 0.815,
+    "novelty": 0.73,
+    "depth_confidence": 0.38
+  },
+  "2116429999917891730": {
+    "scorer_version": 2,
+    "quality": 72,
+    "signal": 0.79,
+    "depth": 2.2,
+    "depth_normalized": 0.55,
+    "novelty": 0.72,
+    "depth_confidence": 0.77
+  },
+  "2116424979348660726": {
+    "scorer_version": 2,
+    "quality": 65,
+    "signal": 0.63,
+    "depth": 2.32,
+    "depth_normalized": 0.58,
+    "novelty": 0.73,
+    "depth_confidence": 0.72
+  },
+  "2116419934142005301": {
+    "scorer_version": 2,
+    "quality": 72,
+    "signal": 0.79,
+    "depth": 2.22,
+    "depth_normalized": 0.555,
+    "novelty": 0.73,
+    "depth_confidence": 0.8
+  },
+  "2116414900964655411": {
+    "scorer_version": 2,
+    "quality": 39,
+    "signal": 0.23,
+    "depth": 1.85,
+    "depth_normalized": 0.4625,
+    "novelty": 0.6,
+    "depth_confidence": 0.82
+  },
+  "2116404832936288545": {
+    "scorer_version": 2,
+    "quality": 60,
+    "signal": 0.57,
+    "depth": 2.17,
+    "depth_normalized": 0.5425,
+    "novelty": 0.69,
+    "depth_confidence": 0.82
+  },
+  "2116399801134645490": {
+    "scorer_version": 2,
+    "quality": 54,
+    "signal": 0.51,
+    "depth": 2.03,
+    "depth_normalized": 0.5075,
+    "novelty": 0.62,
+    "depth_confidence": 0.89
+  },
+  "2116394812274249851": {
+    "scorer_version": 2,
+    "quality": 53,
+    "signal": 0.42,
+    "depth": 1.8,
+    "depth_normalized": 0.45,
+    "novelty": 0.76,
+    "depth_confidence": 0.79
+  },
+  "2116389734389854638": {
+    "scorer_version": 2,
+    "quality": 70,
+    "signal": 0.71,
+    "depth": 2.1,
+    "depth_normalized": 0.525,
+    "novelty": 0.79,
+    "depth_confidence": 0.89
+  },
+  "2116384703687110918": {
+    "scorer_version": 2,
+    "quality": 58,
+    "signal": 0.57,
+    "depth": 2.09,
+    "depth_normalized": 0.5225,
+    "novelty": 0.63,
+    "depth_confidence": 0.82
+  },
+  "2116379702537359858": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.41,
+    "depth": 1.83,
+    "depth_normalized": 0.4575,
+    "novelty": 0.66,
+    "depth_confidence": 0.77
+  },
+  "2116427817609032055": {
+    "scorer_version": 2,
+    "quality": 80,
+    "signal": 0.88,
+    "depth": 2.84,
+    "depth_normalized": 0.71,
+    "novelty": 0.71,
+    "depth_confidence": 0.87
+  },
+  "2116420177562620406": {
+    "scorer_version": 2,
+    "quality": 82,
+    "signal": 0.94,
+    "depth": 2.95,
+    "depth_normalized": 0.7375,
+    "novelty": 0.69,
+    "depth_confidence": 0.96
+  },
+  "2116419107318866362": {
+    "scorer_version": 2,
+    "quality": 71,
+    "signal": 0.69,
+    "depth": 2.38,
+    "depth_normalized": 0.595,
+    "novelty": 0.81,
+    "depth_confidence": 0.62
+  },
+  "2116362915410215309": {
+    "scorer_version": 2,
+    "quality": 54,
+    "signal": 0.54,
+    "depth": 2.0,
+    "depth_normalized": 0.5,
+    "novelty": 0.57,
+    "depth_confidence": 0.73
+  },
+  "2116304474541007125": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.15,
+    "depth": 1.29,
+    "depth_normalized": 0.3225,
+    "novelty": 0.4,
+    "depth_confidence": 0.75
+  },
+  "2116193667085963337": {
+    "scorer_version": 2,
+    "quality": 32,
+    "signal": 0.12,
+    "depth": 2.04,
+    "depth_normalized": 0.51,
+    "novelty": 0.54,
+    "depth_confidence": 0.67
+  },
+  "2116183344291676460": {
+    "scorer_version": 2,
+    "quality": 19,
+    "signal": 0.17,
+    "depth": 1.05,
+    "depth_normalized": 0.2625,
+    "novelty": 0.19,
+    "depth_confidence": 0.92
+  },
+  "2116154747769995719": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.08,
+    "depth": 1.23,
+    "depth_normalized": 0.3075,
+    "novelty": 0.54,
+    "depth_confidence": 0.81
+  },
+  "2116246536942432439": {
+    "scorer_version": 2,
+    "quality": 29,
+    "signal": 0.24,
+    "depth": 1.19,
+    "depth_normalized": 0.2975,
+    "novelty": 0.37,
+    "depth_confidence": 0.79
+  },
+  "2116201628307272172": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.09,
+    "depth": 1.14,
+    "depth_normalized": 0.285,
+    "novelty": 0.51,
+    "depth_confidence": 0.81
+  },
+  "2116224571162628264": {
+    "scorer_version": 2,
+    "quality": 17,
+    "signal": 0.05,
+    "depth": 0.63,
+    "depth_normalized": 0.1575,
+    "novelty": 0.38,
+    "depth_confidence": 0.62
+  },
+  "2116299279967060429": {
+    "scorer_version": 2,
+    "quality": 24,
+    "signal": 0.15,
+    "depth": 1.11,
+    "depth_normalized": 0.2775,
+    "novelty": 0.38,
+    "depth_confidence": 0.89
+  },
+  "2116305711181558151": {
+    "scorer_version": 2,
+    "quality": 27,
+    "signal": 0.24,
+    "depth": 1.1,
+    "depth_normalized": 0.275,
+    "novelty": 0.33,
+    "depth_confidence": 0.92
+  },
+  "2116289018757304322": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.16,
+    "depth": 1.1,
+    "depth_normalized": 0.275,
+    "novelty": 0.4,
+    "depth_confidence": 0.91
+  },
+  "2116253097278497142": {
+    "scorer_version": 2,
+    "quality": 47,
+    "signal": 0.44,
+    "depth": 1.23,
+    "depth_normalized": 0.3075,
+    "novelty": 0.62,
+    "depth_confidence": 0.82
+  },
+  "2116250706353033618": {
+    "scorer_version": 2,
+    "quality": 71,
+    "signal": 0.79,
+    "depth": 1.91,
+    "depth_normalized": 0.4775,
+    "novelty": 0.72,
+    "depth_confidence": 0.88
+  },
+  "2116240643584622817": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.5,
+    "depth": 1.48,
+    "depth_normalized": 0.37,
+    "novelty": 0.74,
+    "depth_confidence": 0.61
+  },
+  "2116213972420501881": {
+    "scorer_version": 2,
+    "quality": 51,
+    "signal": 0.49,
+    "depth": 1.42,
+    "depth_normalized": 0.355,
+    "novelty": 0.64,
+    "depth_confidence": 0.66
+  },
+  "2116198688540545067": {
+    "scorer_version": 2,
+    "quality": 53,
+    "signal": 0.44,
+    "depth": 1.63,
+    "depth_normalized": 0.4075,
+    "novelty": 0.77,
+    "depth_confidence": 0.68
+  },
+  "2116331537310347475": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.54,
+    "depth": 1.51,
+    "depth_normalized": 0.3775,
+    "novelty": 0.69,
+    "depth_confidence": 0.59
+  },
+  "2116331518096269664": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.41,
+    "depth": 1.51,
+    "depth_normalized": 0.3775,
+    "novelty": 0.7,
+    "depth_confidence": 0.59
+  },
+  "2116275301575799093": {
+    "scorer_version": 2,
+    "quality": 24,
+    "signal": 0.11,
+    "depth": 1.15,
+    "depth_normalized": 0.2875,
+    "novelty": 0.44,
+    "depth_confidence": 0.85
+  },
+  "2116455144783249553": {
+    "scorer_version": 2,
+    "quality": 15,
+    "signal": 0.04,
+    "depth": 0.33,
+    "depth_normalized": 0.0825,
+    "novelty": 0.38,
+    "depth_confidence": 0.73
+  },
+  "2116347236112064861": {
+    "scorer_version": 2,
+    "quality": 17,
+    "signal": 0.05,
+    "depth": 1.0,
+    "depth_normalized": 0.25,
+    "novelty": 0.31,
+    "depth_confidence": 0.9
+  },
+  "2116245501293056416": {
+    "scorer_version": 2,
+    "quality": 32,
+    "signal": 0.22,
+    "depth": 1.15,
+    "depth_normalized": 0.2875,
+    "novelty": 0.52,
+    "depth_confidence": 0.87
+  },
+  "2116266607638876506": {
+    "scorer_version": 2,
+    "quality": 11,
+    "signal": 0.03,
+    "depth": 0.08,
+    "depth_normalized": 0.02,
+    "novelty": 0.3,
+    "depth_confidence": 0.94
+  },
+  "2116252041194746184": {
+    "scorer_version": 2,
+    "quality": 26,
+    "signal": 0.18,
+    "depth": 1.1,
+    "depth_normalized": 0.275,
+    "novelty": 0.38,
+    "depth_confidence": 0.92
+  },
+  "2116470247062704534": {
+    "scorer_version": 2,
+    "quality": 14,
+    "signal": 0.04,
+    "depth": 0.92,
+    "depth_normalized": 0.23,
+    "novelty": 0.26,
+    "depth_confidence": 0.83
+  },
+  "2116465017855803755": {
+    "scorer_version": 2,
+    "quality": 23,
+    "signal": 0.09,
+    "depth": 1.14,
+    "depth_normalized": 0.285,
+    "novelty": 0.43,
+    "depth_confidence": 0.83
+  },
+  "2116451556870717496": {
+    "scorer_version": 2,
+    "quality": 58,
+    "signal": 0.52,
+    "depth": 2.03,
+    "depth_normalized": 0.5075,
+    "novelty": 0.74,
+    "depth_confidence": 0.85
+  },
+  "2116447994337972251": {
+    "scorer_version": 2,
+    "quality": 18,
+    "signal": 0.06,
+    "depth": 0.99,
+    "depth_normalized": 0.2475,
+    "novelty": 0.34,
+    "depth_confidence": 0.79
+  },
+  "2116314160677970221": {
+    "scorer_version": 2,
+    "quality": 49,
+    "signal": 0.43,
+    "depth": 1.45,
+    "depth_normalized": 0.3625,
+    "novelty": 0.67,
+    "depth_confidence": 0.62
+  },
+  "2116307147244138733": {
+    "scorer_version": 2,
+    "quality": 40,
+    "signal": 0.38,
+    "depth": 1.38,
+    "depth_normalized": 0.345,
+    "novelty": 0.47,
+    "depth_confidence": 0.69
+  },
+  "2116305175631565219": {
+    "scorer_version": 2,
+    "quality": 29,
+    "signal": 0.13,
+    "depth": 0.84,
+    "depth_normalized": 0.21,
+    "novelty": 0.6,
+    "depth_confidence": 0.73
+  },
+  "2116300227858645008": {
+    "scorer_version": 2,
+    "quality": 56,
+    "signal": 0.48,
+    "depth": 1.85,
+    "depth_normalized": 0.4625,
+    "novelty": 0.75,
+    "depth_confidence": 0.77
+  },
+  "2116297581345058857": {
+    "scorer_version": 2,
+    "quality": 25,
+    "signal": 0.08,
+    "depth": 1.07,
+    "depth_normalized": 0.2675,
+    "novelty": 0.52,
+    "depth_confidence": 0.84
+  },
+  "2116294361264673214": {
+    "scorer_version": 2,
+    "quality": 55,
+    "signal": 0.5,
+    "depth": 2.05,
+    "depth_normalized": 0.5125,
+    "novelty": 0.67,
+    "depth_confidence": 0.86
+  },
+  "2116253325909975310": {
+    "scorer_version": 2,
+    "quality": 50,
+    "signal": 0.46,
+    "depth": 1.56,
+    "depth_normalized": 0.39,
+    "novelty": 0.63,
+    "depth_confidence": 0.62
+  },
+  "2116249581340029257": {
+    "scorer_version": 2,
+    "quality": 33,
+    "signal": 0.13,
+    "depth": 1.66,
+    "depth_normalized": 0.415,
+    "novelty": 0.62,
+    "depth_confidence": 0.69
+  },
+  "2116227645864321366": {
+    "scorer_version": 2,
+    "quality": 30,
+    "signal": 0.1,
+    "depth": 1.3,
+    "depth_normalized": 0.325,
+    "novelty": 0.61,
+    "depth_confidence": 0.74
+  },
+  "2116209814220984783": {
+    "scorer_version": 2,
+    "quality": 20,
+    "signal": 0.12,
+    "depth": 1.13,
+    "depth_normalized": 0.2825,
+    "novelty": 0.29,
+    "depth_confidence": 0.88
+  },
+  "2116152599569424534": {
+    "scorer_version": 2,
+    "quality": 22,
+    "signal": 0.06,
+    "depth": 0.79,
+    "depth_normalized": 0.1975,
+    "novelty": 0.51,
+    "depth_confidence": 0.74
+  },
+  "2116210401067102417": {
+    "scorer_version": 2,
+    "quality": 48,
+    "signal": 0.36,
+    "depth": 1.79,
+    "depth_normalized": 0.4475,
+    "novelty": 0.7,
+    "depth_confidence": 0.77
+  },
+  "2116168441262493964": {
+    "scorer_version": 2,
+    "quality": 53,
+    "signal": 0.46,
+    "depth": 1.91,
+    "depth_normalized": 0.4775,
+    "novelty": 0.69,
+    "depth_confidence": 0.82
+  },
+  "2116154418630393910": {
+    "scorer_version": 2,
+    "quality": 50,
+    "signal": 0.38,
+    "depth": 1.92,
+    "depth_normalized": 0.48,
+    "novelty": 0.72,
+    "depth_confidence": 0.83
+  },
+  "2116470361185308794": {
+    "scorer_version": 2,
+    "quality": 48,
+    "signal": 0.39,
+    "depth": 1.81,
+    "depth_normalized": 0.4525,
+    "novelty": 0.66,
+    "depth_confidence": 0.77
+  },
+  "2116443826738892887": {
+    "scorer_version": 2,
+    "quality": 31,
+    "signal": 0.14,
+    "depth": 0.96,
+    "depth_normalized": 0.24,
+    "novelty": 0.64,
+    "depth_confidence": 0.73
+  },
+  "2116304849515970563": {
+    "scorer_version": 2,
+    "quality": 38,
+    "signal": 0.22,
+    "depth": 1.69,
+    "depth_normalized": 0.4225,
+    "novelty": 0.63,
+    "depth_confidence": 0.71
+  },
+  "2116250796396249545": {
+    "scorer_version": 2,
+    "quality": 41,
+    "signal": 0.28,
+    "depth": 1.36,
+    "depth_normalized": 0.34,
+    "novelty": 0.66,
+    "depth_confidence": 0.68
+  },
+  "2116219186099662868": {
+    "scorer_version": 2,
+    "quality": 54,
+    "signal": 0.41,
+    "depth": 2.04,
+    "depth_normalized": 0.51,
+    "novelty": 0.78,
+    "depth_confidence": 0.84
+  },
+  "2116218889814118817": {
+    "scorer_version": 2,
+    "quality": 58,
+    "signal": 0.48,
+    "depth": 2.06,
+    "depth_normalized": 0.515,
+    "novelty": 0.79,
+    "depth_confidence": 0.79
+  },
+  "2116200881741766695": {
+    "scorer_version": 2,
+    "quality": 46,
+    "signal": 0.33,
+    "depth": 1.61,
+    "depth_normalized": 0.4025,
+    "novelty": 0.7,
+    "depth_confidence": 0.66
+  },
+  "2116145178998084008": {
+    "scorer_version": 2,
+    "quality": 34,
+    "signal": 0.13,
+    "depth": 1.31,
+    "depth_normalized": 0.3275,
+    "novelty": 0.71,
+    "depth_confidence": 0.62
+  },
+  "2116275146663010330": {
+    "scorer_version": 2,
+    "quality": 74,
+    "signal": 0.68,
+    "depth": 3.36,
+    "depth_normalized": 0.84,
+    "novelty": 0.79,
+    "depth_confidence": 0.63
+  },
+  "2116263123111796859": {
+    "scorer_version": 2,
+    "quality": 33,
+    "signal": 0.21,
+    "depth": 1.54,
+    "depth_normalized": 0.385,
+    "novelty": 0.49,
+    "depth_confidence": 0.61
+  },
+  "2116221681295393200": {
+    "scorer_version": 2,
+    "quality": 53,
+    "signal": 0.43,
+    "depth": 1.74,
+    "depth_normalized": 0.435,
+    "novelty": 0.76,
+    "depth_confidence": 0.76
   }
 }
