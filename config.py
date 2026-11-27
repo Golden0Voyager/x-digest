@@ -25,7 +25,7 @@ AI_MAX_BATCH_SIZE = int(os.getenv("AI_MAX_BATCH_SIZE", "30"))
 # Token Plan 端点专用批次大小
 # 适用场景：insights.py 走 TP 的洞察任务（打分已交给 Jev）
 # 设计依据：
-#   - deepseek-v4-flash 上下文 32K，30 条输入 ~6K tokens + 输出 ~12K，安全
+#   - deepseek-flash 上下文 32K，30 条输入 ~6K tokens + 输出 ~12K，安全
 #   - TP 按"次"计费（每 5h 150 次），单次塞越多越省配额
 # 保守起步：30。观察稳定后可逐步上调
 AI_BATCH_SIZE_TP = int(os.getenv("AI_BATCH_SIZE_TP", "30"))

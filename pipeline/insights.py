@@ -2,7 +2,7 @@
 Step 3: 专注洞察与分类 (科普增强版)
 
 在联合打分和翻译完成后运行。
-利用 deepseek-v4-flash（SenseNova Token Plan）的 32K 上下文，
+利用 deepseek-flash（SenseNova Token Plan）的 32K 上下文，
 为非专业人士补全背景常识。
 
 参考：

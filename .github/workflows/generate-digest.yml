@@ -88,8 +88,8 @@ jobs:
           # AI 管线配置
           AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
           AI_MODEL: DeepSeek-V3-1
-          AI_MODEL_TRANSLATE: deepseek-v4-flash
-          AI_MODEL_INSIGHTS: deepseek-v4-flash
+          AI_MODEL_TRANSLATE: deepseek-flash
+          AI_MODEL_INSIGHTS: deepseek-flash
           AI_BATCH_SIZE_TP: 30
 
           # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
