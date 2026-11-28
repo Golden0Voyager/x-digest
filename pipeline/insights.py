@@ -2,14 +2,8 @@
 Step 3: 专注洞察与分类 (科普增强版)
 
 在联合打分和翻译完成后运行。
-利用 deepseek-flash（SenseNova Token Plan）的 32K 上下文，
-为非专业人士补全背景常识。
-
-参考：
-  - docs/api/sensenova-token-plan-usage.md
-  - 端点：https://token.sensenova.cn/v1（与原 api.sensenova.cn 不同的服务）
-  - 限速：每 5h 1500 次（远比原 1 QPS 宽松）
-  - 降级：首选失败时自动回退到主链（V3-1 / R1）
+利用 AI_MODEL_INSIGHTS 的长上下文，为非专业人士补全背景常识。
+首选失败时按 AI_FALLBACK_CHAIN 交错降级到其他供应商和模型。
 """
 
 import asyncio
@@ -17,13 +11,7 @@ import json
 from datetime import date
 from pathlib import Path
 
-from config import (
-    AI_BATCH_COOLDOWN,
-    AI_BATCH_SIZE_TP,
-    AI_MODEL_INSIGHTS,
-    SENSENOVA_TP_API_KEY,
-    SENSENOVA_TP_BASE_URL,
-)
+from config import AI_BATCH_COOLDOWN, AI_BATCH_SIZE_TP, AI_MODEL_INSIGHTS
 from pipeline import Color, call_ai_with_retry, extract_json, load_json, save_json
 
 INSIGHTS_PROMPT_TEMPLATE = """\
@@ -60,8 +48,7 @@ async def run_insights(
 
     返回 {tweet_id: {"thought": str, "category": str, "quality": int, "background": str}}
 
-    批次大小使用 AI_BATCH_SIZE_TP（默认 60），适配 Token Plan 端点的长上下文与配额。
-    max_tokens=24000：60 条 × 单条 ~400 tokens 输出 + 安全余量。
+    批次大小使用 AI_BATCH_SIZE_TP；输出上限优先采用 AI_MODEL_MAX_TOKENS 的模型级配置。
     """
     cache_file = intermediate_dir / "insights.json"
     raw_cache: dict = {} if force_rerun else load_json(cache_file)
@@ -109,12 +96,7 @@ async def run_insights(
                     ],
                     temperature=0.3,
                     model_override=AI_MODEL_INSIGHTS,
-                    # 洞察任务走独立 Token Plan 端点（与主链 api.sensenova.cn 不同）
-                    base_url_override=SENSENOVA_TP_BASE_URL,
-                    api_key_override=SENSENOVA_TP_API_KEY,
-                    # 批次 30 条 × 单条 background+thought ~400 tokens = 12K 输出
-                    # 32K 上下文，留足安全余量
-                    max_tokens=24000,
+                    max_tokens=240000,
                 )
                 items = extract_json(response.choices[0].message.content)
                 break

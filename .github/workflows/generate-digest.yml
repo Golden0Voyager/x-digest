@@ -86,18 +86,24 @@ jobs:
       - name: Run digest pipeline
         env:
           # AI 管线配置
-          AI_PROVIDER_CHAIN: SENSENOVA,SILICONFLOW,GROQ,OPENROUTER
-          AI_MODEL: DeepSeek-V3-1
-          AI_MODEL_TRANSLATE: deepseek-flash
-          AI_MODEL_INSIGHTS: deepseek-flash
+          AI_PROVIDER_CHAIN: OPENROUTER,SENSENOVA
+          AI_MODEL: baidu/ernie-5.5-flash-preview:free
+          AI_MODEL_TRANSLATE: baidu/ernie-5.5-flash-preview:free
+          AI_MODEL_INSIGHTS: baidu/ernie-5.5-flash-preview:free
+          AI_MODEL_MAX_TOKENS: '{"baidu/ernie-5.5-flash-preview:free":60000,"deepseek-flash":240000,"nvidia/nemotron-3.5-super-vl:free":60000,"sensenova-6.8-flash-lite":60000,"nvidia/nemotron-3.5-lightning:free":60000,"sensenova-6.8-flash":60000}'
+          AI_FALLBACK_CHAIN: SENSENOVA:deepseek-flash,OPENROUTER:nvidia/nemotron-3.5-super-vl:free,SENSENOVA:sensenova-6.8-flash-lite,OPENROUTER:nvidia/nemotron-3.5-lightning:free,SENSENOVA:sensenova-6.8-flash
           AI_BATCH_SIZE_TP: 30
 
           # 供应商 BASE_URL（防止 CI 上空字符串导致 Connection error）
           SENSENOVA_BASE_URL: https://api.sensenova.cn/compatible-mode/v2
+          SENSENOVA_MODEL: deepseek-flash
+          SENSENOVA_FALLBACK_BASE_URL: https://token.sensenova.cn/v1
+          SENSENOVA_FALLBACK_API_KEY: ${{ secrets.SENSENOVA_TP_API_KEY }}
           SENSENOVA_TP_BASE_URL: https://token.sensenova.cn/v1
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
           GROQ_BASE_URL: https://api.groq.com/openai/v1
           OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+          OPENROUTER_MODEL: baidu/ernie-5.5-flash-preview:free
 
           # 飞书与 API Keys
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}

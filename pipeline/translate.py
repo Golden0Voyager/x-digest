@@ -10,14 +10,7 @@ import json
 import re
 from pathlib import Path
 
-from config import (
-    AI_BATCH_COOLDOWN,
-    AI_BATCH_SIZE,
-    AI_MAX_BATCH_SIZE,
-    AI_MODEL_TRANSLATE,
-    SENSENOVA_TP_API_KEY,
-    SENSENOVA_TP_BASE_URL,
-)
+from config import AI_BATCH_COOLDOWN, AI_BATCH_SIZE, AI_MAX_BATCH_SIZE, AI_MODEL_TRANSLATE
 from pipeline import Color, call_ai_with_retry, extract_json, load_json, save_json
 
 _CJK_RE = re.compile(r"[\u4e00-\u9fff]")
@@ -129,10 +122,7 @@ async def run_translate(
                     ],
                     temperature=0.2,
                     model_override=AI_MODEL_TRANSLATE,
-                    max_tokens=4000,
-                    # 主链旧翻译模型已下线且端点 503，翻译统一走 Token Plan
-                    base_url_override=SENSENOVA_TP_BASE_URL,
-                    api_key_override=SENSENOVA_TP_API_KEY,
+                    max_tokens=240000,
                 )
                 items = extract_json(response.choices[0].message.content)
                 break
@@ -174,7 +164,7 @@ async def run_translate(
     if missing:
         print(f"  {Color.YELLOW}⚠️ {len(missing)} 条推文缺少翻译，正在并发补译...{Color.RESET}")
 
-        # 全局限速之外再加低并发，避免补译一次占满 Token Plan 的 RPM
+        # 全局限速之外再加低并发，避免补译一次占满供应商 RPM
         sem = asyncio.Semaphore(2)
 
         async def _translate_one(t):
@@ -189,9 +179,7 @@ async def run_translate(
                         ],
                         temperature=0.2,
                         model_override=AI_MODEL_TRANSLATE,
-                        max_tokens=2048,
-                        base_url_override=SENSENOVA_TP_BASE_URL,
-                        api_key_override=SENSENOVA_TP_API_KEY,
+                        max_tokens=60000,
                     )
 
                     return tid, resp.choices[0].message.content.strip()
