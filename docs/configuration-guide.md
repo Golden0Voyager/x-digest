@@ -14,65 +14,79 @@ PROXY=http://127.0.0.1:7897
 
 ---
 
-## 2. AI 供应商降级链
+## 2. AI 供应商与模型降级链
 
 ```bash
-AI_PROVIDER_CHAIN=SENSENOVA,GROQ,OPENROUTER
+AI_PROVIDER_CHAIN=OPENROUTER,SENSENOVA
+AI_MODEL_TRANSLATE=baidu/ernie-5.5-flash-preview:free
+AI_MODEL_INSIGHTS=baidu/ernie-5.5-flash-preview:free
+
+AI_FALLBACK_CHAIN=SENSENOVA:deepseek-flash,OPENROUTER:nvidia/nemotron-3.5-super-vl:free,SENSENOVA:sensenova-6.8-flash-lite,OPENROUTER:nvidia/nemotron-3.5-lightning:free,SENSENOVA:sensenova-6.8-flash
+
+AI_MODEL_MAX_TOKENS='{"baidu/ernie-5.5-flash-preview:free":60000,"deepseek-flash":240000,"nvidia/nemotron-3.5-super-vl:free":60000,"sensenova-6.8-flash-lite":60000,"nvidia/nemotron-3.5-lightning:free":60000,"sensenova-6.8-flash":60000}'
 ```
 
-**工作原理：** 逗号分隔的供应商前缀列表。**第一个为降级链兜底（仅当任务首选模型全部失败时启用）**，后续为降级备选。每个供应商失败时自动降级到下一个。
+**当前调用顺序：**
 
-> 实际任务（打分/翻译/洞察）的首选模型在 `pipeline/score.py`、`pipeline/translate.py`、`pipeline/insights.py` 中 hardcode，详见「任务差异化模型」段。`SENSENOVA_MODEL`（V3-1）只是兜底。
+```text
+OpenRouter Ernie（首选，最多 2 次）
+  → SenseNova Token Plan deepseek-flash
+  → OpenRouter Nemotron Super
+  → SenseNova Token Plan sensenova-6.8-flash-lite
+  → OpenRouter Nemotron Lightning
+  → SenseNova Token Plan sensenova-6.8-flash
+```
+
+- `AI_PROVIDER_CHAIN`：逗号分隔的供应商前缀；第一个配置了 Key 的供应商作为任务首选。
+- `AI_FALLBACK_CHAIN`：可选的显式模型顺序，格式为 `PREFIX:model`。每个模型只尝试一次，可跨供应商交错，避免请求集中在同一个免费端点。
+- `AI_MODEL_MAX_TOKENS`：JSON 对象，按模型 ID 覆盖输出上限；未配置的模型使用调用方传入的 `max_tokens`。
+- 不设置 `AI_FALLBACK_CHAIN` 时，仍按供应商分组，并使用 `{PREFIX}_FALLBACK_MODEL`、`{PREFIX}_FALLBACK_MODEL_2` 等变量。
+
+> 翻译和洞察的当前首选模型由 `AI_MODEL_TRANSLATE` / `AI_MODEL_INSIGHTS` 指定。打分已交给 Jev，不再由 LLM 评分模型承担。
 
 ### 添加供应商的三步法
 
-1. 在 `AI_PROVIDER_CHAIN` 中追加前缀名
-2. 配置该前缀的三要素：`{前缀}_API_KEY`、`{前缀}_BASE_URL`、`{前缀}_MODEL`
-3. （可选）配置备选模型：`{前缀}_FALLBACK_MODEL`
+1. 在 `AI_PROVIDER_CHAIN` 中追加前缀名。
+2. 配置该前缀的三要素：`{前缀}_API_KEY`、`{前缀}_BASE_URL`、`{前缀}_MODEL`。
+3. 在 `AI_FALLBACK_CHAIN` 中按需要插入 `前缀:模型`；也可继续使用编号式 `{前缀}_FALLBACK_MODEL*` 做供应商内降级。
 
 ### 预置供应商示例
 
 ```bash
-# ── SenseNova / 商汤（降级链兜底 — 国内直连，DeepSeek 全系免费）──
-#   文档：docs/api/sensenova-best-practices.md
-#   仅当任务首选（score/translate/insights 各自的 hardcode 模型）全失败时启用。
-#   免费模型：
-#     DeepSeek-V3-1            通用对话 32K    当前兜底
-#     DeepSeek-R1              原生推理 8K     兜底备选
-#     DeepSeek-R1-Distill-Qwen-32B  蒸馏推理 8K   永久免费
-#     DeepSeek-R1-Distill-Qwen-14B  蒸馏推理 32K  永久免费
-#   限流：1 QPS / 6 RPM / 128K TPM — 并行调用需主动控制并发度
+# ── OpenRouter（当前任务首选）──
+OPENROUTER_API_KEY=sk-or-v1-xxxx
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=baidu/ernie-5.5-flash-preview:free
+
+# ── SenseNova / Token Plan（交错降级）──
 SENSENOVA_API_KEY=sk-xxxxxxxxxxxxxxxx
 SENSENOVA_BASE_URL=https://api.sensenova.cn/compatible-mode/v2
-SENSENOVA_MODEL=DeepSeek-V3-1
-SENSENOVA_FALLBACK_MODEL=DeepSeek-R1
+SENSENOVA_MODEL=deepseek-flash
+# 显式链中的 SenseNova 模型统一走 Token Plan
+SENSENOVA_FALLBACK_BASE_URL=https://token.sensenova.cn/v1
+# 留空则复用 SENSENOVA_API_KEY；CI 中注入 SENSENOVA_TP_API_KEY
+SENSENOVA_FALLBACK_API_KEY=
 
-# ── Groq（降级备选 — 极速推理）──
+# ── Groq（可选降级供应商）──
 GROQ_API_KEY=gsk_xxxx
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=moonshotai/kimi-k2-instruct-0905
-
-# ── OpenRouter（降级备选 — 限免模型聚合平台）──
-OPENROUTER_API_KEY=sk-or-v1-xxxx
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=openrouter/free
 ```
 
-### 为翻译和洞察指定不同模型
+### 模型级输出上限
 
-利用 SenseNova 文档推荐的模型分工：通用任务用 V3-1，翻译用永久免费的 Distill-14B，洞察走 Token Plan 上的 sensenova-6.7-flash-lite：
+`AI_MODEL_MAX_TOKENS` 的键必须与请求中的模型 ID 完全一致。当前配置：
 
-```bash
-AI_MODEL_TRANSLATE=DeepSeek-R1-Distill-Qwen-14B   # 翻译：永久免费，术语保留 67%
-AI_MODEL_INSIGHTS=sensenova-6.7-flash-lite         # 洞察：走 Token Plan，科普质量极佳
-```
+| 模型 | `max_tokens` | 说明 |
+|------|-------------:|------|
+| OpenRouter Ernie | 60,000 | 免费模型，保留充足输出空间 |
+| SenseNova `deepseek-flash` | 240,000 | Token Plan 长输出配置 |
+| OpenRouter Nemotron Super | 60,000 | 低于 131,072 输出上限 |
+| SenseNova `sensenova-6.8-flash-lite` | 60,000 | 适配 Token Plan 约 64K 输出快照 |
+| OpenRouter Nemotron Lightning | 60,000 | 低于 65,536 输出上限，避免推理 token 吃满小额预算 |
+| SenseNova `sensenova-6.8-flash` | 60,000 | 适配 Token Plan 约 64K 输出快照 |
 
-默认两者都使用兜底 V3-1，只在需要差异化时配置。
-
-> ⚠️ **限流提醒**：
-> - 主链 1 QPS / 6 RPM，并行使用 R1 + V3-1 调用极易触发 429
-> - pipeline/score.py 采用**跨端点双引擎**（sensenova-6.7-flash-lite @ token.sensenova.cn + DeepSeek-R1-Distill-Qwen-14B @ api.sensenova.cn）规避互相限流
-> - Token Plan 每 5h 1500 次配额独立，不消耗主链额度
+> ⚠️ **限流提醒**：交错链把连续失败分散到不同供应商，降低单端点 RPM 压力；Token Plan 调用仍受 `TP_MIN_INTERVAL_SECONDS=15` 的全局间隔保护。
 
 ---
 
@@ -175,31 +189,22 @@ FEISHU_USER_ID=ou_xxxx
 
 ## 6. 常见配置组合
 
-### 场景 A：SenseNova / 商汤（推荐起手配置，零费用 + 国内直连）
+### 场景 A：OpenRouter + SenseNova 交错降级（当前生产配置）
+
+使用第 2 节的完整 `AI_PROVIDER_CHAIN`、`AI_FALLBACK_CHAIN` 和 `AI_MODEL_MAX_TOKENS` 配置。关键参数：
 
 ```bash
-AI_PROVIDER_CHAIN=SENSENOVA,GROQ,OPENROUTER
-
-SENSENOVA_API_KEY=sk-xxxxxxxxxxxxxxxx
-SENSENOVA_BASE_URL=https://api.sensenova.cn/compatible-mode/v2
-SENSENOVA_MODEL=DeepSeek-V3-1
-SENSENOVA_FALLBACK_MODEL=DeepSeek-R1
-
-# 任务差异化（跨端点双引擎：避免互相限流）
-AI_MODEL_TRANSLATE=DeepSeek-R1-Distill-Qwen-14B   # 主链，永久免费
-AI_MODEL_INSIGHTS=sensenova-6.7-flash-lite         # Token Plan，5h 1500 次
-
-# Token Plan 独立端点
-SENSENOVA_TP_BASE_URL=https://token.sensenova.cn/v1
-SENSENOVA_TP_API_KEY=    # 留空时复用 SENSENOVA_API_KEY
-
-# SenseNova 限流 1 QPS / 6 RPM，保守设置
+AI_PROVIDER_CHAIN=OPENROUTER,SENSENOVA
+AI_MODEL_TRANSLATE=baidu/ernie-5.5-flash-preview:free
+AI_MODEL_INSIGHTS=baidu/ernie-5.5-flash-preview:free
+SENSENOVA_FALLBACK_BASE_URL=https://token.sensenova.cn/v1
 AI_BATCH_SIZE=15
+AI_BATCH_SIZE_TP=30
 AI_MAX_BATCH_SIZE=30
 AI_BATCH_COOLDOWN=15
 ```
 
-> 适用：所有国内用户。**打分**：跨端点双引擎（sensenova-6.7-flash-lite + Distill-14B）；**翻译**：Distill-14B；**洞察**：sensenova-6.7-flash-lite。pipeline/score.py 的双引擎跨端点并行不互相限流，Token Plan 配额独立。
+> OpenRouter 作为首选；失败后依次交替到 SenseNova Token Plan 和 OpenRouter 的其他模型。每个模型的输出上限由 `AI_MODEL_MAX_TOKENS` 单独控制。
 
 ### 场景 B：Groq 免费用户（极速推理备选）
 

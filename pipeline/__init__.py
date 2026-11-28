@@ -15,7 +15,7 @@ from pathlib import Path
 import httpx
 from openai import OpenAI
 
-from config import AI_API_KEY, AI_BASE_URL, AI_FALLBACK_PROVIDERS, AI_MODEL
+from config import AI_API_KEY, AI_BASE_URL, AI_FALLBACK_PROVIDERS, AI_MODEL, AI_MODEL_MAX_TOKENS
 
 # ── 终端色彩 ──────────────────────────────────────────────
 
@@ -209,11 +209,10 @@ def call_ai_with_retry(
 ):
     """带快速降级的 AI 调用。
 
-    主模型 2 次尝试，备选模型各 1 次（每供应商共 3 次），
-    全部供应商耗尽后抛出最后一个异常。
+    主模型 2 次尝试，备选模型各 1 次，全部模型耗尽后抛出最后一个异常。
 
     model_override: 允许为特定任务覆盖主模型设置
-    max_tokens: 最大输出 token 数，防止响应截断（默认 4096）
+    max_tokens: 默认输出 token 上限；AI_MODEL_MAX_TOKENS 中配置的模型值优先
     base_url_override: 覆盖主供应商的 base_url（用于独立端点如 Token Plan）
     api_key_override: 覆盖主供应商的 api_key
     """
@@ -233,6 +232,7 @@ def call_ai_with_retry(
     for i, provider in enumerate(providers):
         client = _get_client(provider["api_key"], provider["base_url"])
         max_attempts = 2 if provider.get("is_primary") else 1
+        model_max_tokens = AI_MODEL_MAX_TOKENS.get(provider["model"], max_tokens)
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -241,7 +241,7 @@ def call_ai_with_retry(
                     model=provider["model"],
                     messages=messages,
                     temperature=temperature,
-                    max_tokens=max_tokens,
+                    max_tokens=model_max_tokens,
                 )
                 # 提取 finish_reason（length 表示被 max_tokens 截断 — 关键观察信号）
                 finish_reason = None
